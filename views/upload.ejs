@@ -1,0 +1,18 @@
+<%- include('layout', { body: `
+  <h2>Upload Photos</h2>
+  <form method="POST" action="/upload" enctype="multipart/form-data">
+    <label>Brand / Main folder</label>
+    <input type="text" name="brand" placeholder="e.g. Pathi Silks" required />
+
+    <label>Person / Sub folder</label>
+    <input type="text" name="person" placeholder="e.g. Sarika" required />
+
+    <label>Date</label>
+    <input type="date" name="date" required />
+
+    <label>Select images</label>
+    <input type="file" name="images" multiple accept="image/*" required />
+
+    <button type="submit">Upload</button>
+  </form>
+` }) %>

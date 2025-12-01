@@ -1,0 +1,25 @@
+<%- include('layout', { body: `
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <h2>Login</h2>
+
+      ${error ? `<p class="auth-error">${error}</p>` : ''}
+
+      <form method="POST" action="/login">
+        <label>
+          Username
+          <input type="text" name="username" required />
+        </label>
+
+        <label>
+          Password
+          <input type="password" name="password" required />
+        </label>
+
+        <button type="submit" class="btn-primary">Login</button>
+      </form>
+
+      <p class="auth-hint">Use admin or boss account to access the gallery.</p>
+    </div>
+  </div>
+` }) %>

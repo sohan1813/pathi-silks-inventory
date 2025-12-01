@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pathi Silks Inventory</title>
+  <link rel="stylesheet" href="/public/style.css" />
+</head>
+<body>
+  <header>
+    <div class="header-left">
+      <img src="/public/pathi-logo.jpg" alt="Pathi Silks logo" class="header-logo">
+      <div class="header-title">Pathi Silks Inventory</div>
+    </div>
+    <nav>
+      <a href="/login">Login</a>
+      <a href="/upload">Upload</a>
+      <a href="/gallery">Gallery</a>
+      <a href="/logout">Logout</a>
+    </nav>
+  </header>
+
+  <main>
+    <%- body %>
+  </main>
+
+  <!-- Image lightbox -->
+  <div id="lightbox" class="lightbox">
+    <span id="lightbox-close" class="lightbox-close">&times;</span>
+    <span id="lightbox-prev" class="lightbox-arrow lightbox-prev">&#10094;</span>
+    <span id="lightbox-next" class="lightbox-arrow lightbox-next">&#10095;</span>
+    <div class="lightbox-content">
+      <img id="lightbox-img" src="" alt="">
+    </div>
+  </div>
+
+  <script src="/public/lightbox.js"></script>
+</body>
+</html>
