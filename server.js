@@ -40,6 +40,12 @@ function requireLogin(role) {
 }
 
 // --- ROUTES ---
+
+// Home -> redirect to login
+app.get('/', (req, res) => {
+  res.redirect('/login');
+});
+
 app.get('/login', (req, res) => {
   res.render('login', { error: null });
 });
@@ -72,9 +78,9 @@ app.get('/upload', requireLogin('admin'), (req, res) => {
 
 // Handle upload (Brand -> Person -> Date -> Photos)
 app.post('/upload', requireLogin('admin'), (req, res) => {
-  const brand = req.body.brand || 'DefaultBrand';      // e.g. Pathi Silks
-  const person = req.body.person || 'DefaultPerson';   // e.g. Sarika
-  const date = req.body.date || 'NoDate';              // e.g. 2025-01-12
+  const brand = req.body.brand || 'DefaultBrand';
+  const person = req.body.person || 'DefaultPerson';
+  const date = req.body.date || 'NoDate';
 
   if (!req.files || !req.files.images) {
     return res.status(400).send('No files uploaded');
@@ -83,7 +89,6 @@ app.post('/upload', requireLogin('admin'), (req, res) => {
   let images = req.files.images;
   if (!Array.isArray(images)) images = [images];
 
-  // uploads/<Brand>/<Person>/<Date>/
   const albumDir = path.join(__dirname, 'uploads', brand, person, date);
   if (!fs.existsSync(albumDir)) {
     fs.mkdirSync(albumDir, { recursive: true });
@@ -118,15 +123,18 @@ app.get('/gallery', requireLogin('boss'), (req, res) => {
     return res.render('gallery', { brands: [], isAdmin: false });
   }
 
-  const brands = fs.readdirSync(uploadsDir)
+  const brands = fs
+    .readdirSync(uploadsDir)
     .filter((brandName) => fs.statSync(path.join(uploadsDir, brandName)).isDirectory())
     .map((brandName) => {
       const brandPath = path.join(uploadsDir, brandName);
-      const persons = fs.readdirSync(brandPath)
+      const persons = fs
+        .readdirSync(brandPath)
         .filter((personName) => fs.statSync(path.join(brandPath, personName)).isDirectory())
         .map((personName) => {
           const personPath = path.join(brandPath, personName);
-          const dates = fs.readdirSync(personPath)
+          const dates = fs
+            .readdirSync(personPath)
             .filter((dateName) => fs.statSync(path.join(personPath, dateName)).isDirectory())
             .map((dateName) => {
               const datePath = path.join(personPath, dateName);
@@ -154,15 +162,18 @@ app.get('/admin-gallery', requireLogin('admin'), (req, res) => {
     return res.render('gallery', { brands: [], isAdmin: true });
   }
 
-  const brands = fs.readdirSync(uploadsDir)
+  const brands = fs
+    .readdirSync(uploadsDir)
     .filter((brandName) => fs.statSync(path.join(uploadsDir, brandName)).isDirectory())
     .map((brandName) => {
       const brandPath = path.join(uploadsDir, brandName);
-      const persons = fs.readdirSync(brandPath)
+      const persons = fs
+        .readdirSync(brandPath)
         .filter((personName) => fs.statSync(path.join(brandPath, personName)).isDirectory())
         .map((personName) => {
           const personPath = path.join(brandPath, personName);
-          const dates = fs.readdirSync(personPath)
+          const dates = fs
+            .readdirSync(personPath)
             .filter((dateName) => fs.statSync(path.join(personPath, dateName)).isDirectory())
             .map((dateName) => {
               const datePath = path.join(personPath, dateName);
