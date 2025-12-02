@@ -102,6 +102,34 @@ app.post('/upload', requireLogin('admin'), (req, res) => {
   res.redirect('/upload');
 });
 
+// Admin rename photo
+app.post('/rename-photo', requireLogin('admin'), (req, res) => {
+  const { brand, person, date, oldfilename, newfilename } = req.body;
+  if (!brand || !person || !date || !oldfilename || !newfilename) {
+    return res.status(400).send('Missing data');
+  }
+
+  const oldPath = path.join(__dirname, 'uploads', brand, person, date, oldfilename);
+  
+  // Get file extension from oldfilename
+  const fileExt = path.extname(oldfilename);
+  const newNameWithExt = newfilename.includes('.') ? newfilename : newfilename + fileExt;
+  const newPath = path.join(__dirname, 'uploads', brand, person, date, newNameWithExt);
+
+  try {
+    if (fs.existsSync(oldPath)) {
+      fs.renameSync(oldPath, newPath);
+      console.log(`Renamed: ${oldfilename} → ${newNameWithExt}`);
+    } else {
+      console.log(`File not found: ${oldPath}`);
+    }
+  } catch (err) {
+    console.error('Rename error:', err);
+  }
+
+  res.redirect('/admin-gallery');
+});
+
 // Admin delete photo
 app.post('/delete-photo', requireLogin('admin'), (req, res) => {
   const { brand, person, date, filename } = req.body;
@@ -109,8 +137,13 @@ app.post('/delete-photo', requireLogin('admin'), (req, res) => {
 
   const filePath = path.join(__dirname, 'uploads', brand, person, date, filename);
 
-  if (fs.existsSync(filePath)) {
-    fs.unlinkSync(filePath);
+  try {
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+      console.log(`Deleted: ${filename}`);
+    }
+  } catch (err) {
+    console.error('Delete error:', err);
   }
 
   res.redirect('/admin-gallery');
@@ -155,7 +188,7 @@ app.get('/gallery', requireLogin('boss'), (req, res) => {
   res.render('gallery', { brands, isAdmin: false });
 });
 
-// Admin gallery view (can delete)
+// Admin gallery view (can delete and rename)
 app.get('/admin-gallery', requireLogin('admin'), (req, res) => {
   const uploadsDir = path.join(__dirname, 'uploads');
   if (!fs.existsSync(uploadsDir)) {
