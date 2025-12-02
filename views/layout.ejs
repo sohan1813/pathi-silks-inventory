@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <title>Pathi Silks Inventory</title>
   <link rel="stylesheet" href="/public/style.css" />
+  <link rel="manifest" href="/public/manifest.webmanifest" />
+  <meta name="theme-color" content="#201a2c" />
 </head>
 <body>
   <header>
@@ -16,6 +18,7 @@
       <a href="/upload">Upload</a>
       <a href="/gallery">Gallery</a>
       <a href="/logout">Logout</a>
+      <button id="installAppBtn" class="install-btn" style="display:none;">Install app</button>
     </nav>
   </header>
 
@@ -26,13 +29,40 @@
   <!-- Image lightbox -->
   <div id="lightbox" class="lightbox">
     <span id="lightbox-close" class="lightbox-close">&times;</span>
-    <span id="lightbox-prev" class="lightbox-arrow lightbox-prev">&#10094;</span>
-    <span id="lightbox-next" class="lightbox-arrow lightbox-next">&#10095;</span>
+    <span id="lightbox-prev" class="lightbox-arrow lightbox-prev">❮</span>
+    <span id="lightbox-next" class="lightbox-arrow lightbox-next">❯</span>
     <div class="lightbox-content">
       <img id="lightbox-img" src="" alt="">
     </div>
   </div>
 
   <script src="/public/lightbox.js"></script>
+
+  <script>
+    // Register service worker for PWA
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/public/sw.js');
+    }
+
+    // Custom install button handling
+    let deferredInstallPrompt = null;
+    const installBtn = document.getElementById('installAppBtn');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      if (installBtn) installBtn.style.display = 'inline-block';
+    });
+
+    if (installBtn) {
+      installBtn.addEventListener('click', async () => {
+        if (!deferredInstallPrompt) return;
+        deferredInstallPrompt.prompt();
+        await deferredInstallPrompt.userChoice;
+        deferredInstallPrompt = null;
+        installBtn.style.display = 'none';
+      });
+    }
+  </script>
 </body>
 </html>
