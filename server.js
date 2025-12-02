@@ -39,6 +39,33 @@ function requireLogin(role) {
   };
 }
 
+// --- SHEETS METADATA HELPERS ---
+function getSheetsMetadata() {
+  const metaFile = path.join(__dirname, 'uploads', 'sheets.json');
+  if (fs.existsSync(metaFile)) {
+    try {
+      return JSON.parse(fs.readFileSync(metaFile, 'utf8'));
+    } catch (err) {
+      console.error('Error reading sheets.json:', err);
+      return {};
+    }
+  }
+  return {};
+}
+
+function saveSheetsMetadata(data) {
+  const metaFile = path.join(__dirname, 'uploads', 'sheets.json');
+  const uploadsDir = path.join(__dirname, 'uploads');
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  }
+  try {
+    fs.writeFileSync(metaFile, JSON.stringify(data, null, 2));
+  } catch (err) {
+    console.error('Error saving sheets.json:', err);
+  }
+}
+
 // --- ROUTES ---
 
 // Home -> redirect to login
@@ -149,6 +176,94 @@ app.post('/delete-photo', requireLogin('admin'), (req, res) => {
   res.redirect('/admin-gallery');
 });
 
+// Add Google Sheet
+app.post('/add-sheet', requireLogin('admin'), (req, res) => {
+  const { brand, person, date, sheetId, sheetName } = req.body;
+  if (!brand || !person || !date || !sheetId) {
+    return res.status(400).send('Missing data');
+  }
+
+  const sheetsData = getSheetsMetadata();
+  const key = `${brand}/${person}/${date}`;
+  
+  if (!sheetsData[key]) {
+    sheetsData[key] = {};
+  }
+  
+  sheetsData[key].sheetId = sheetId;
+  sheetsData[key].sheetName = sheetName || 'Sales Data';
+  sheetsData[key].embedUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/edit`;
+  
+  saveSheetsMetadata(sheetsData);
+  console.log(`Added sheet: ${key}`);
+  
+  res.redirect('/admin-sheets');
+});
+
+// Remove Google Sheet
+app.post('/remove-sheet', requireLogin('admin'), (req, res) => {
+  const { brand, person, date } = req.body;
+  if (!brand || !person || !date) {
+    return res.status(400).send('Missing data');
+  }
+
+  const sheetsData = getSheetsMetadata();
+  const key = `${brand}/${person}/${date}`;
+  
+  if (sheetsData[key]) {
+    delete sheetsData[key].sheetId;
+    delete sheetsData[key].sheetName;
+    delete sheetsData[key].embedUrl;
+  }
+  
+  saveSheetsMetadata(sheetsData);
+  console.log(`Removed sheet: ${key}`);
+  
+  res.redirect('/admin-sheets');
+});
+
+// Boss sheets view
+app.get('/sheets', requireLogin('boss'), (req, res) => {
+  const sheetsMetadata = getSheetsMetadata();
+  
+  const sheets = Object.entries(sheetsMetadata)
+    .filter(([_, data]) => data.sheetId) // Only show entries with sheetId
+    .map(([key, data]) => {
+      const [brand, person, date] = key.split('/');
+      return {
+        brand,
+        person,
+        date,
+        sheetId: data.sheetId,
+        sheetName: data.sheetName || 'Sales Data',
+        embedUrl: data.embedUrl
+      };
+    });
+
+  res.render('sheets-album', { sheets, isAdmin: false });
+});
+
+// Admin sheets view
+app.get('/admin-sheets', requireLogin('admin'), (req, res) => {
+  const sheetsMetadata = getSheetsMetadata();
+  
+  const sheets = Object.entries(sheetsMetadata)
+    .filter(([_, data]) => data.sheetId) // Only show entries with sheetId
+    .map(([key, data]) => {
+      const [brand, person, date] = key.split('/');
+      return {
+        brand,
+        person,
+        date,
+        sheetId: data.sheetId,
+        sheetName: data.sheetName || 'Sales Data',
+        embedUrl: data.embedUrl
+      };
+    });
+
+  res.render('sheets-album', { sheets, isAdmin: true });
+});
+
 // Boss gallery view (Brand -> Person -> Date)
 app.get('/gallery', requireLogin('boss'), (req, res) => {
   const uploadsDir = path.join(__dirname, 'uploads');
@@ -158,7 +273,7 @@ app.get('/gallery', requireLogin('boss'), (req, res) => {
 
   const brands = fs
     .readdirSync(uploadsDir)
-    .filter((brandName) => fs.statSync(path.join(uploadsDir, brandName)).isDirectory())
+    .filter((brandName) => brandName !== 'sheets.json' && fs.statSync(path.join(uploadsDir, brandName)).isDirectory())
     .map((brandName) => {
       const brandPath = path.join(uploadsDir, brandName);
       const persons = fs
@@ -197,7 +312,7 @@ app.get('/admin-gallery', requireLogin('admin'), (req, res) => {
 
   const brands = fs
     .readdirSync(uploadsDir)
-    .filter((brandName) => fs.statSync(path.join(uploadsDir, brandName)).isDirectory())
+    .filter((brandName) => brandName !== 'sheets.json' && fs.statSync(path.join(uploadsDir, brandName)).isDirectory())
     .map((brandName) => {
       const brandPath = path.join(uploadsDir, brandName);
       const persons = fs

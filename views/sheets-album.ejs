@@ -1,0 +1,89 @@
+<%- include('layout', { body: `
+  <h2>📊 Sales Sheets</h2>
+
+  <div class="search-bar">
+    <input
+      type="text"
+      id="sheetsSearch"
+      placeholder="Search brand, person or date…"
+    />
+  </div>
+
+  ${isAdmin ? `
+    <div style="margin-bottom: 20px; padding: 15px; background: #e8f4f8; border-radius: 8px; border-left: 4px solid #4285f4;">
+      <h4 style="margin: 0 0 10px 0;">➕ Add New Sheet</h4>
+      <form method="POST" action="/add-sheet" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end;">
+        <div style="flex: 1; min-width: 150px;">
+          <label style="font-size: 12px; color: #666;">Brand</label>
+          <input type="text" name="brand" placeholder="e.g. Pathi Silks" style="width: 100%; padding: 8px; border: 1px solid #d0d4dc; border-radius: 4px; font-size: 13px;" required />
+        </div>
+        <div style="flex: 1; min-width: 150px;">
+          <label style="font-size: 12px; color: #666;">Person</label>
+          <input type="text" name="person" placeholder="e.g. Tanya Tussar" style="width: 100%; padding: 8px; border: 1px solid #d0d4dc; border-radius: 4px; font-size: 13px;" required />
+        </div>
+        <div style="flex: 1; min-width: 150px;">
+          <label style="font-size: 12px; color: #666;">Date</label>
+          <input type="date" name="date" style="width: 100%; padding: 8px; border: 1px solid #d0d4dc; border-radius: 4px; font-size: 13px;" required />
+        </div>
+        <div style="flex: 1; min-width: 200px;">
+          <label style="font-size: 12px; color: #666;">Sheet ID</label>
+          <input type="text" name="sheetId" placeholder="Google Sheet ID" style="width: 100%; padding: 8px; border: 1px solid #d0d4dc; border-radius: 4px; font-size: 13px;" required />
+        </div>
+        <div style="flex: 1; min-width: 150px;">
+          <label style="font-size: 12px; color: #666;">Sheet Name (optional)</label>
+          <input type="text" name="sheetName" placeholder="e.g. Sales Inventory" style="width: 100%; padding: 8px; border: 1px solid #d0d4dc; border-radius: 4px; font-size: 13px;" />
+        </div>
+        <button type="submit" style="padding: 8px 16px; background: #4285f4; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500;">Add Sheet</button>
+      </form>
+    </div>
+  ` : ''}
+
+  <div style="display: grid; gap: 24px;">
+    ${sheets.length === 0 ? `
+      <div style="padding: 40px; text-align: center; background: #f9f9f9; border-radius: 8px; color: #999;">
+        <p style="font-size: 16px; margin: 0;">No sheets added yet</p>
+      </div>
+    ` : `
+      ${sheets.map((sheet, idx) => `
+        <div class="sheet-card" id="sheet-${idx}" style="padding: 20px; background: #fff; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div>
+              <h3 style="margin: 0; font-size: 18px;">${sheet.brand} / ${sheet.person}</h3>
+              <p style="margin: 4px 0 0 0; font-size: 12px; color: #666;">📅 ${sheet.date} • ${sheet.sheetName}</p>
+            </div>
+            ${isAdmin ? `
+              <form method="POST" action="/remove-sheet" style="display: inline;">
+                <input type="hidden" name="brand" value="${sheet.brand}" />
+                <input type="hidden" name="person" value="${sheet.person}" />
+                <input type="hidden" name="date" value="${sheet.date}" />
+                <button type="submit" style="padding: 6px 12px; background: #ea4335; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">Remove</button>
+              </form>
+            ` : ''}
+          </div>
+          
+          <iframe 
+            src="https://docs.google.com/spreadsheets/d/\${sheet.sheetId}/preview" 
+            width="100%" 
+            height="500" 
+            style="border: none; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.1);">
+          </iframe>
+        </div>
+      `).join('')}
+    `}
+  </div>
+
+  <script>
+    const sheetsSearch = document.getElementById('sheetsSearch');
+    if (sheetsSearch) {
+      sheetsSearch.addEventListener('input', function() {
+        const term = this.value.toLowerCase().trim();
+        const cards = document.querySelectorAll('.sheet-card');
+        
+        cards.forEach(card => {
+          const text = card.textContent.toLowerCase();
+          card.style.display = text.includes(term) || !term ? 'block' : 'none';
+        });
+      });
+    }
+  </script>
+` }) %>
