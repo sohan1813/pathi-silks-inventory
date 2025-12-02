@@ -61,13 +61,23 @@
                       <img src="${file.src}" alt="${file.name}" class="lb-img" />
                       <div class="photo-filename">${file.name}</div>
                       ${isAdmin ? `
-                        <form method="POST" action="/delete-photo">
-                          <input type="hidden" name="brand" value="${brand.name}" />
-                          <input type="hidden" name="person" value="${person.name}" />
-                          <input type="hidden" name="date" value="${date.name}" />
-                          <input type="hidden" name="filename" value="${file.name}" />
-                          <button type="submit" class="delete-btn">Delete</button>
-                        </form>
+                        <div class="photo-actions">
+                          <form method="POST" action="/rename-photo" style="display: flex; gap: 4px; width: 100%;">
+                            <input type="hidden" name="brand" value="${brand.name}" />
+                            <input type="hidden" name="person" value="${person.name}" />
+                            <input type="hidden" name="date" value="${date.name}" />
+                            <input type="hidden" name="oldfilename" value="${file.name}" />
+                            <input type="text" name="newfilename" placeholder="New name" style="flex: 1; padding: 4px 6px; font-size: 11px; border: 1px solid #d0d4dc; border-radius: 4px;" required />
+                            <button type="submit" style="padding: 4px 10px; background: #207c8f; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 11px;">Rename</button>
+                          </form>
+                          <form method="POST" action="/delete-photo" style="width: 100%;">
+                            <input type="hidden" name="brand" value="${brand.name}" />
+                            <input type="hidden" name="person" value="${person.name}" />
+                            <input type="hidden" name="date" value="${date.name}" />
+                            <input type="hidden" name="filename" value="${file.name}" />
+                            <button type="submit" class="delete-btn">Delete</button>
+                          </form>
+                        </div>
                       ` : ''}
                     </div>
                   `).join('')}
