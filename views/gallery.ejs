@@ -58,7 +58,8 @@
                 <div class="photos">
                   ${date.files.map(file => `
                     <div class="photo-card">
-                      <img src="${file.src}" alt="" class="lb-img" />
+                      <img src="${file.src}" alt="${file.name}" class="lb-img" />
+                      <div class="photo-filename">${file.name}</div>
                       ${isAdmin ? `
                         <form method="POST" action="/delete-photo">
                           <input type="hidden" name="brand" value="${brand.name}" />
