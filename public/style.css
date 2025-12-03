@@ -250,16 +250,6 @@ button {
   display: block;
 }
 
-/* Small gradient overlay at bottom of image */
-.photo-card::before {
-  content: "";
-  position: absolute;
-  inset: auto 0 62px 0;
-  height: 32px;
-  background: linear-gradient(to top, rgba(15, 23, 42, 0.4), transparent);
-  pointer-events: none;
-}
-
 /* Bottom text strip */
 .photo-card-inner {
   padding: 6px 8px 8px;
