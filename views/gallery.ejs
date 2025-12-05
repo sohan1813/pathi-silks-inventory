@@ -158,7 +158,7 @@
               const match = combined.includes(term);
               db.style.display = match ? '' : 'none';
               if (match) personHasMatch = true;
-            });
+               });
 
             pb.style.display = personHasMatch ? '' : 'none';
             if (personHasMatch) brandHasMatch = true;
@@ -167,10 +167,10 @@
           sec.style.display = brandHasMatch ? '' : 'none';
         });
       }
-
+         
       if (searchInput) {
         searchInput.addEventListener('input', applySearch);
       }
     });
   </script>
-` }) %>
+` }) %>  
