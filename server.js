@@ -4,22 +4,28 @@ const fileUpload = require('express-fileupload');
 const session = require('express-session');
 const fs = require('fs');
 const path = require('path');
-const { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
+const {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+  DeleteObjectCommand,
+} = require('@aws-sdk/client-s3');
 
 const app = express();
 
 // --- S3 CONFIG ---
+// Use AWS_* env vars, plus AWS_REGION and S3_BUCKET_NAME
 const s3 = new S3Client({
-  region: process.env.S3_REGION,
+  region: process.env.AWS_REGION,
   credentials: {
-    accessKeyId: process.env.S3_ACCESS_KEY,
-    secretAccessKey: process.env.S3_SECRET_KEY,
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   },
 });
 
-const S3_BUCKET = process.env.S3_BUCKET;
+const S3_BUCKET = process.env.S3_BUCKET_NAME;
 
-// --- LOCAL METADATA FILE FOR PHOTOS (on disk, but content survives via git/S3) ---
+// --- LOCAL METADATA FILE FOR PHOTOS ---
 const PHOTOS_META_FILE = path.join(__dirname, 'uploads', 'photos.json');
 
 // --- CONFIG ---
@@ -36,8 +42,6 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload());
 app.use('/public', express.static(path.join(__dirname, 'public')));
-
-// keep for sheets.json / photos.json if needed locally
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use(
@@ -73,7 +77,6 @@ async function loadSheetsFromS3() {
     const json = Buffer.concat(chunks).toString('utf8');
     return JSON.parse(json);
   } catch (err) {
-    // If object missing, just start fresh
     if (err.name !== 'NoSuchKey' && err.$metadata?.httpStatusCode !== 404) {
       console.error('loadSheetsFromS3 error:', err);
     }
@@ -92,7 +95,6 @@ async function saveSheetsToS3(data) {
   await s3.send(command);
 }
 
-// --- SHEETS METADATA HELPERS (now via S3) ---
 async function getSheetsMetadata() {
   return await loadSheetsFromS3();
 }
@@ -101,7 +103,7 @@ async function saveSheetsMetadata(data) {
   await saveSheetsToS3(data);
 }
 
-// --- PHOTOS METADATA HELPERS (for S3 URLs, stored locally) ---
+// --- PHOTOS METADATA HELPERS (local file with S3 URLs) ---
 function getPhotosMetadata() {
   if (fs.existsSync(PHOTOS_META_FILE)) {
     try {
@@ -128,7 +130,6 @@ function savePhotosMetadata(data) {
 
 // --- ROUTES ---
 
-// Home -> redirect to login
 app.get('/', (req, res) => {
   res.redirect('/login');
 });
@@ -163,7 +164,7 @@ app.get('/upload', requireLogin('admin'), (req, res) => {
   res.render('upload');
 });
 
-// Handle upload (Brand -> Person -> Date -> Photos) TO S3
+// Handle upload TO S3
 app.post('/upload', requireLogin('admin'), async (req, res) => {
   const brand = (req.body.brand || 'DefaultBrand').trim();
   const person = (req.body.person || 'DefaultPerson').trim();
@@ -199,11 +200,10 @@ app.post('/upload', requireLogin('admin'), async (req, res) => {
           Key: s3Key,
           Body: img.data,
           ContentType: img.mimetype,
-          // no ACL because bucket has ACLs disabled
         })
       );
 
-      const url = `https://${S3_BUCKET}.s3.${process.env.S3_REGION}.amazonaws.com/${s3Key}`;
+      const url = `https://${S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${s3Key}`;
 
       photosMeta[safeBrand][safePerson][safeDate].push({
         name: fileName,
@@ -220,7 +220,7 @@ app.post('/upload', requireLogin('admin'), async (req, res) => {
   }
 });
 
-// Admin rename photo (metadata only)
+// Admin rename photo
 app.post('/rename-photo', requireLogin('admin'), (req, res) => {
   const { brand, person, date, oldfilename, newfilename } = req.body;
   if (!brand || !person || !date || !oldfilename || !newfilename) {
@@ -246,7 +246,7 @@ app.post('/rename-photo', requireLogin('admin'), (req, res) => {
   res.redirect('/admin-gallery');
 });
 
-// Admin delete photo (delete from S3 + metadata)
+// Admin delete photo
 app.post('/delete-photo', requireLogin('admin'), async (req, res) => {
   const { brand, person, date, filename } = req.body;
   if (!brand || !person || !date || !filename) {
@@ -285,7 +285,7 @@ app.post('/delete-photo', requireLogin('admin'), async (req, res) => {
   res.redirect('/admin-gallery');
 });
 
-// Add Google Sheet (now uses S3)
+// Add Google Sheet
 app.post('/add-sheet', requireLogin('admin'), async (req, res) => {
   const { brand, person, date, sheetId, sheetName } = req.body;
   if (!brand || !person || !date || !sheetId) {
@@ -309,7 +309,7 @@ app.post('/add-sheet', requireLogin('admin'), async (req, res) => {
   res.redirect('/admin-sheets');
 });
 
-// Remove Google Sheet (now uses S3)
+// Remove Google Sheet
 app.post('/remove-sheet', requireLogin('admin'), async (req, res) => {
   const { brand, person, date } = req.body;
   if (!brand || !person || !date) {
@@ -373,7 +373,7 @@ app.get('/admin-sheets', requireLogin('admin'), async (req, res) => {
   res.render('sheets-album', { sheets, isAdmin: true });
 });
 
-// Boss gallery view (Brand -> Person -> Date) from S3 metadata
+// Boss gallery view
 app.get('/gallery', requireLogin('boss'), (req, res) => {
   const photosMeta = getPhotosMetadata();
   const brands = Object.keys(photosMeta).map((brandName) => {
@@ -395,7 +395,7 @@ app.get('/gallery', requireLogin('boss'), (req, res) => {
   res.render('gallery', { brands, isAdmin: false });
 });
 
-// Admin gallery view (can delete and rename)
+// Admin gallery view
 app.get('/admin-gallery', requireLogin('admin'), (req, res) => {
   const photosMeta = getPhotosMetadata();
   const brands = Object.keys(photosMeta).map((brandName) => {
