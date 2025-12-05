@@ -1,10 +1,26 @@
+require('dotenv').config();
 const express = require('express');
 const fileUpload = require('express-fileupload');
 const session = require('express-session');
 const fs = require('fs');
 const path = require('path');
+const { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
 
 const app = express();
+
+// --- S3 CONFIG ---
+const s3 = new S3Client({
+  region: process.env.S3_REGION,
+  credentials: {
+    accessKeyId: process.env.S3_ACCESS_KEY,
+    secretAccessKey: process.env.S3_SECRET_KEY,
+  },
+});
+
+const S3_BUCKET = process.env.S3_BUCKET;
+
+// --- LOCAL METADATA FILE FOR PHOTOS (on disk, but content survives via git/S3) ---
+const PHOTOS_META_FILE = path.join(__dirname, 'uploads', 'photos.json');
 
 // --- CONFIG ---
 const PORT = process.env.PORT || 3000;
@@ -20,6 +36,8 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload());
 app.use('/public', express.static(path.join(__dirname, 'public')));
+
+// keep for sheets.json / photos.json if needed locally
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use(
@@ -39,30 +57,72 @@ function requireLogin(role) {
   };
 }
 
-// --- SHEETS METADATA HELPERS ---
-function getSheetsMetadata() {
-  const metaFile = path.join(__dirname, 'uploads', 'sheets.json');
-  if (fs.existsSync(metaFile)) {
+// --- S3 HELPERS FOR SHEETS METADATA ---
+async function loadSheetsFromS3() {
+  try {
+    const command = new GetObjectCommand({
+      Bucket: S3_BUCKET,
+      Key: 'metadata/sheets.json',
+    });
+    const response = await s3.send(command);
+
+    const chunks = [];
+    for await (const chunk of response.Body) {
+      chunks.push(chunk);
+    }
+    const json = Buffer.concat(chunks).toString('utf8');
+    return JSON.parse(json);
+  } catch (err) {
+    // If object missing, just start fresh
+    if (err.name !== 'NoSuchKey' && err.$metadata?.httpStatusCode !== 404) {
+      console.error('loadSheetsFromS3 error:', err);
+    }
+    return {};
+  }
+}
+
+async function saveSheetsToS3(data) {
+  const body = Buffer.from(JSON.stringify(data, null, 2), 'utf8');
+  const command = new PutObjectCommand({
+    Bucket: S3_BUCKET,
+    Key: 'metadata/sheets.json',
+    Body: body,
+    ContentType: 'application/json',
+  });
+  await s3.send(command);
+}
+
+// --- SHEETS METADATA HELPERS (now via S3) ---
+async function getSheetsMetadata() {
+  return await loadSheetsFromS3();
+}
+
+async function saveSheetsMetadata(data) {
+  await saveSheetsToS3(data);
+}
+
+// --- PHOTOS METADATA HELPERS (for S3 URLs, stored locally) ---
+function getPhotosMetadata() {
+  if (fs.existsSync(PHOTOS_META_FILE)) {
     try {
-      return JSON.parse(fs.readFileSync(metaFile, 'utf8'));
+      return JSON.parse(fs.readFileSync(PHOTOS_META_FILE, 'utf8'));
     } catch (err) {
-      console.error('Error reading sheets.json:', err);
+      console.error('Error reading photos.json:', err);
       return {};
     }
   }
   return {};
 }
 
-function saveSheetsMetadata(data) {
-  const metaFile = path.join(__dirname, 'uploads', 'sheets.json');
+function savePhotosMetadata(data) {
   const uploadsDir = path.join(__dirname, 'uploads');
   if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });
   }
   try {
-    fs.writeFileSync(metaFile, JSON.stringify(data, null, 2));
+    fs.writeFileSync(PHOTOS_META_FILE, JSON.stringify(data, null, 2));
   } catch (err) {
-    console.error('Error saving sheets.json:', err);
+    console.error('Error saving photos.json:', err);
   }
 }
 
@@ -103,11 +163,11 @@ app.get('/upload', requireLogin('admin'), (req, res) => {
   res.render('upload');
 });
 
-// Handle upload (Brand -> Person -> Date -> Photos)
-app.post('/upload', requireLogin('admin'), (req, res) => {
-  const brand = req.body.brand || 'DefaultBrand';
-  const person = req.body.person || 'DefaultPerson';
-  const date = req.body.date || 'NoDate';
+// Handle upload (Brand -> Person -> Date -> Photos) TO S3
+app.post('/upload', requireLogin('admin'), async (req, res) => {
+  const brand = (req.body.brand || 'DefaultBrand').trim();
+  const person = (req.body.person || 'DefaultPerson').trim();
+  const date = (req.body.date || 'NoDate').trim();
 
   if (!req.files || !req.files.images) {
     return res.status(400).send('No files uploaded');
@@ -116,118 +176,167 @@ app.post('/upload', requireLogin('admin'), (req, res) => {
   let images = req.files.images;
   if (!Array.isArray(images)) images = [images];
 
-  const albumDir = path.join(__dirname, 'uploads', brand, person, date);
-  if (!fs.existsSync(albumDir)) {
-    fs.mkdirSync(albumDir, { recursive: true });
+  const safeBrand = brand.replace(/\s+/g, '-');
+  const safePerson = person.replace(/\s+/g, '-');
+  const safeDate = date.replace(/\s+/g, '-');
+
+  const photosMeta = getPhotosMetadata();
+  if (!photosMeta[safeBrand]) photosMeta[safeBrand] = {};
+  if (!photosMeta[safeBrand][safePerson]) photosMeta[safeBrand][safePerson] = {};
+  if (!photosMeta[safeBrand][safePerson][safeDate]) {
+    photosMeta[safeBrand][safePerson][safeDate] = [];
   }
 
-  images.forEach((img) => {
-    const fileName = Date.now() + '_' + img.name;
-    img.mv(path.join(albumDir, fileName));
-  });
+  try {
+    for (const img of images) {
+      const timestamp = Date.now();
+      const fileName = `${timestamp}_${img.name}`;
+      const s3Key = `photos/${safeBrand}/${safePerson}/${safeDate}/${fileName}`;
 
-  res.redirect('/upload');
+      await s3.send(
+        new PutObjectCommand({
+          Bucket: S3_BUCKET,
+          Key: s3Key,
+          Body: img.data,
+          ContentType: img.mimetype,
+          // no ACL because bucket has ACLs disabled
+        })
+      );
+
+      const url = `https://${S3_BUCKET}.s3.${process.env.S3_REGION}.amazonaws.com/${s3Key}`;
+
+      photosMeta[safeBrand][safePerson][safeDate].push({
+        name: fileName,
+        url,
+        s3Key,
+      });
+    }
+
+    savePhotosMetadata(photosMeta);
+    res.redirect('/upload');
+  } catch (err) {
+    console.error('S3 upload error:', err);
+    res.status(500).send('Upload failed');
+  }
 });
 
-// Admin rename photo
+// Admin rename photo (metadata only)
 app.post('/rename-photo', requireLogin('admin'), (req, res) => {
   const { brand, person, date, oldfilename, newfilename } = req.body;
   if (!brand || !person || !date || !oldfilename || !newfilename) {
     return res.status(400).send('Missing data');
   }
 
-  const oldPath = path.join(__dirname, 'uploads', brand, person, date, oldfilename);
-  
-  // Get file extension from oldfilename
-  const fileExt = path.extname(oldfilename);
-  const newNameWithExt = newfilename.includes('.') ? newfilename : newfilename + fileExt;
-  const newPath = path.join(__dirname, 'uploads', brand, person, date, newNameWithExt);
+  const safeBrand = brand.replace(/\s+/g, '-');
+  const safePerson = person.replace(/\s+/g, '-');
+  const safeDate = date.replace(/\s+/g, '-');
 
-  try {
-    if (fs.existsSync(oldPath)) {
-      fs.renameSync(oldPath, newPath);
-      console.log(`Renamed: ${oldfilename} → ${newNameWithExt}`);
-    } else {
-      console.log(`File not found: ${oldPath}`);
-    }
-  } catch (err) {
-    console.error('Rename error:', err);
+  const photosMeta = getPhotosMetadata();
+  const files = photosMeta?.[safeBrand]?.[safePerson]?.[safeDate];
+  if (!files) return res.redirect('/admin-gallery');
+
+  const file = files.find((f) => f.name === oldfilename);
+  if (file) {
+    const ext = path.extname(file.name);
+    file.name = newfilename.includes('.') ? newfilename : newfilename + ext;
+    savePhotosMetadata(photosMeta);
+    console.log(`Renamed (meta): ${oldfilename} → ${file.name}`);
   }
 
   res.redirect('/admin-gallery');
 });
 
-// Admin delete photo
-app.post('/delete-photo', requireLogin('admin'), (req, res) => {
+// Admin delete photo (delete from S3 + metadata)
+app.post('/delete-photo', requireLogin('admin'), async (req, res) => {
   const { brand, person, date, filename } = req.body;
-  if (!brand || !person || !date || !filename) return res.status(400).send('Missing data');
+  if (!brand || !person || !date || !filename) {
+    return res.status(400).send('Missing data');
+  }
 
-  const filePath = path.join(__dirname, 'uploads', brand, person, date, filename);
+  const safeBrand = brand.replace(/\s+/g, '-');
+  const safePerson = person.replace(/\s+/g, '-');
+  const safeDate = date.replace(/\s+/g, '-');
+
+  const photosMeta = getPhotosMetadata();
+  const files = photosMeta?.[safeBrand]?.[safePerson]?.[safeDate];
+  if (!files) return res.redirect('/admin-gallery');
+
+  const index = files.findIndex((f) => f.name === filename);
+  if (index === -1) return res.redirect('/admin-gallery');
+
+  const file = files[index];
 
   try {
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-      console.log(`Deleted: ${filename}`);
-    }
+    await s3.send(
+      new DeleteObjectCommand({
+        Bucket: S3_BUCKET,
+        Key: file.s3Key,
+      })
+    );
+    console.log(`Deleted from S3: ${file.s3Key}`);
   } catch (err) {
-    console.error('Delete error:', err);
+    console.error('S3 delete error:', err);
   }
+
+  files.splice(index, 1);
+  savePhotosMetadata(photosMeta);
+  console.log(`Deleted from metadata: ${filename}`);
 
   res.redirect('/admin-gallery');
 });
 
-// Add Google Sheet
-app.post('/add-sheet', requireLogin('admin'), (req, res) => {
+// Add Google Sheet (now uses S3)
+app.post('/add-sheet', requireLogin('admin'), async (req, res) => {
   const { brand, person, date, sheetId, sheetName } = req.body;
   if (!brand || !person || !date || !sheetId) {
     return res.status(400).send('Missing data');
   }
 
-  const sheetsData = getSheetsMetadata();
+  const sheetsData = await getSheetsMetadata();
   const key = `${brand}/${person}/${date}`;
-  
+
   if (!sheetsData[key]) {
     sheetsData[key] = {};
   }
-  
+
   sheetsData[key].sheetId = sheetId;
   sheetsData[key].sheetName = sheetName || 'Sales Data';
   sheetsData[key].embedUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/edit`;
-  
-  saveSheetsMetadata(sheetsData);
+
+  await saveSheetsMetadata(sheetsData);
   console.log(`Added sheet: ${key}`);
-  
+
   res.redirect('/admin-sheets');
 });
 
-// Remove Google Sheet
-app.post('/remove-sheet', requireLogin('admin'), (req, res) => {
+// Remove Google Sheet (now uses S3)
+app.post('/remove-sheet', requireLogin('admin'), async (req, res) => {
   const { brand, person, date } = req.body;
   if (!brand || !person || !date) {
     return res.status(400).send('Missing data');
   }
 
-  const sheetsData = getSheetsMetadata();
+  const sheetsData = await getSheetsMetadata();
   const key = `${brand}/${person}/${date}`;
-  
+
   if (sheetsData[key]) {
     delete sheetsData[key].sheetId;
     delete sheetsData[key].sheetName;
     delete sheetsData[key].embedUrl;
   }
-  
-  saveSheetsMetadata(sheetsData);
+
+  await saveSheetsMetadata(sheetsData);
   console.log(`Removed sheet: ${key}`);
-  
+
   res.redirect('/admin-sheets');
 });
 
 // Boss sheets view
-app.get('/sheets', requireLogin('boss'), (req, res) => {
-  const sheetsMetadata = getSheetsMetadata();
-  
+app.get('/sheets', requireLogin('boss'), async (req, res) => {
+  const sheetsMetadata = await getSheetsMetadata();
+
   const sheets = Object.entries(sheetsMetadata)
-    .filter(([_, data]) => data.sheetId) // Only show entries with sheetId
+    .filter(([_, data]) => data.sheetId)
     .map(([key, data]) => {
       const [brand, person, date] = key.split('/');
       return {
@@ -236,7 +345,7 @@ app.get('/sheets', requireLogin('boss'), (req, res) => {
         date,
         sheetId: data.sheetId,
         sheetName: data.sheetName || 'Sales Data',
-        embedUrl: data.embedUrl
+        embedUrl: data.embedUrl,
       };
     });
 
@@ -244,11 +353,11 @@ app.get('/sheets', requireLogin('boss'), (req, res) => {
 });
 
 // Admin sheets view
-app.get('/admin-sheets', requireLogin('admin'), (req, res) => {
-  const sheetsMetadata = getSheetsMetadata();
-  
+app.get('/admin-sheets', requireLogin('admin'), async (req, res) => {
+  const sheetsMetadata = await getSheetsMetadata();
+
   const sheets = Object.entries(sheetsMetadata)
-    .filter(([_, data]) => data.sheetId) // Only show entries with sheetId
+    .filter(([_, data]) => data.sheetId)
     .map(([key, data]) => {
       const [brand, person, date] = key.split('/');
       return {
@@ -257,87 +366,53 @@ app.get('/admin-sheets', requireLogin('admin'), (req, res) => {
         date,
         sheetId: data.sheetId,
         sheetName: data.sheetName || 'Sales Data',
-        embedUrl: data.embedUrl
+        embedUrl: data.embedUrl,
       };
     });
 
   res.render('sheets-album', { sheets, isAdmin: true });
 });
 
-// Boss gallery view (Brand -> Person -> Date)
+// Boss gallery view (Brand -> Person -> Date) from S3 metadata
 app.get('/gallery', requireLogin('boss'), (req, res) => {
-  const uploadsDir = path.join(__dirname, 'uploads');
-  if (!fs.existsSync(uploadsDir)) {
-    return res.render('gallery', { brands: [], isAdmin: false });
-  }
-
-  const brands = fs
-    .readdirSync(uploadsDir)
-    .filter((brandName) => brandName !== 'sheets.json' && fs.statSync(path.join(uploadsDir, brandName)).isDirectory())
-    .map((brandName) => {
-      const brandPath = path.join(uploadsDir, brandName);
-      const persons = fs
-        .readdirSync(brandPath)
-        .filter((personName) => fs.statSync(path.join(brandPath, personName)).isDirectory())
-        .map((personName) => {
-          const personPath = path.join(brandPath, personName);
-          const dates = fs
-            .readdirSync(personPath)
-            .filter((dateName) => fs.statSync(path.join(personPath, dateName)).isDirectory())
-            .map((dateName) => {
-              const datePath = path.join(personPath, dateName);
-              const files = fs
-                .readdirSync(datePath)
-                .filter((f) => /\.(png|jpe?g|gif)$/i.test(f))
-                .map((f) => ({
-                  src: `/uploads/${brandName}/${personName}/${dateName}/${f}`,
-                  name: f,
-                }));
-              return { name: dateName, files };
-            });
-          return { name: personName, dates };
-        });
-      return { name: brandName, persons };
+  const photosMeta = getPhotosMetadata();
+  const brands = Object.keys(photosMeta).map((brandName) => {
+    const personsMeta = photosMeta[brandName];
+    const persons = Object.keys(personsMeta).map((personName) => {
+      const datesMeta = personsMeta[personName];
+      const dates = Object.keys(datesMeta).map((dateName) => {
+        const files = datesMeta[dateName].map((f) => ({
+          src: f.url,
+          name: f.name,
+        }));
+        return { name: dateName, files };
+      });
+      return { name: personName, dates };
     });
+    return { name: brandName, persons };
+  });
 
   res.render('gallery', { brands, isAdmin: false });
 });
 
 // Admin gallery view (can delete and rename)
 app.get('/admin-gallery', requireLogin('admin'), (req, res) => {
-  const uploadsDir = path.join(__dirname, 'uploads');
-  if (!fs.existsSync(uploadsDir)) {
-    return res.render('gallery', { brands: [], isAdmin: true });
-  }
-
-  const brands = fs
-    .readdirSync(uploadsDir)
-    .filter((brandName) => brandName !== 'sheets.json' && fs.statSync(path.join(uploadsDir, brandName)).isDirectory())
-    .map((brandName) => {
-      const brandPath = path.join(uploadsDir, brandName);
-      const persons = fs
-        .readdirSync(brandPath)
-        .filter((personName) => fs.statSync(path.join(brandPath, personName)).isDirectory())
-        .map((personName) => {
-          const personPath = path.join(brandPath, personName);
-          const dates = fs
-            .readdirSync(personPath)
-            .filter((dateName) => fs.statSync(path.join(personPath, dateName)).isDirectory())
-            .map((dateName) => {
-              const datePath = path.join(personPath, dateName);
-              const files = fs
-                .readdirSync(datePath)
-                .filter((f) => /\.(png|jpe?g|gif)$/i.test(f))
-                .map((f) => ({
-                  src: `/uploads/${brandName}/${personName}/${dateName}/${f}`,
-                  name: f,
-                }));
-              return { name: dateName, files };
-            });
-          return { name: personName, dates };
-        });
-      return { name: brandName, persons };
+  const photosMeta = getPhotosMetadata();
+  const brands = Object.keys(photosMeta).map((brandName) => {
+    const personsMeta = photosMeta[brandName];
+    const persons = Object.keys(personsMeta).map((personName) => {
+      const datesMeta = personsMeta[personName];
+      const dates = Object.keys(datesMeta).map((dateName) => {
+        const files = datesMeta[dateName].map((f) => ({
+          src: f.url,
+          name: f.name,
+        }));
+        return { name: dateName, files };
+      });
+      return { name: personName, dates };
     });
+    return { name: brandName, persons };
+  });
 
   res.render('gallery', { brands, isAdmin: true });
 });
