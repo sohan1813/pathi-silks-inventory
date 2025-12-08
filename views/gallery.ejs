@@ -1,148 +1,176 @@
-<%- include('layout', {
-  body: `
-  <h2 style="margin-bottom:18px; font-size:26px; font-weight:600;">Your Gallery</h2>
+<%- include('layout', { body: `
+  <h2>Your Gallery</h2>
 
-  <div style="margin-bottom:22px;">
+  <div class="search-bar">
     <input
       type="text"
       id="gallerySearch"
-      placeholder="Search brand, person, or date…"
-      style="
-        width: 100%;
-        padding: 13px 15px;
-        border-radius: 10px;
-        border: 1px solid #dcdcdc;
-        background: #fff;
-        font-size: 15px;
-      "
+      placeholder="Search brand, person or date… (e.g. Pathi, Tanya, 2024-02-22)"
     />
   </div>
 
-  <div class="jumper-bar"
-    style="
-      background: #fff;
-      padding: 16px;
-      border-radius: 12px;
-      border: 1px solid #e4e4e4;
-      margin-bottom: 26px;
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-    "
-  >
-    <div>
-      <label>Brand:</label><br />
-      <select id="brandSelect" class="filter-select">
-        <option value="">All brands</option>
-        ${brands.map(b => `<option value="brand-${b.name.replace(/\s+/g,'-')}">${b.name}</option>`).join('')}
-      </select>
-    </div>
-
-    <div>
-      <label>Person:</label><br />
-      <select id="personSelect" class="filter-select">
-        <option value="">All persons</option>
-        ${brands.map(b => b.persons.map(p => `
-            <option value="person-${b.name.replace(/\s+/g,'-')}-${p.name.replace(/\s+/g,'-')}">
+  ${brands.length === 0 ? '<p>No folders yet.</p>' : `
+    <div class="jumper-bar">
+      <div>
+        <label for="brandSelect">Jump to brand:</label>
+        <select id="brandSelect">
+          <option value="">All brands</option>
+          ${brands.map(b => `
+            <option value="brand-${b.name.replace(/\\s+/g, '-')}">${b.name}</option>
+          `).join('')}
+        </select>
+      </div>
+      <div>
+        <label for="personSelect">Jump to person:</label>
+        <select id="personSelect">
+          <option value="">All persons</option>
+          ${brands.map(b => b.persons.map(p => `
+            <option value="person-${b.name.replace(/\\s+/g, '-')}-${p.name.replace(/\\s+/g, '-')}">
               ${b.name} – ${p.name}
             </option>
-        `).join('')).join('')}
-      </select>
-    </div>
-
-    <div>
-      <label>Date:</label><br />
-      <select id="dateSelect" class="filter-select">
-        <option value="">All dates</option>
-        ${brands.map(b => b.persons.map(p => p.dates.map(d => `
-            <option value="date-${b.name.replace(/\s+/g,'-')}-${p.name.replace(/\s+/g,'-')}-${d.name}">
+          `).join('')).join('')}
+        </select>
+      </div>
+      <div>
+        <label for="dateSelect">Jump to date:</label>
+        <select id="dateSelect">
+          <option value="">All dates</option>
+          ${brands.map(b => b.persons.map(p => p.dates.map(d => `
+            <option value="date-${b.name.replace(/\\s+/g, '-')}-${p.name.replace(/\\s+/g, '-')}-${d.name}">
               ${b.name} – ${p.name} – ${d.name}
             </option>
-        `).join('')).join('')).join('')}
-      </select>
+          `).join('')).join('')).join('')}
+        </select>
+      </div>
     </div>
-  </div>
-
-  <style>
-    .filter-select {
-      padding: 10px;
-      width: 200px;
-      border-radius: 8px;
-      border: 1px solid #dcdcdc;
-      background: #fff;
-    }
-
-    .photo-card {
-      background: #ffffff;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 1px solid #eaeaea;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.04);
-      transition: 0.2s ease;
-    }
-
-    .photo-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 14px rgba(0,0,0,0.08);
-    }
-
-    .photos {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(190px,1fr));
-      gap: 18px;
-      margin-bottom: 30px;
-    }
-
-    .photo-card img {
-      width: 100%;
-      height: 180px;
-      object-fit: cover;
-    }
-
-    .photo-card-inner {
-      padding: 10px;
-      font-size: 14px;
-      color: #444;
-    }
-
-    h2, h3, h4 {
-      margin-top: 30px;
-      margin-bottom: 12px;
-      font-weight: 600;
-    }
-  </style>
+  `}
 
   <div class="albums">
     ${brands.map(brand => `
-      <section id="brand-${brand.name.replace(/\s+/g,'-')}">
+      <section class="album" id="brand-${brand.name.replace(/\\s+/g, '-')}">
         <h2>${brand.name}</h2>
-
         ${brand.persons.map(person => `
-          <section id="person-${brand.name.replace(/\s+/g,'-')}-${person.name.replace(/\s+/g,'-')}">
+          <section class="person-block" id="person-${brand.name.replace(/\\s+/g, '-')}-${person.name.replace(/\\s+/g, '-')}">
             <h3>${person.name}</h3>
-
             ${person.dates.map(date => `
-              <div id="date-${brand.name.replace(/\s+/g,'-')}-${person.name.replace(/\s+/g,'-')}-${date.name}">
+              <div class="date-block" id="date-${brand.name.replace(/\\s+/g, '-')}-${person.name.replace(/\\s+/g, '-')}-${date.name}">
                 <h4>${date.name}</h4>
-
                 <div class="photos">
                   ${date.files.map(file => `
                     <div class="photo-card">
-                      <img src="${file.src}" class="lb-img" />
-
+                      <img src="${file.src}" alt="${file.name}" class="lb-img" />
                       <div class="photo-card-inner">
-                        ${file.name}
+                        <div class="photo-filename">${file.name}</div>
+                        ${isAdmin ? `
+                          <div class="photo-actions">
+                            <form method="POST" action="/rename-photo" class="rename-form">
+                              <input type="hidden" name="brand" value="${brand.name}" />
+                              <input type="hidden" name="person" value="${person.name}" />
+                              <input type="hidden" name="date" value="${date.name}" />
+                              <input type="hidden" name="oldfilename" value="${file.name}" />
+                              <input
+                                type="text"
+                                name="newfilename"
+                                placeholder="New name"
+                                class="rename-input"
+                                required
+                              />
+                              <button type="submit" class="rename-btn">Rename</button>
+                            </form>
+                            <form method="POST" action="/delete-photo" class="delete-form">
+                              <input type="hidden" name="brand" value="${brand.name}" />
+                              <input type="hidden" name="person" value="${person.name}" />
+                              <input type="hidden" name="date" value="${date.name}" />
+                              <input type="hidden" name="filename" value="${file.name}" />
+                              <button type="submit" class="delete-btn">Delete</button>
+                            </form>
+                          </div>
+                        ` : ''}
                       </div>
                     </div>
                   `).join('')}
                 </div>
               </div>
             `).join('')}
-
           </section>
         `).join('')}
-
       </section>
     `).join('')}
   </div>
-` }) %>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const brandSelect = document.getElementById('brandSelect');
+      const personSelect = document.getElementById('personSelect');
+      const dateSelect = document.getElementById('dateSelect');
+
+      function jumpTo(id) {
+        if (!id) return;
+        const el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      if (brandSelect) {
+        brandSelect.addEventListener('change', function () {
+          jumpTo(this.value);
+        });
+      }
+      if (personSelect) {
+        personSelect.addEventListener('change', function () {
+          jumpTo(this.value);
+        });
+      }
+      if (dateSelect) {
+        dateSelect.addEventListener('change', function () {
+          jumpTo(this.value);
+        });
+      }
+
+      // Simple text search: brand / person / date
+      const searchInput = document.getElementById('gallerySearch');
+
+      function normalize(str) {
+        return str.toLowerCase();
+      }
+
+      function applySearch() {
+        const term = normalize(searchInput.value.trim());
+        const brandSections = document.querySelectorAll('.album');
+
+        if (!term) {
+          brandSections.forEach(sec => sec.style.display = '');
+          return;
+        }
+
+        brandSections.forEach(sec => {
+          const brandName = normalize(sec.querySelector('h2').textContent || '');
+          const personBlocks = sec.querySelectorAll('.person-block');
+          let brandHasMatch = false;
+
+          personBlocks.forEach(pb => {
+            const personName = normalize(pb.querySelector('h3').textContent || '');
+            const dateBlocks = pb.querySelectorAll('.date-block');
+            let personHasMatch = false;
+
+            dateBlocks.forEach(db => {
+              const dateText = normalize(db.querySelector('h4').textContent || '');
+              const combined = brandName + ' ' + personName + ' ' + dateText;
+              const match = combined.includes(term);
+              db.style.display = match ? '' : 'none';
+              if (match) personHasMatch = true;
+               });
+
+            pb.style.display = personHasMatch ? '' : 'none';
+            if (personHasMatch) brandHasMatch = true;
+          });
+
+          sec.style.display = brandHasMatch ? '' : 'none';
+        });
+      }
+         
+      if (searchInput) {
+        searchInput.addEventListener('input', applySearch);
+      }
+    });
+  </script>
+` }) %>  

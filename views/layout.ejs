@@ -5,85 +5,20 @@
   <title>Pathi Silks Inventory</title>
   <link rel="stylesheet" href="/public/style.css" />
   <link rel="manifest" href="/public/manifest.webmanifest" />
-  <meta name="theme-color" content="#ffffff" />
-
-  <style>
-    body {
-      font-family: Inter, sans-serif;
-      margin: 0;
-      background: #f7f6f4;
-      color: #222;
-    }
-
-    header {
-      background: #ffffff;
-      border-bottom: 1px solid #e4e4e4;
-      padding: 12px 22px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .header-logo {
-      height: 40px;
-      border-radius: 6px;
-    }
-
-    .header-title {
-      font-size: 20px;
-      font-weight: 600;
-      color: #222;
-    }
-
-    nav a {
-      margin-left: 18px;
-      text-decoration: none;
-      font-weight: 500;
-      color: #333;
-      padding: 6px 10px;
-      border-radius: 6px;
-      transition: 0.2s ease;
-    }
-
-    nav a:hover {
-      background: #eee;
-    }
-
-    main {
-      padding: 28px 40px;
-      max-width: 1400px;
-      margin: auto;
-    }
-
-    /* Lightbox override */
-    .lightbox-content img {
-      max-height: 80vh;
-      object-fit: contain;
-    }
-  </style>
+  <meta name="theme-color" content="#201a2c" />
 </head>
-
 <body>
   <header>
     <div class="header-left">
-      <img src="/public/pathi-logo.jpg" class="header-logo" />
+      <img src="/public/pathi-logo.jpg" alt="Pathi Silks logo" class="header-logo">
       <div class="header-title">Pathi Silks Inventory</div>
     </div>
-
     <nav>
       <a href="/gallery">📸 Gallery</a>
       <a href="/sheets">📊 Sheets</a>
-      <a href="/upload"⬆️ Upload</a>
+      <a href="/upload">⬆️ Upload</a>
       <a href="/logout">🚪 Logout</a>
+      <button id="installAppBtn" class="install-btn" style="display:none;">Install app</button>
     </nav>
   </header>
 
@@ -91,15 +26,43 @@
     <%- body %>
   </main>
 
+  <!-- Image lightbox -->
   <div id="lightbox" class="lightbox">
     <span id="lightbox-close" class="lightbox-close">&times;</span>
     <span id="lightbox-prev" class="lightbox-arrow lightbox-prev">❮</span>
     <span id="lightbox-next" class="lightbox-arrow lightbox-next">❯</span>
     <div class="lightbox-content">
-      <img id="lightbox-img" src="">
+      <img id="lightbox-img" src="" alt="">
     </div>
   </div>
 
   <script src="/public/lightbox.js"></script>
+
+  <script>
+    // Register service worker for PWA
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/public/sw.js');
+    }
+
+    // Custom install button handling
+    let deferredInstallPrompt = null;
+    const installBtn = document.getElementById('installAppBtn');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      if (installBtn) installBtn.style.display = 'inline-block';
+    });
+
+    if (installBtn) {
+      installBtn.addEventListener('click', async () => {
+        if (!deferredInstallPrompt) return;
+        deferredInstallPrompt.prompt();
+        await deferredInstallPrompt.userChoice;
+        deferredInstallPrompt = null;
+        installBtn.style.display = 'none';
+      });
+    }
+  </script>
 </body>
 </html>
