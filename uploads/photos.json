@@ -757,6 +757,55 @@
           "s3Key": "photos/Pathi-Silks/Tanya-Tussar/2025-06-30/1764928686346_fad1e7c1-2657-4575-b401-d7bdd5c1f9fb.jpg"
         }
       ]
+    },
+    "Tara-Tussar": {
+      "2025-01-01": [
+        {
+          "name": "1765187554869_3082.jpeg",
+          "url": "https://pathi-silks-inventory-images.s3.ap-southeast-2.amazonaws.com/photos/Pathi-Silks/Tara-Tussar/2025-01-01/1765187554869_3082.jpeg",
+          "s3Key": "photos/Pathi-Silks/Tara-Tussar/2025-01-01/1765187554869_3082.jpeg"
+        },
+        {
+          "name": "1765187556313_4008.jpeg",
+          "url": "https://pathi-silks-inventory-images.s3.ap-southeast-2.amazonaws.com/photos/Pathi-Silks/Tara-Tussar/2025-01-01/1765187556313_4008.jpeg",
+          "s3Key": "photos/Pathi-Silks/Tara-Tussar/2025-01-01/1765187556313_4008.jpeg"
+        },
+        {
+          "name": "1765187556513_4015.jpeg",
+          "url": "https://pathi-silks-inventory-images.s3.ap-southeast-2.amazonaws.com/photos/Pathi-Silks/Tara-Tussar/2025-01-01/1765187556513_4015.jpeg",
+          "s3Key": "photos/Pathi-Silks/Tara-Tussar/2025-01-01/1765187556513_4015.jpeg"
+        },
+        {
+          "name": "1765187556718_4017.jpeg",
+          "url": "https://pathi-silks-inventory-images.s3.ap-southeast-2.amazonaws.com/photos/Pathi-Silks/Tara-Tussar/2025-01-01/1765187556718_4017.jpeg",
+          "s3Key": "photos/Pathi-Silks/Tara-Tussar/2025-01-01/1765187556718_4017.jpeg"
+        },
+        {
+          "name": "1765187556938_4053.jpeg",
+          "url": "https://pathi-silks-inventory-images.s3.ap-southeast-2.amazonaws.com/photos/Pathi-Silks/Tara-Tussar/2025-01-01/1765187556938_4053.jpeg",
+          "s3Key": "photos/Pathi-Silks/Tara-Tussar/2025-01-01/1765187556938_4053.jpeg"
+        },
+        {
+          "name": "1765187557162_4055.jpeg",
+          "url": "https://pathi-silks-inventory-images.s3.ap-southeast-2.amazonaws.com/photos/Pathi-Silks/Tara-Tussar/2025-01-01/1765187557162_4055.jpeg",
+          "s3Key": "photos/Pathi-Silks/Tara-Tussar/2025-01-01/1765187557162_4055.jpeg"
+        },
+        {
+          "name": "1765187557377_4063.jpeg",
+          "url": "https://pathi-silks-inventory-images.s3.ap-southeast-2.amazonaws.com/photos/Pathi-Silks/Tara-Tussar/2025-01-01/1765187557377_4063.jpeg",
+          "s3Key": "photos/Pathi-Silks/Tara-Tussar/2025-01-01/1765187557377_4063.jpeg"
+        },
+        {
+          "name": "1765187557586_4067.jpeg",
+          "url": "https://pathi-silks-inventory-images.s3.ap-southeast-2.amazonaws.com/photos/Pathi-Silks/Tara-Tussar/2025-01-01/1765187557586_4067.jpeg",
+          "s3Key": "photos/Pathi-Silks/Tara-Tussar/2025-01-01/1765187557586_4067.jpeg"
+        },
+        {
+          "name": "1765187557801_4090.jpeg",
+          "url": "https://pathi-silks-inventory-images.s3.ap-southeast-2.amazonaws.com/photos/Pathi-Silks/Tara-Tussar/2025-01-01/1765187557801_4090.jpeg",
+          "s3Key": "photos/Pathi-Silks/Tara-Tussar/2025-01-01/1765187557801_4090.jpeg"
+        }
+      ]
     }
   }
 }

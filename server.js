@@ -1,3 +1,4 @@
+console.log('ENV REGION =', process.env.AWS_REGION);
 require('dotenv').config();
 const express = require('express');
 const fileUpload = require('express-fileupload');
@@ -14,7 +15,6 @@ const {
 const app = express();
 
 // --- S3 CONFIG ---
-// Use AWS_* env vars, plus AWS_REGION and S3_BUCKET_NAME
 const s3 = new S3Client({
   region: process.env.AWS_REGION,
   credentials: {
@@ -24,9 +24,6 @@ const s3 = new S3Client({
 });
 
 const S3_BUCKET = process.env.S3_BUCKET_NAME;
-
-// --- LOCAL METADATA FILE FOR PHOTOS ---
-const PHOTOS_META_FILE = path.join(__dirname, 'uploads', 'photos.json');
 
 // --- CONFIG ---
 const PORT = process.env.PORT || 3000;
@@ -103,29 +100,46 @@ async function saveSheetsMetadata(data) {
   await saveSheetsToS3(data);
 }
 
-// --- PHOTOS METADATA HELPERS (local file with S3 URLs) ---
-function getPhotosMetadata() {
-  if (fs.existsSync(PHOTOS_META_FILE)) {
-    try {
-      return JSON.parse(fs.readFileSync(PHOTOS_META_FILE, 'utf8'));
-    } catch (err) {
-      console.error('Error reading photos.json:', err);
-      return {};
+// --- PHOTOS METADATA HELPERS (S3 JSON) ---
+async function loadPhotosFromS3() {
+  try {
+    const command = new GetObjectCommand({
+      Bucket: S3_BUCKET,
+      Key: 'metadata/photos.json',
+    });
+    const response = await s3.send(command);
+
+    const chunks = [];
+    for await (const chunk of response.Body) {
+      chunks.push(chunk);
     }
+    const json = Buffer.concat(chunks).toString('utf8');
+    return JSON.parse(json);
+  } catch (err) {
+    if (err.name !== 'NoSuchKey' && err.$metadata?.httpStatusCode !== 404) {
+      console.error('loadPhotosFromS3 error:', err);
+    }
+    return {};
   }
-  return {};
 }
 
-function savePhotosMetadata(data) {
-  const uploadsDir = path.join(__dirname, 'uploads');
-  if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
-  }
-  try {
-    fs.writeFileSync(PHOTOS_META_FILE, JSON.stringify(data, null, 2));
-  } catch (err) {
-    console.error('Error saving photos.json:', err);
-  }
+async function savePhotosToS3(data) {
+  const body = Buffer.from(JSON.stringify(data, null, 2), 'utf8');
+  const command = new PutObjectCommand({
+    Bucket: S3_BUCKET,
+    Key: 'metadata/photos.json',
+    Body: body,
+    ContentType: 'application/json',
+  });
+  await s3.send(command);
+}
+
+async function getPhotosMetadata() {
+  return await loadPhotosFromS3();
+}
+
+async function savePhotosMetadata(data) {
+  await savePhotosToS3(data);
 }
 
 // --- ROUTES ---
@@ -181,7 +195,7 @@ app.post('/upload', requireLogin('admin'), async (req, res) => {
   const safePerson = person.replace(/\s+/g, '-');
   const safeDate = date.replace(/\s+/g, '-');
 
-  const photosMeta = getPhotosMetadata();
+  const photosMeta = await getPhotosMetadata();
   if (!photosMeta[safeBrand]) photosMeta[safeBrand] = {};
   if (!photosMeta[safeBrand][safePerson]) photosMeta[safeBrand][safePerson] = {};
   if (!photosMeta[safeBrand][safePerson][safeDate]) {
@@ -212,7 +226,7 @@ app.post('/upload', requireLogin('admin'), async (req, res) => {
       });
     }
 
-    savePhotosMetadata(photosMeta);
+    await savePhotosMetadata(photosMeta);
     res.redirect('/upload');
   } catch (err) {
     console.error('S3 upload error:', err);
@@ -221,7 +235,7 @@ app.post('/upload', requireLogin('admin'), async (req, res) => {
 });
 
 // Admin rename photo
-app.post('/rename-photo', requireLogin('admin'), (req, res) => {
+app.post('/rename-photo', requireLogin('admin'), async (req, res) => {
   const { brand, person, date, oldfilename, newfilename } = req.body;
   if (!brand || !person || !date || !oldfilename || !newfilename) {
     return res.status(400).send('Missing data');
@@ -231,7 +245,7 @@ app.post('/rename-photo', requireLogin('admin'), (req, res) => {
   const safePerson = person.replace(/\s+/g, '-');
   const safeDate = date.replace(/\s+/g, '-');
 
-  const photosMeta = getPhotosMetadata();
+  const photosMeta = await getPhotosMetadata();
   const files = photosMeta?.[safeBrand]?.[safePerson]?.[safeDate];
   if (!files) return res.redirect('/admin-gallery');
 
@@ -239,7 +253,7 @@ app.post('/rename-photo', requireLogin('admin'), (req, res) => {
   if (file) {
     const ext = path.extname(file.name);
     file.name = newfilename.includes('.') ? newfilename : newfilename + ext;
-    savePhotosMetadata(photosMeta);
+    await savePhotosMetadata(photosMeta);
     console.log(`Renamed (meta): ${oldfilename} → ${file.name}`);
   }
 
@@ -257,7 +271,7 @@ app.post('/delete-photo', requireLogin('admin'), async (req, res) => {
   const safePerson = person.replace(/\s+/g, '-');
   const safeDate = date.replace(/\s+/g, '-');
 
-  const photosMeta = getPhotosMetadata();
+  const photosMeta = await getPhotosMetadata();
   const files = photosMeta?.[safeBrand]?.[safePerson]?.[safeDate];
   if (!files) return res.redirect('/admin-gallery');
 
@@ -279,7 +293,7 @@ app.post('/delete-photo', requireLogin('admin'), async (req, res) => {
   }
 
   files.splice(index, 1);
-  savePhotosMetadata(photosMeta);
+  await savePhotosMetadata(photosMeta);
   console.log(`Deleted from metadata: ${filename}`);
 
   res.redirect('/admin-gallery');
@@ -374,8 +388,8 @@ app.get('/admin-sheets', requireLogin('admin'), async (req, res) => {
 });
 
 // Boss gallery view
-app.get('/gallery', requireLogin('boss'), (req, res) => {
-  const photosMeta = getPhotosMetadata();
+app.get('/gallery', requireLogin('boss'), async (req, res) => {
+  const photosMeta = await getPhotosMetadata();
   const brands = Object.keys(photosMeta).map((brandName) => {
     const personsMeta = photosMeta[brandName];
     const persons = Object.keys(personsMeta).map((personName) => {
@@ -396,8 +410,8 @@ app.get('/gallery', requireLogin('boss'), (req, res) => {
 });
 
 // Admin gallery view
-app.get('/admin-gallery', requireLogin('admin'), (req, res) => {
-  const photosMeta = getPhotosMetadata();
+app.get('/admin-gallery', requireLogin('admin'), async (req, res) => {
+  const photosMeta = await getPhotosMetadata();
   const brands = Object.keys(photosMeta).map((brandName) => {
     const personsMeta = photosMeta[brandName];
     const persons = Object.keys(personsMeta).map((personName) => {
