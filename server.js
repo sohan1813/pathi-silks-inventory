@@ -28,7 +28,7 @@ const S3_BUCKET = process.env.S3_BUCKET_NAME;
 // --- CONFIG ---
 const PORT = process.env.PORT || 3000;
 const ADMIN_USER = 'you';
-the ADMIN_PASS = 'yourpassword';
+const ADMIN_PASS = 'yourpassword';
 const BOSS_USER = 'boss';
 const BOSS_PASS = 'bosspassword';
 
