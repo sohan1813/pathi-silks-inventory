@@ -186,13 +186,8 @@ app.post('/upload', requireLogin('admin'), async (req, res) => {
   date = (date || 'NoDate').trim();
   galleryType = galleryType || 'main';
 
-  // If user chose "Other albums", you can force brand name or prefix if you want:
-  // Example: always store other albums under Pathi-Prints
-  if (galleryType === 'other') {
-    // Option A: keep admin-typed brand, only page decides where to show.
-    // Option B (uncomment to force specific brand):
-    // brand = 'Pathi Prints';
-  }
+  // If you want, you can force brand here when galleryType === 'other'
+  // e.g. brand = 'Pathi Prints';
 
   if (!req.files || !req.files.images) {
     return res.status(400).send('No files uploaded');
@@ -238,11 +233,8 @@ app.post('/upload', requireLogin('admin'), async (req, res) => {
 
     await savePhotosMetadata(photosMeta);
 
-    // After upload, go to the right gallery page
-    if (galleryType === 'other') {
-      return res.redirect('/other-gallery');
-    }
-    return res.redirect('/gallery');
+    // Admin should go to admin gallery, not boss routes
+    return res.redirect('/admin-gallery');
   } catch (err) {
     console.error('S3 upload error:', err);
     res.status(500).send('Upload failed');
