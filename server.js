@@ -28,7 +28,7 @@ const S3_BUCKET = process.env.S3_BUCKET_NAME;
 // --- CONFIG ---
 const PORT = process.env.PORT || 3000;
 const ADMIN_USER = 'you';
-const ADMIN_PASS = 'yourpassword';
+the ADMIN_PASS = 'yourpassword';
 const BOSS_USER = 'boss';
 const BOSS_PASS = 'bosspassword';
 
@@ -387,7 +387,7 @@ app.get('/admin-sheets', requireLogin('admin'), async (req, res) => {
   res.render('sheets-album', { sheets, isAdmin: true });
 });
 
-// Boss gallery view
+// Boss main gallery view (all brands)
 app.get('/gallery', requireLogin('boss'), async (req, res) => {
   const photosMeta = await getPhotosMetadata();
   const brands = Object.keys(photosMeta).map((brandName) => {
@@ -409,7 +409,39 @@ app.get('/gallery', requireLogin('boss'), async (req, res) => {
   res.render('gallery', { brands, isAdmin: false });
 });
 
-// Admin gallery view
+// Boss OTHER ALBUMS gallery view – choose brands for this page
+app.get('/other-gallery', requireLogin('boss'), async (req, res) => {
+  const photosMeta = await getPhotosMetadata();
+
+  const allowedBrands = ['Pathi-Prints']; // change to your safeBrand names
+
+  const filteredMeta = Object.keys(photosMeta)
+    .filter((b) => allowedBrands.includes(b))
+    .reduce((acc, b) => {
+      acc[b] = photosMeta[b];
+      return acc;
+    }, {});
+
+  const brands = Object.keys(filteredMeta).map((brandName) => {
+    const personsMeta = filteredMeta[brandName];
+    const persons = Object.keys(personsMeta).map((personName) => {
+      const datesMeta = personsMeta[personName];
+      const dates = Object.keys(datesMeta).map((dateName) => {
+        const files = datesMeta[dateName].map((f) => ({
+          src: f.url,
+          name: f.name,
+        }));
+        return { name: dateName, files };
+      });
+      return { name: personName, dates };
+    });
+    return { name: brandName, persons };
+  });
+
+  res.render('gallery', { brands, isAdmin: false });
+});
+
+// Admin gallery view (all brands)
 app.get('/admin-gallery', requireLogin('admin'), async (req, res) => {
   const photosMeta = await getPhotosMetadata();
   const brands = Object.keys(photosMeta).map((brandName) => {
