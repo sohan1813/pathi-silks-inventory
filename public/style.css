@@ -426,12 +426,15 @@ button {
 
 /* ---------- Filter / jumper bar ---------- */
 
+/* also marble here so strip matches albums */
 .jumper-bar {
   display: flex;
   gap: 16px;
   margin-bottom: 18px;
   padding: 10px 12px;
-  background: #ffffff;
+  background: url("/public/pink-marble.jpg");
+  background-size: cover;
+  background-position: center;
   border-radius: 12px;
   align-items: center;
   flex-wrap: wrap;
