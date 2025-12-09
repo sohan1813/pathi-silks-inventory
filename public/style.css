@@ -1,35 +1,16 @@
-/* Import modern font similar to banner */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-
 /* Global layout and brand feel */
 body {
-  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   margin: 0;
   padding: 0;
-  /* soft pink paper-like background */
-  background:
-    radial-gradient(circle at top, #ffd9e6 0%, #ffe8f0 35%, #ffeef4 100%);
-  color: #2b1a1f;
-}
-
-/* optional paper texture overlay (put paper-texture.jpg in /public) */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.18;
-  background-image: url("/public/paper-texture.jpg");
-  background-size: cover;
-  mix-blend-mode: multiply;
-  z-index: -1;
+  background: radial-gradient(circle at top, #fdf7f3 0, #f4ece8 45%, #f1e7e0 100%);
+  color: #1f2933;
 }
 
 main {
   max-width: 1140px;
   margin: 0 auto;
   padding: 24px 16px 44px;
-  animation: pageFade 0.22s ease-out;
 }
 
 /* Header with Pathi Silks branding */
@@ -38,9 +19,9 @@ header {
   justify-content: space-between;
   align-items: center;
   padding: 10px 18px;
-  background: linear-gradient(90deg, #0d0e11, #16181f, #101117);
+  background: #201a2c; /* deep plum */
   color: #fff;
-  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.75);
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.4);
   position: sticky;
   top: 0;
   z-index: 40;
@@ -77,13 +58,12 @@ header nav a {
   font-size: 14px;
   padding: 6px 10px;
   border-radius: 999px;
-  transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+  transition: background 0.18s ease, color 0.18s ease;
 }
 
 header nav a:hover {
   background: rgba(249, 250, 251, 0.14);
   color: #ffffff;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
 }
 
 /* Install button */
@@ -120,15 +100,14 @@ header nav a:hover {
   background: #ffffff;
   border-radius: 18px;
   padding: 26px 24px 28px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
-  border: 1px solid rgba(248, 113, 150, 0.25);
+  box-shadow: 0 20px 55px rgba(15, 23, 42, 0.2);
+  border: 1px solid rgba(148, 163, 184, 0.25);
 }
 
 .auth-card h2 {
   margin-top: 0;
   margin-bottom: 14px;
   font-size: 22px;
-  color: #111827;
 }
 
 .auth-card form {
@@ -139,7 +118,7 @@ header nav a:hover {
 
 .auth-card label {
   font-size: 13px;
-  color: #6b7280;
+  color: #4b5563;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -149,16 +128,15 @@ header nav a:hover {
   width: 100%;
   padding: 9px 10px;
   border-radius: 10px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #d0d4dc;
   font-size: 14px;
-  background: #ffffff;
-  color: #111827;
+  background: #f9fafb;
 }
 
 .auth-card input:focus {
   outline: none;
-  border-color: #f472b6;
-  box-shadow: 0 0 0 2px rgba(244, 114, 182, 0.4);
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.16);
 }
 
 /* Primary button */
@@ -168,19 +146,19 @@ header nav a:hover {
   padding: 9px 0;
   border-radius: 999px;
   border: none;
-  background: linear-gradient(90deg, #f97316, #ec4899);
+  background: linear-gradient(90deg, #7c3aed, #ec4899);
   color: #fff;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 14px 32px rgba(236, 72, 153, 0.38);
   transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
 }
 
 .btn-primary:hover {
   filter: brightness(1.06);
   transform: translateY(-1px);
-  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 18px 40px rgba(124, 58, 237, 0.45);
 }
 
 .auth-error {
@@ -193,7 +171,7 @@ header nav a:hover {
 .auth-hint {
   margin-top: 10px;
   font-size: 12px;
-  color: #6b7280;
+  color: #9ca3af;
 }
 
 /* Generic inputs & buttons (for other forms like upload) */
@@ -204,16 +182,7 @@ button {
 
 /* ---------- Albums and photos ---------- */
 
-/* big panel on top of pink background using marble texture */
 .albums {
-  max-width: 1150px;
-  margin: 32px auto 80px;
-  padding: 32px 32px 40px;
-  border-radius: 28px;
-  background: url("/public/pink-marble.jpg");
-  background-size: cover;
-  background-position: center;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
   display: flex;
   flex-direction: column;
   gap: 30px;
@@ -222,23 +191,21 @@ button {
 .album h2,
 .album h3 {
   margin-bottom: 8px;
-  color: #111827;
 }
 
 /* Person section card */
 .person-block {
   margin-top: 6px;
   padding: 14px 14px 20px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.96);
-  border: 1px solid rgba(248, 113, 150, 0.25);
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.15);
+  border-radius: 14px;
+  background: #ffffff;
+  border: 1px solid rgba(209, 213, 219, 0.8);
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.06);
 }
 
 .person-block h3 {
   font-size: 16px;
   margin-bottom: 4px;
-  color: #111827;
 }
 
 /* Date row */
@@ -262,18 +229,18 @@ button {
   gap: 12px;
 }
 
-/* Photo card – light with pink accent */
+/* Photo card – modern look */
 .photo-card {
   position: relative;
   display: flex;
   flex-direction: column;
-  background: #ffffff;
+  background: linear-gradient(180deg, #ffffff, #f9fafb);
   border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.16);
   cursor: pointer;
   transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
-  border: 1px solid rgba(248, 113, 150, 0.35);
+  border: 1px solid rgba(209, 213, 219, 0.9);
 }
 
 .photo-card img {
@@ -281,7 +248,6 @@ button {
   height: 150px;
   object-fit: cover;
   display: block;
-  border-bottom: 1px solid rgba(248, 113, 150, 0.25);
 }
 
 /* Bottom text strip */
@@ -294,7 +260,7 @@ button {
 
 .photo-filename {
   font-size: 11px;
-  color: #111827;
+  color: #374151;
   font-weight: 600;
   word-break: break-word;
   width: 100%;
@@ -305,11 +271,11 @@ button {
   line-height: 1.3;
 }
 
-/* Hover effect – gentle lift */
+/* Hover effect */
 .photo-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.22);
-  border-color: rgba(236, 72, 153, 0.8);
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.28);
+  border-color: rgba(124, 58, 237, 0.8);
 }
 
 /* Photo actions (rename + delete for admin) */
@@ -331,21 +297,20 @@ button {
   flex: 1;
   padding: 4px 6px;
   font-size: 11px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #d0d4dc;
   border-radius: 6px;
   background: #ffffff;
-  color: #111827;
 }
 
 .rename-input:focus {
   outline: none;
-  border-color: #f472b6;
-  box-shadow: 0 0 0 2px rgba(244, 114, 182, 0.35);
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.12);
 }
 
 .rename-btn {
   padding: 4px 8px;
-  background: #0ea5e9;
+  background: #207c8f;
   color: #fff;
   border: none;
   border-radius: 6px;
@@ -356,7 +321,7 @@ button {
 }
 
 .rename-btn:hover {
-  background: #0284c7;
+  background: #186177;
 }
 
 .delete-form {
@@ -368,7 +333,7 @@ button {
   width: 100%;
   padding: 4px 0 6px;
   font-size: 11px;
-  background: #dc2626;
+  background: #c0392b;
   color: #fff;
   border: none;
   border-radius: 6px;
@@ -378,7 +343,7 @@ button {
 }
 
 .delete-btn:hover {
-  background: #b91c1c;
+  background: #a83224;
 }
 
 /* ---------- Lightbox overlay ---------- */
@@ -387,7 +352,7 @@ button {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.92);
+  background: rgba(0, 0, 0, 0.9);
   justify-content: center;
   align-items: center;
   z-index: 9999;
@@ -409,7 +374,7 @@ button {
   object-fit: contain;
   display: block;
   border-radius: 10px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.9);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.7);
 }
 
 .lightbox-close {
@@ -455,33 +420,33 @@ button {
   gap: 16px;
   margin-bottom: 18px;
   padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.96);
-  border-radius: 16px;
+  background: #ffffff;
+  border-radius: 12px;
   align-items: center;
   flex-wrap: wrap;
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.18);
-  border: 1px solid rgba(248, 113, 150, 0.25);
+  box-shadow: 0 1px 6px rgba(15, 23, 42, 0.06);
+  border: 1px solid rgba(209, 213, 219, 0.7);
 }
 
 .jumper-bar label {
   margin-right: 4px;
   font-size: 13px;
-  color: #6b7280;
+  color: #4b5563;
 }
 
 .jumper-bar select {
   padding: 6px 8px;
   border-radius: 999px;
-  border: 1px solid #e5e7eb;
-  background: #ffffff;
+  border: 1px solid #d0d4dc;
+  background: #f9fafb;
   font-size: 13px;
   color: #111827;
 }
 
 .jumper-bar select:focus {
   outline: none;
-  border-color: #f472b6;
-  box-shadow: 0 0 0 2px rgba(244, 114, 182, 0.35);
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.18);
 }
 
 /* Search bar */
@@ -494,23 +459,22 @@ button {
   max-width: 360px;
   padding: 8px 12px;
   border-radius: 999px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #d0d4dc;
   background: #ffffff;
   font-size: 14px;
-  color: #111827;
-}
-
-.search-bar input::placeholder {
-  color: #9ca3af;
 }
 
 .search-bar input:focus {
   outline: none;
-  border-color: #f472b6;
-  box-shadow: 0 0 0 2px rgba(244, 114, 182, 0.35);
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.18);
 }
 
 /* Simple page fade-in */
+main {
+  animation: pageFade 0.22s ease-out;
+}
+
 @keyframes pageFade {
   from {
     opacity: 0;
