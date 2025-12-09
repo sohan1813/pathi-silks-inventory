@@ -210,7 +210,7 @@ button {
   margin: 32px auto 80px;
   padding: 32px 32px 40px;
   border-radius: 28px;
-  background: url("/public/pink-marble.png");
+  background: url("/public/pink-marble.jpg");
   background-size: cover;
   background-position: center;
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
