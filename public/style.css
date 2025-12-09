@@ -1,10 +1,13 @@
+/* Import modern font similar to banner */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
 /* Global layout and brand feel */
 body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   margin: 0;
   padding: 0;
-  background: radial-gradient(circle at top, #fdf7f3 0, #f4ece8 45%, #f1e7e0 100%);
-  color: #1f2933;
+  background: radial-gradient(circle at top left, #2b2b2f 0%, #121318 40%, #050507 100%);
+  color: #e5e7eb;
 }
 
 main {
@@ -19,9 +22,9 @@ header {
   justify-content: space-between;
   align-items: center;
   padding: 10px 18px;
-  background: #201a2c; /* deep plum */
+  background: linear-gradient(90deg, #0d0e11, #16181f, #101117);
   color: #fff;
-  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.4);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.75);
   position: sticky;
   top: 0;
   z-index: 40;
@@ -58,12 +61,13 @@ header nav a {
   font-size: 14px;
   padding: 6px 10px;
   border-radius: 999px;
-  transition: background 0.18s ease, color 0.18s ease;
+  transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
 }
 
 header nav a:hover {
   background: rgba(249, 250, 251, 0.14);
   color: #ffffff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
 }
 
 /* Install button */
@@ -97,17 +101,18 @@ header nav a:hover {
 .auth-card {
   width: 100%;
   max-width: 380px;
-  background: #ffffff;
+  background: #111318;
   border-radius: 18px;
   padding: 26px 24px 28px;
-  box-shadow: 0 20px 55px rgba(15, 23, 42, 0.2);
-  border: 1px solid rgba(148, 163, 184, 0.25);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(55, 65, 81, 0.6);
 }
 
 .auth-card h2 {
   margin-top: 0;
   margin-bottom: 14px;
   font-size: 22px;
+  color: #f9fafb;
 }
 
 .auth-card form {
@@ -118,7 +123,7 @@ header nav a:hover {
 
 .auth-card label {
   font-size: 13px;
-  color: #4b5563;
+  color: #9ca3af;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -128,15 +133,16 @@ header nav a:hover {
   width: 100%;
   padding: 9px 10px;
   border-radius: 10px;
-  border: 1px solid #d0d4dc;
+  border: 1px solid #4b5563;
   font-size: 14px;
-  background: #f9fafb;
+  background: #020617;
+  color: #e5e7eb;
 }
 
 .auth-card input:focus {
   outline: none;
   border-color: #7c3aed;
-  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.16);
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.35);
 }
 
 /* Primary button */
@@ -151,21 +157,21 @@ header nav a:hover {
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 14px 32px rgba(236, 72, 153, 0.38);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.8);
   transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
 }
 
 .btn-primary:hover {
   filter: brightness(1.06);
   transform: translateY(-1px);
-  box-shadow: 0 18px 40px rgba(124, 58, 237, 0.45);
+  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.9);
 }
 
 .auth-error {
   margin-top: 0;
   margin-bottom: 10px;
   font-size: 13px;
-  color: #b91c1c;
+  color: #fca5a5;
 }
 
 .auth-hint {
@@ -191,6 +197,7 @@ button {
 .album h2,
 .album h3 {
   margin-bottom: 8px;
+  color: #f9fafb;
 }
 
 /* Person section card */
@@ -198,14 +205,15 @@ button {
   margin-top: 6px;
   padding: 14px 14px 20px;
   border-radius: 14px;
-  background: #ffffff;
-  border: 1px solid rgba(209, 213, 219, 0.8);
-  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.06);
+  background: radial-gradient(circle at top, #191b22 0%, #101319 55%, #07080c 100%);
+  border: 1px solid rgba(55, 65, 81, 0.9);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85);
 }
 
 .person-block h3 {
   font-size: 16px;
   margin-bottom: 4px;
+  color: #f9fafb;
 }
 
 /* Date row */
@@ -216,7 +224,7 @@ button {
 .date-block h4 {
   font-size: 13px;
   font-weight: 600;
-  color: #6b7280;
+  color: #9ca3af;
   margin-bottom: 8px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -229,18 +237,18 @@ button {
   gap: 12px;
 }
 
-/* Photo card – modern look */
+/* Photo card – dark 3D look */
 .photo-card {
   position: relative;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(180deg, #ffffff, #f9fafb);
+  background: radial-gradient(circle at top, #1f2129 0%, #111318 60%, #050509 100%);
   border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.16);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.9);
   cursor: pointer;
   transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
-  border: 1px solid rgba(209, 213, 219, 0.9);
+  border: 1px solid rgba(75, 85, 99, 0.9);
 }
 
 .photo-card img {
@@ -260,7 +268,7 @@ button {
 
 .photo-filename {
   font-size: 11px;
-  color: #374151;
+  color: #e5e7eb;
   font-weight: 600;
   word-break: break-word;
   width: 100%;
@@ -274,8 +282,8 @@ button {
 /* Hover effect */
 .photo-card:hover {
   transform: translateY(-4px) scale(1.01);
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.28);
-  border-color: rgba(124, 58, 237, 0.8);
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 1);
+  border-color: rgba(250, 250, 250, 0.8);
 }
 
 /* Photo actions (rename + delete for admin) */
@@ -297,20 +305,21 @@ button {
   flex: 1;
   padding: 4px 6px;
   font-size: 11px;
-  border: 1px solid #d0d4dc;
+  border: 1px solid #4b5563;
   border-radius: 6px;
-  background: #ffffff;
+  background: #020617;
+  color: #e5e7eb;
 }
 
 .rename-input:focus {
   outline: none;
   border-color: #7c3aed;
-  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.12);
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.35);
 }
 
 .rename-btn {
   padding: 4px 8px;
-  background: #207c8f;
+  background: #0ea5e9;
   color: #fff;
   border: none;
   border-radius: 6px;
@@ -321,7 +330,7 @@ button {
 }
 
 .rename-btn:hover {
-  background: #186177;
+  background: #0284c7;
 }
 
 .delete-form {
@@ -333,7 +342,7 @@ button {
   width: 100%;
   padding: 4px 0 6px;
   font-size: 11px;
-  background: #c0392b;
+  background: #dc2626;
   color: #fff;
   border: none;
   border-radius: 6px;
@@ -343,7 +352,7 @@ button {
 }
 
 .delete-btn:hover {
-  background: #a83224;
+  background: #b91c1c;
 }
 
 /* ---------- Lightbox overlay ---------- */
@@ -352,7 +361,7 @@ button {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.9);
+  background: rgba(0, 0, 0, 0.92);
   justify-content: center;
   align-items: center;
   z-index: 9999;
@@ -374,7 +383,7 @@ button {
   object-fit: contain;
   display: block;
   border-radius: 10px;
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.7);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.9);
 }
 
 .lightbox-close {
@@ -420,33 +429,33 @@ button {
   gap: 16px;
   margin-bottom: 18px;
   padding: 10px 12px;
-  background: #ffffff;
+  background: #111318;
   border-radius: 12px;
   align-items: center;
   flex-wrap: wrap;
-  box-shadow: 0 1px 6px rgba(15, 23, 42, 0.06);
-  border: 1px solid rgba(209, 213, 219, 0.7);
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(55, 65, 81, 0.9);
 }
 
 .jumper-bar label {
   margin-right: 4px;
   font-size: 13px;
-  color: #4b5563;
+  color: #9ca3af;
 }
 
 .jumper-bar select {
   padding: 6px 8px;
   border-radius: 999px;
-  border: 1px solid #d0d4dc;
-  background: #f9fafb;
+  border: 1px solid #4b5563;
+  background: #020617;
   font-size: 13px;
-  color: #111827;
+  color: #f9fafb;
 }
 
 .jumper-bar select:focus {
   outline: none;
   border-color: #7c3aed;
-  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.18);
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.35);
 }
 
 /* Search bar */
@@ -459,15 +468,16 @@ button {
   max-width: 360px;
   padding: 8px 12px;
   border-radius: 999px;
-  border: 1px solid #d0d4dc;
-  background: #ffffff;
+  border: 1px solid #4b5563;
+  background: #020617;
   font-size: 14px;
+  color: #e5e7eb;
 }
 
 .search-bar input:focus {
   outline: none;
   border-color: #7c3aed;
-  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.18);
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.35);
 }
 
 /* Simple page fade-in */
