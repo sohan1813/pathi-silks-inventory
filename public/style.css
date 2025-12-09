@@ -117,18 +117,18 @@ header nav a:hover {
 .auth-card {
   width: 100%;
   max-width: 380px;
-  background: #111318;
+  background: #ffffff;
   border-radius: 18px;
   padding: 26px 24px 28px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8);
-  border: 1px solid rgba(55, 65, 81, 0.6);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(248, 113, 150, 0.25);
 }
 
 .auth-card h2 {
   margin-top: 0;
   margin-bottom: 14px;
   font-size: 22px;
-  color: #f9fafb;
+  color: #111827;
 }
 
 .auth-card form {
@@ -139,7 +139,7 @@ header nav a:hover {
 
 .auth-card label {
   font-size: 13px;
-  color: #9ca3af;
+  color: #6b7280;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -149,16 +149,16 @@ header nav a:hover {
   width: 100%;
   padding: 9px 10px;
   border-radius: 10px;
-  border: 1px solid #4b5563;
+  border: 1px solid #e5e7eb;
   font-size: 14px;
-  background: #020617;
-  color: #e5e7eb;
+  background: #ffffff;
+  color: #111827;
 }
 
 .auth-card input:focus {
   outline: none;
-  border-color: #7c3aed;
-  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.35);
+  border-color: #f472b6;
+  box-shadow: 0 0 0 2px rgba(244, 114, 182, 0.4);
 }
 
 /* Primary button */
@@ -168,32 +168,32 @@ header nav a:hover {
   padding: 9px 0;
   border-radius: 999px;
   border: none;
-  background: linear-gradient(90deg, #7c3aed, #ec4899);
+  background: linear-gradient(90deg, #f97316, #ec4899);
   color: #fff;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
   transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
 }
 
 .btn-primary:hover {
   filter: brightness(1.06);
   transform: translateY(-1px);
-  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.9);
+  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.25);
 }
 
 .auth-error {
   margin-top: 0;
   margin-bottom: 10px;
   font-size: 13px;
-  color: #fca5a5;
+  color: #b91c1c;
 }
 
 .auth-hint {
   margin-top: 10px;
   font-size: 12px;
-  color: #9ca3af;
+  color: #6b7280;
 }
 
 /* Generic inputs & buttons (for other forms like upload) */
@@ -204,14 +204,16 @@ button {
 
 /* ---------- Albums and photos ---------- */
 
-/* big dark panel on top of pink background */
+/* big panel on top of pink background using marble texture */
 .albums {
   max-width: 1150px;
   margin: 32px auto 80px;
   padding: 32px 32px 40px;
   border-radius: 28px;
-  background: radial-gradient(circle at top left, #252735 0%, #181824 55%, #101019 100%);
-  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.35);
+  background: url("/public/pink-marble.png");
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
   display: flex;
   flex-direction: column;
   gap: 30px;
@@ -220,23 +222,23 @@ button {
 .album h2,
 .album h3 {
   margin-bottom: 8px;
-  color: #f9fafb;
+  color: #111827;
 }
 
 /* Person section card */
 .person-block {
   margin-top: 6px;
   padding: 14px 14px 20px;
-  border-radius: 14px;
-  background: radial-gradient(circle at top, #191b22 0%, #101319 55%, #07080c 100%);
-  border: 1px solid rgba(55, 65, 81, 0.9);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(248, 113, 150, 0.25);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.15);
 }
 
 .person-block h3 {
   font-size: 16px;
   margin-bottom: 4px;
-  color: #f9fafb;
+  color: #111827;
 }
 
 /* Date row */
@@ -247,7 +249,7 @@ button {
 .date-block h4 {
   font-size: 13px;
   font-weight: 600;
-  color: #9ca3af;
+  color: #6b7280;
   margin-bottom: 8px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -260,18 +262,18 @@ button {
   gap: 12px;
 }
 
-/* Photo card – dark 3D look */
+/* Photo card – light with pink accent */
 .photo-card {
   position: relative;
   display: flex;
   flex-direction: column;
-  background: radial-gradient(circle at top, #1f2129 0%, #111318 60%, #050509 100%);
+  background: #ffffff;
   border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.9);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.15);
   cursor: pointer;
   transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
-  border: 1px solid rgba(75, 85, 99, 0.9);
+  border: 1px solid rgba(248, 113, 150, 0.35);
 }
 
 .photo-card img {
@@ -279,7 +281,7 @@ button {
   height: 150px;
   object-fit: cover;
   display: block;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(248, 113, 150, 0.25);
 }
 
 /* Bottom text strip */
@@ -292,7 +294,7 @@ button {
 
 .photo-filename {
   font-size: 11px;
-  color: #e5e7eb;
+  color: #111827;
   font-weight: 600;
   word-break: break-word;
   width: 100%;
@@ -303,11 +305,11 @@ button {
   line-height: 1.3;
 }
 
-/* Hover effect */
+/* Hover effect – gentle lift */
 .photo-card:hover {
-  transform: translateY(-4px) scale(1.01);
-  box-shadow: 0 22px 60px rgba(0, 0, 0, 1);
-  border-color: rgba(250, 250, 250, 0.8);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.22);
+  border-color: rgba(236, 72, 153, 0.8);
 }
 
 /* Photo actions (rename + delete for admin) */
@@ -329,16 +331,16 @@ button {
   flex: 1;
   padding: 4px 6px;
   font-size: 11px;
-  border: 1px solid #4b5563;
+  border: 1px solid #e5e7eb;
   border-radius: 6px;
-  background: #020617;
-  color: #e5e7eb;
+  background: #ffffff;
+  color: #111827;
 }
 
 .rename-input:focus {
   outline: none;
-  border-color: #7c3aed;
-  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.35);
+  border-color: #f472b6;
+  box-shadow: 0 0 0 2px rgba(244, 114, 182, 0.35);
 }
 
 .rename-btn {
@@ -453,33 +455,33 @@ button {
   gap: 16px;
   margin-bottom: 18px;
   padding: 10px 12px;
-  background: #111318;
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 16px;
   align-items: center;
   flex-wrap: wrap;
-  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.7);
-  border: 1px solid rgba(55, 65, 81, 0.9);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(248, 113, 150, 0.25);
 }
 
 .jumper-bar label {
   margin-right: 4px;
   font-size: 13px;
-  color: #9ca3af;
+  color: #6b7280;
 }
 
 .jumper-bar select {
   padding: 6px 8px;
   border-radius: 999px;
-  border: 1px solid #4b5563;
-  background: #020617;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
   font-size: 13px;
-  color: #f9fafb;
+  color: #111827;
 }
 
 .jumper-bar select:focus {
   outline: none;
-  border-color: #7c3aed;
-  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.35);
+  border-color: #f472b6;
+  box-shadow: 0 0 0 2px rgba(244, 114, 182, 0.35);
 }
 
 /* Search bar */
@@ -492,16 +494,20 @@ button {
   max-width: 360px;
   padding: 8px 12px;
   border-radius: 999px;
-  border: 1px solid #4b5563;
-  background: #020617;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
   font-size: 14px;
-  color: #e5e7eb;
+  color: #111827;
+}
+
+.search-bar input::placeholder {
+  color: #9ca3af;
 }
 
 .search-bar input:focus {
   outline: none;
-  border-color: #7c3aed;
-  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.35);
+  border-color: #f472b6;
+  box-shadow: 0 0 0 2px rgba(244, 114, 182, 0.35);
 }
 
 /* Simple page fade-in */
