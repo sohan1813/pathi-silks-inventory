@@ -6,14 +6,30 @@ body {
   font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   margin: 0;
   padding: 0;
-  background: radial-gradient(circle at top left, #2b2b2f 0%, #121318 40%, #050507 100%);
-  color: #e5e7eb;
+  /* soft pink paper-like background */
+  background:
+    radial-gradient(circle at top, #ffd9e6 0%, #ffe8f0 35%, #ffeef4 100%);
+  color: #2b1a1f;
+}
+
+/* optional paper texture overlay (put paper-texture.jpg in /public) */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.18;
+  background-image: url("/public/paper-texture.jpg");
+  background-size: cover;
+  mix-blend-mode: multiply;
+  z-index: -1;
 }
 
 main {
   max-width: 1140px;
   margin: 0 auto;
   padding: 24px 16px 44px;
+  animation: pageFade 0.22s ease-out;
 }
 
 /* Header with Pathi Silks branding */
@@ -188,7 +204,14 @@ button {
 
 /* ---------- Albums and photos ---------- */
 
+/* big dark panel on top of pink background */
 .albums {
+  max-width: 1150px;
+  margin: 32px auto 80px;
+  padding: 32px 32px 40px;
+  border-radius: 28px;
+  background: radial-gradient(circle at top left, #252735 0%, #181824 55%, #101019 100%);
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.35);
   display: flex;
   flex-direction: column;
   gap: 30px;
@@ -256,6 +279,7 @@ button {
   height: 150px;
   object-fit: cover;
   display: block;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 /* Bottom text strip */
@@ -481,10 +505,6 @@ button {
 }
 
 /* Simple page fade-in */
-main {
-  animation: pageFade 0.22s ease-out;
-}
-
 @keyframes pageFade {
   from {
     opacity: 0;
