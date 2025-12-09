@@ -178,16 +178,13 @@ app.get('/upload', requireLogin('admin'), (req, res) => {
   res.render('upload');
 });
 
-// Handle upload TO S3 (main + other albums)
+// Handle upload TO S3 (marks main/other, but still redirects back to /upload)
 app.post('/upload', requireLogin('admin'), async (req, res) => {
   let { brand, person, date, galleryType } = req.body;
   brand = (brand || 'DefaultBrand').trim();
   person = (person || 'DefaultPerson').trim();
   date = (date || 'NoDate').trim();
-  galleryType = galleryType || 'main';
-
-  // If you want, you can force brand here when galleryType === 'other'
-  // e.g. brand = 'Pathi Prints';
+  galleryType = galleryType === 'other' ? 'other' : 'main';  // only two values
 
   if (!req.files || !req.files.images) {
     return res.status(400).send('No files uploaded');
@@ -228,13 +225,13 @@ app.post('/upload', requireLogin('admin'), async (req, res) => {
         name: fileName,
         url,
         s3Key,
+        galleryType,      // <-- main or other
       });
     }
 
     await savePhotosMetadata(photosMeta);
-
-    // Admin should go to admin gallery, not boss routes
-    return res.redirect('/admin-gallery');
+    // behaviour same as your original code: back to upload page
+    return res.redirect('/upload');
   } catch (err) {
     console.error('S3 upload error:', err);
     res.status(500).send('Upload failed');
@@ -394,7 +391,7 @@ app.get('/admin-sheets', requireLogin('admin'), async (req, res) => {
   res.render('sheets-album', { sheets, isAdmin: true });
 });
 
-// Boss main gallery view (all brands)
+// Boss main gallery view (ONLY main gallery photos)
 app.get('/gallery', requireLogin('boss'), async (req, res) => {
   const photosMeta = await getPhotosMetadata();
   const brands = Object.keys(photosMeta).map((brandName) => {
@@ -402,53 +399,48 @@ app.get('/gallery', requireLogin('boss'), async (req, res) => {
     const persons = Object.keys(personsMeta).map((personName) => {
       const datesMeta = personsMeta[personName];
       const dates = Object.keys(datesMeta).map((dateName) => {
-        const files = datesMeta[dateName].map((f) => ({
-          src: f.url,
-          name: f.name,
-        }));
+        const files = datesMeta[dateName]
+          .filter((f) => !f.galleryType || f.galleryType === 'main')
+          .map((f) => ({
+            src: f.url,
+            name: f.name,
+          }));
         return { name: dateName, files };
-      });
+      }).filter(d => d.files.length > 0);
       return { name: personName, dates };
-    });
+    }).filter(p => p.dates.length > 0);
     return { name: brandName, persons };
-  });
+  }).filter(b => b.persons.length > 0);
 
   res.render('gallery', { brands, isAdmin: false });
 });
 
-// Boss OTHER ALBUMS gallery view – choose brands for this page
+// Boss OTHER ALBUMS gallery view (ONLY other photos)
 app.get('/other-gallery', requireLogin('boss'), async (req, res) => {
   const photosMeta = await getPhotosMetadata();
 
-  const allowedBrands = ['Pathi-Prints']; // change to your safeBrand names
-
-  const filteredMeta = Object.keys(photosMeta)
-    .filter((b) => allowedBrands.includes(b))
-    .reduce((acc, b) => {
-      acc[b] = photosMeta[b];
-      return acc;
-    }, {});
-
-  const brands = Object.keys(filteredMeta).map((brandName) => {
-    const personsMeta = filteredMeta[brandName];
+  const brands = Object.keys(photosMeta).map((brandName) => {
+    const personsMeta = photosMeta[brandName];
     const persons = Object.keys(personsMeta).map((personName) => {
       const datesMeta = personsMeta[personName];
       const dates = Object.keys(datesMeta).map((dateName) => {
-        const files = datesMeta[dateName].map((f) => ({
-          src: f.url,
-          name: f.name,
-        }));
+        const files = datesMeta[dateName]
+          .filter((f) => f.galleryType === 'other')
+          .map((f) => ({
+            src: f.url,
+            name: f.name,
+          }));
         return { name: dateName, files };
-      });
+      }).filter(d => d.files.length > 0);
       return { name: personName, dates };
-    });
+    }).filter(p => p.dates.length > 0);
     return { name: brandName, persons };
-  });
+  }).filter(b => b.persons.length > 0);
 
   res.render('gallery', { brands, isAdmin: false });
 });
 
-// Admin gallery view (all brands)
+// Admin gallery view (all brands, ALL photos)
 app.get('/admin-gallery', requireLogin('admin'), async (req, res) => {
   const photosMeta = await getPhotosMetadata();
   const brands = Object.keys(photosMeta).map((brandName) => {
