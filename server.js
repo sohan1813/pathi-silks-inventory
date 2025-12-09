@@ -225,12 +225,11 @@ app.post('/upload', requireLogin('admin'), async (req, res) => {
         name: fileName,
         url,
         s3Key,
-        galleryType,      // <-- main or other
+        galleryType,      // main or other
       });
     }
 
     await savePhotosMetadata(photosMeta);
-    // behaviour same as your original code: back to upload page
     return res.redirect('/upload');
   } catch (err) {
     console.error('S3 upload error:', err);
@@ -391,26 +390,32 @@ app.get('/admin-sheets', requireLogin('admin'), async (req, res) => {
   res.render('sheets-album', { sheets, isAdmin: true });
 });
 
-// Boss main gallery view (ONLY main gallery photos)
+// Boss main gallery view (ONLY main gallery photos, hide Salem/Sathyamangalam)
 app.get('/gallery', requireLogin('boss'), async (req, res) => {
   const photosMeta = await getPhotosMetadata();
-  const brands = Object.keys(photosMeta).map((brandName) => {
-    const personsMeta = photosMeta[brandName];
-    const persons = Object.keys(personsMeta).map((personName) => {
-      const datesMeta = personsMeta[personName];
-      const dates = Object.keys(datesMeta).map((dateName) => {
-        const files = datesMeta[dateName]
-          .filter((f) => !f.galleryType || f.galleryType === 'main')
-          .map((f) => ({
-            src: f.url,
-            name: f.name,
-          }));
-        return { name: dateName, files };
-      }).filter(d => d.files.length > 0);
-      return { name: personName, dates };
-    }).filter(p => p.dates.length > 0);
-    return { name: brandName, persons };
-  }).filter(b => b.persons.length > 0);
+
+  // Brand names to hide from Main Gallery (but still available in Other Albums)
+  const HIDE_BRANDS_FROM_MAIN = ['Salem/Sathyamangalam'];
+
+  const brands = Object.keys(photosMeta)
+    .filter((brandName) => !HIDE_BRANDS_FROM_MAIN.includes(brandName))
+    .map((brandName) => {
+      const personsMeta = photosMeta[brandName];
+      const persons = Object.keys(personsMeta).map((personName) => {
+        const datesMeta = personsMeta[personName];
+        const dates = Object.keys(datesMeta).map((dateName) => {
+          const files = datesMeta[dateName]
+            .filter((f) => !f.galleryType || f.galleryType === 'main')
+            .map((f) => ({
+              src: f.url,
+              name: f.name,
+            }));
+          return { name: dateName, files };
+        }).filter(d => d.files.length > 0);
+        return { name: personName, dates };
+      }).filter(p => p.dates.length > 0);
+      return { name: brandName, persons };
+    }).filter(b => b.persons.length > 0);
 
   res.render('gallery', { brands, isAdmin: false });
 });
