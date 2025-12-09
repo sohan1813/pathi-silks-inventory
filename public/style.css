@@ -3,7 +3,7 @@ body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   margin: 0;
   padding: 0;
-  /* outside background = smooth pink gradient (image 2) */
+  /* outside page background – pink gradient image (888.jpg) */
   background: url("/public/888.jpg") no-repeat fixed center top;
   background-size: cover;
   color: #1f2933;
@@ -13,6 +13,7 @@ main {
   max-width: 1140px;
   margin: 0 auto;
   padding: 24px 16px 44px;
+  animation: pageFade 0.22s ease-out;
 }
 
 /* Header with Pathi Silks branding */
@@ -184,7 +185,7 @@ button {
 
 /* ---------- Albums and photos ---------- */
 
-/* outer albums wrapper = MARBLE (image 3) */
+/* outer albums wrapper = MARBLE (third image) */
 .albums {
   max-width: 1150px;
   margin: 32px auto 80px;
@@ -199,12 +200,12 @@ button {
   gap: 30px;
 }
 
-.album h2,
-.album h3 {
-  margin-bottom: 8px;
+/* make each album section transparent so marble shows */
+.album {
+  background: transparent;
 }
 
-/* Person section card (inside marble, plain white) */
+/* Person section card – white on marble */
 .person-block {
   margin-top: 6px;
   padding: 14px 14px 20px;
@@ -212,6 +213,11 @@ button {
   background: #ffffff;
   border: 1px solid rgba(209, 213, 219, 0.85);
   box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
+}
+
+.album h2,
+.album h3 {
+  margin-bottom: 8px;
 }
 
 .person-block h3 {
@@ -240,7 +246,7 @@ button {
   gap: 12px;
 }
 
-/* Photo card – white, soft shadow */
+/* Photo card – white with soft shadow */
 .photo-card {
   position: relative;
   display: flex;
@@ -426,15 +432,12 @@ button {
 
 /* ---------- Filter / jumper bar ---------- */
 
-/* also marble here so strip matches albums */
 .jumper-bar {
   display: flex;
   gap: 16px;
   margin-bottom: 18px;
   padding: 10px 12px;
-  background: url("/public/pink-marble.jpg");
-  background-size: cover;
-  background-position: center;
+  background: #ffffff;
   border-radius: 12px;
   align-items: center;
   flex-wrap: wrap;
@@ -485,10 +488,6 @@ button {
 }
 
 /* Simple page fade-in */
-main {
-  animation: pageFade 0.22s ease-out;
-}
-
 @keyframes pageFade {
   from {
     opacity: 0;
