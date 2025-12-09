@@ -1,6 +1,19 @@
 <%- include('layout', { body: `
   <h2>Upload Photos</h2>
+
   <form method="POST" action="/upload" enctype="multipart/form-data">
+    <fieldset class="upload-gallery-type">
+      <legend>Upload to</legend>
+      <label>
+        <input type="radio" name="galleryType" value="main" checked />
+        Main gallery
+      </label>
+      <label>
+        <input type="radio" name="galleryType" value="other" />
+        Other albums
+      </label>
+    </fieldset>
+
     <label>Brand / Main folder</label>
     <input type="text" name="brand" placeholder="e.g. Pathi Silks" required />
 

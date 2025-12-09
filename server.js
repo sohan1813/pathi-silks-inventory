@@ -178,11 +178,21 @@ app.get('/upload', requireLogin('admin'), (req, res) => {
   res.render('upload');
 });
 
-// Handle upload TO S3
+// Handle upload TO S3 (main + other albums)
 app.post('/upload', requireLogin('admin'), async (req, res) => {
-  const brand = (req.body.brand || 'DefaultBrand').trim();
-  const person = (req.body.person || 'DefaultPerson').trim();
-  const date = (req.body.date || 'NoDate').trim();
+  let { brand, person, date, galleryType } = req.body;
+  brand = (brand || 'DefaultBrand').trim();
+  person = (person || 'DefaultPerson').trim();
+  date = (date || 'NoDate').trim();
+  galleryType = galleryType || 'main';
+
+  // If user chose "Other albums", you can force brand name or prefix if you want:
+  // Example: always store other albums under Pathi-Prints
+  if (galleryType === 'other') {
+    // Option A: keep admin-typed brand, only page decides where to show.
+    // Option B (uncomment to force specific brand):
+    // brand = 'Pathi Prints';
+  }
 
   if (!req.files || !req.files.images) {
     return res.status(400).send('No files uploaded');
@@ -227,7 +237,12 @@ app.post('/upload', requireLogin('admin'), async (req, res) => {
     }
 
     await savePhotosMetadata(photosMeta);
-    res.redirect('/upload');
+
+    // After upload, go to the right gallery page
+    if (galleryType === 'other') {
+      return res.redirect('/other-gallery');
+    }
+    return res.redirect('/gallery');
   } catch (err) {
     console.error('S3 upload error:', err);
     res.status(500).send('Upload failed');
