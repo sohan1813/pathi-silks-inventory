@@ -14,11 +14,24 @@
       <div class="header-title">Pathi Silks Inventory</div>
     </div>
     <nav>
-      <a href="/gallery">📸 Main Gallery</a>
-      <a href="/other-gallery">🗂️ Other Albums</a>
-      <a href="/sales-gallery">💰 Sales</a>
-      <a href="/sheets">📊 Sheets</a>
-      <a href="/upload">⬆️ Upload</a>
+      <!-- Boss links -->
+      <% if (typeof isAdmin === 'undefined' || !isAdmin) { %>
+        <a href="/gallery">📸 Main Gallery</a>
+        <a href="/other-gallery">🗂️ Other Albums</a>
+        <a href="/sales-gallery">💰 Sales</a>
+        <a href="/sheets">📊 Sheets</a>
+      <% } %>
+
+      <!-- Admin links -->
+      <% if (isAdmin) { %>
+        <a href="/admin-gallery">📸 Admin Gallery</a>
+        <a href="/admin-main-gallery">📸 Admin Main</a>
+        <a href="/admin-other-gallery">🗂️ Admin Other</a>
+        <a href="/admin-sales-gallery">💰 Admin Sales</a>
+        <a href="/admin-sheets">📊 Admin Sheets</a>
+        <a href="/upload">⬆️ Upload</a>
+      <% } %>
+
       <a href="/logout">🚪 Logout</a>
       <button id="installAppBtn" class="install-btn" style="display:none;">Install app</button>
     </nav>
