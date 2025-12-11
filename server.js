@@ -134,8 +134,21 @@ async function savePhotosToS3(data) {
   await s3.send(command);
 }
 
+// normalize metadata so every file has galleryType
 async function getPhotosMetadata() {
-  return await loadPhotosFromS3();
+  const meta = await loadPhotosFromS3();
+
+  Object.values(meta).forEach((persons) => {
+    Object.values(persons).forEach((dates) => {
+      Object.values(dates).forEach((files) => {
+        files.forEach((f) => {
+          if (!f.galleryType) f.galleryType = 'main';
+        });
+      });
+    });
+  });
+
+  return meta;
 }
 
 async function savePhotosMetadata(data) {
@@ -391,6 +404,32 @@ app.get('/admin-sheets', requireLogin('admin'), async (req, res) => {
     });
 
   res.render('sheets-album', { sheets, isAdmin: true });
+});
+
+// Admin gallery view (all photos, with edit/delete)
+app.get('/admin-gallery', requireLogin('admin'), async (req, res) => {
+  const photosMeta = await getPhotosMetadata();
+
+  const brands = Object.keys(photosMeta)
+    .map((brandName) => {
+      const personsMeta = photosMeta[brandName];
+      const persons = Object.keys(personsMeta).map((personName) => {
+        const datesMeta = personsMeta[personName];
+        const dates = Object.keys(datesMeta)
+          .map((dateName) => {
+            const files = datesMeta[dateName].map((f) => ({
+              src: f.url,
+              name: f.name,
+            }));
+            return { name: dateName, files };
+          })
+          .filter((d) => d.files.length > 0);
+        return { name: personName, dates };
+      }).filter((p) => p.dates.length > 0);
+      return { name: brandName, persons };
+    }).filter((b) => b.persons.length > 0);
+
+  res.render('gallery', { brands, isAdmin: true, galleryTitle: 'Admin – All Photos' });
 });
 
 // Boss main gallery (main photos only, hide some brands)
