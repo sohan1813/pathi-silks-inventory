@@ -1,73 +1,84 @@
-<%- include('layout', { body: `
-  <h2>${typeof galleryTitle !== 'undefined' ? galleryTitle : 'Your Gallery'}</h2>
+<%- include('layout', { body: '' }) %>
 
-  <div class="search-bar">
-    <input
-      type="text"
-      id="gallerySearch"
-      placeholder="Search brand, person or date… (e.g. Pathi, Tanya, 2024-02-22)"
-    />
+<h2><%= typeof galleryTitle !== 'undefined' ? galleryTitle : 'Your Gallery' %></h2>
+
+<div class="search-bar">
+  <input
+    type="text"
+    id="gallerySearch"
+    placeholder="Search brand, person or date… (e.g. Pathi, Tanya, 2024-02-22)"
+  />
+</div>
+
+<% if (!brands || brands.length === 0) { %>
+  <p>No folders yet.</p>
+<% } else { %>
+  <div class="jumper-bar">
+    <div>
+      <label for="brandSelect">Jump to brand:</label>
+      <select id="brandSelect">
+        <option value="">All brands</option>
+        <% brands.forEach(function (b) { %>
+          <option value="brand-<%= b.name.replace(/\s+/g, '-') %>"><%= b.name %></option>
+        <% }); %>
+      </select>
+    </div>
+    <div>
+      <label for="personSelect">Jump to person:</label>
+      <select id="personSelect">
+        <option value="">All persons</option>
+        <% brands.forEach(function (b) { %>
+          <% b.persons.forEach(function (p) { %>
+            <option value="person-<%= b.name.replace(/\s+/g, '-') %>-<%= p.name.replace(/\s+/g, '-') %>">
+              <%= b.name %> – <%= p.name %>
+            </option>
+          <% }); %>
+        <% }); %>
+      </select>
+    </div>
+    <div>
+      <label for="dateSelect">Jump to date:</label>
+      <select id="dateSelect">
+        <option value="">All dates</option>
+        <% brands.forEach(function (b) { %>
+          <% b.persons.forEach(function (p) { %>
+            <% p.dates.forEach(function (d) { %>
+              <option value="date-<%= b.name.replace(/\s+/g, '-') %>-<%= p.name.replace(/\s+/g, '-') %>-<%= d.name %>">
+                <%= b.name %> – <%= p.name %> – <%= d.name %>
+              </option>
+            <% }); %>
+          <% }); %>
+        <% }); %>
+      </select>
+    </div>
   </div>
 
-  ${brands.length === 0 ? '<p>No folders yet.</p>' : `
-    <div class="jumper-bar">
-      <div>
-        <label for="brandSelect">Jump to brand:</label>
-        <select id="brandSelect">
-          <option value="">All brands</option>
-          ${brands.map(b => `
-            <option value="brand-${b.name.replace(/\\s+/g, '-')}">${b.name}</option>
-          `).join('')}
-        </select>
-      </div>
-      <div>
-        <label for="personSelect">Jump to person:</label>
-        <select id="personSelect">
-          <option value="">All persons</option>
-          ${brands.map(b => b.persons.map(p => `
-            <option value="person-${b.name.replace(/\\s+/g, '-')}-${p.name.replace(/\\s+/g, '-')}">
-              ${b.name} – ${p.name}
-            </option>
-          `).join('')).join('')}
-        </select>
-      </div>
-      <div>
-        <label for="dateSelect">Jump to date:</label>
-        <select id="dateSelect">
-          <option value="">All dates</option>
-          ${brands.map(b => b.persons.map(p => p.dates.map(d => `
-            <option value="date-${b.name.replace(/\\s+/g, '-')}-${p.name.replace(/\\s+/g, '-')}-${d.name}">
-              ${b.name} – ${p.name} – ${d.name}
-            </option>
-          `).join('')).join('')).join('')}
-        </select>
-      </div>
-    </div>
-  `}
-
   <div class="albums">
-    ${brands.map(brand => `
-      <section class="album" id="brand-${brand.name.replace(/\\s+/g, '-')}">
-        <h2>${brand.name}</h2>
-        ${brand.persons.map(person => `
-          <section class="person-block" id="person-${brand.name.replace(/\\s+/g, '-')}-${person.name.replace(/\\s+/g, '-')}">
-            <h3>${person.name}</h3>
-            ${person.dates.map(date => `
-              <div class="date-block" id="date-${brand.name.replace(/\\s+/g, '-')}-${person.name.replace(/\\s+/g, '-')}-${date.name}">
-                <h4>${date.name}</h4>
+    <% brands.forEach(function (brand) { %>
+      <section class="album" id="brand-<%= brand.name.replace(/\s+/g, '-') %>">
+        <h2><%= brand.name %></h2>
+
+        <% brand.persons.forEach(function (person) { %>
+          <section class="person-block" id="person-<%= brand.name.replace(/\s+/g, '-') %>-<%= person.name.replace(/\s+/g, '-') %>">
+            <h3><%= person.name %></h3>
+
+            <% person.dates.forEach(function (date) { %>
+              <div class="date-block" id="date-<%= brand.name.replace(/\s+/g, '-') %>-<%= person.name.replace(/\s+/g, '-') %>-<%= date.name %>">
+                <h4><%= date.name %></h4>
                 <div class="photos">
-                  ${date.files.map(file => `
+                  <% date.files.forEach(function (file) { %>
                     <div class="photo-card">
-                      <img src="${file.src}" alt="${file.name}" class="lb-img" />
+                      <img src="<%= file.src %>" alt="<%= file.name %>" class="lb-img" />
                       <div class="photo-card-inner">
-                        <div class="photo-filename">${file.name}</div>
-                        ${isAdmin ? `
+                        <div class="photo-filename"><%= file.name %></div>
+
+                        <% if (isAdmin) { %>
                           <div class="photo-actions">
                             <form method="POST" action="/rename-photo" class="rename-form">
-                              <input type="hidden" name="brand" value="${brand.name}" />
-                              <input type="hidden" name="person" value="${person.name}" />
-                              <input type="hidden" name="date" value="${date.name}" />
-                              <input type="hidden" name="oldfilename" value="${file.name}" />
+                              <input type="hidden" name="brand" value="<%= brand.name %>" />
+                              <input type="hidden" name="person" value="<%= person.name %>" />
+                              <input type="hidden" name="date" value="<%= date.name %>" />
+                              <input type="hidden" name="oldfilename" value="<%= file.name %>" />
                               <input
                                 type="text"
                                 name="newfilename"
@@ -77,99 +88,100 @@
                               />
                               <button type="submit" class="rename-btn">Rename</button>
                             </form>
+
                             <form method="POST" action="/delete-photo" class="delete-form">
-                              <input type="hidden" name="brand" value="${brand.name}" />
-                              <input type="hidden" name="person" value="${person.name}" />
-                              <input type="hidden" name="date" value="${date.name}" />
-                              <input type="hidden" name="filename" value="${file.name}" />
+                              <input type="hidden" name="brand" value="<%= brand.name %>" />
+                              <input type="hidden" name="person" value="<%= person.name %>" />
+                              <input type="hidden" name="date" value="<%= date.name %>" />
+                              <input type="hidden" name="filename" value="<%= file.name %>" />
                               <button type="submit" class="delete-btn">Delete</button>
                             </form>
                           </div>
-                        ` : ''}
+                        <% } %>
                       </div>
                     </div>
-                  `).join('')}
+                  <% }); %>
                 </div>
               </div>
-            `).join('')}
+            <% }); %>
           </section>
-        `).join('')}
+        <% }); %>
       </section>
-    `).join('')}
+    <% }); %>
   </div>
+<% } %>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const brandSelect = document.getElementById('brandSelect');
-      const personSelect = document.getElementById('personSelect');
-      const dateSelect = document.getElementById('dateSelect');
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const brandSelect = document.getElementById('brandSelect');
+    const personSelect = document.getElementById('personSelect');
+    const dateSelect = document.getElementById('dateSelect');
 
-      function jumpTo(id) {
-        if (!id) return;
-        const el = document.getElementById(id);
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    function jumpTo(id) {
+      if (!id) return;
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    if (brandSelect) {
+      brandSelect.addEventListener('change', function () {
+        jumpTo(this.value);
+      });
+    }
+    if (personSelect) {
+      personSelect.addEventListener('change', function () {
+        jumpTo(this.value);
+      });
+    }
+    if (dateSelect) {
+      dateSelect.addEventListener('change', function () {
+        jumpTo(this.value);
+      });
+    }
+
+    const searchInput = document.getElementById('gallerySearch');
+
+    function normalize(str) {
+      return str.toLowerCase();
+    }
+
+    function applySearch() {
+      const term = normalize(searchInput.value.trim());
+      const brandSections = document.querySelectorAll('.album');
+
+      if (!term) {
+        brandSections.forEach(sec => sec.style.display = '');
+        return;
       }
 
-      if (brandSelect) {
-        brandSelect.addEventListener('change', function () {
-          jumpTo(this.value);
-        });
-      }
-      if (personSelect) {
-        personSelect.addEventListener('change', function () {
-          jumpTo(this.value);
-        });
-      }
-      if (dateSelect) {
-        dateSelect.addEventListener('change', function () {
-          jumpTo(this.value);
-        });
-      }
+      brandSections.forEach(sec => {
+        const brandName = normalize(sec.querySelector('h2').textContent || '');
+        const personBlocks = sec.querySelectorAll('.person-block');
+        let brandHasMatch = false;
 
-      // Simple text search: brand / person / date
-      const searchInput = document.getElementById('gallerySearch');
+        personBlocks.forEach(pb => {
+          const personName = normalize(pb.querySelector('h3').textContent || '');
+          const dateBlocks = pb.querySelectorAll('.date-block');
+          let personHasMatch = false;
 
-      function normalize(str) {
-        return str.toLowerCase();
-      }
-
-      function applySearch() {
-        const term = normalize(searchInput.value.trim());
-        const brandSections = document.querySelectorAll('.album');
-
-        if (!term) {
-          brandSections.forEach(sec => sec.style.display = '');
-          return;
-        }
-
-        brandSections.forEach(sec => {
-          const brandName = normalize(sec.querySelector('h2').textContent || '');
-          const personBlocks = sec.querySelectorAll('.person-block');
-          let brandHasMatch = false;
-
-          personBlocks.forEach(pb => {
-            const personName = normalize(pb.querySelector('h3').textContent || '');
-            const dateBlocks = pb.querySelectorAll('.date-block');
-            let personHasMatch = false;
-
-            dateBlocks.forEach(db => {
-              const dateText = normalize(db.querySelector('h4').textContent || '');
-              const combined = brandName + ' ' + personName + ' ' + dateText;
-              const match = combined.includes(term);
-              db.style.display = match ? '' : 'none';
-              if (match) personHasMatch = true;
-            });
-
-            pb.style.display = personHasMatch ? '' : 'none';
-            if (personHasMatch) brandHasMatch = true;
+          dateBlocks.forEach(db => {
+            const dateText = normalize(db.querySelector('h4').textContent || '');
+            const combined = brandName + ' ' + personName + ' ' + dateText;
+            const match = combined.includes(term);
+            db.style.display = match ? '' : 'none';
+            if (match) personHasMatch = true;
           });
 
-          sec.style.display = brandHasMatch ? '' : 'none';
+          pb.style.display = personHasMatch ? '' : 'none';
+          if (personHasMatch) brandHasMatch = true;
         });
-      }
 
-      if (searchInput) {
-        searchInput.addEventListener('input', applySearch);
-      }
-    });
-  </script
+        sec.style.display = brandHasMatch ? '' : 'none';
+      });
+    }
+
+    if (searchInput) {
+      searchInput.addEventListener('input', applySearch);
+    }
+  });
+</script>
