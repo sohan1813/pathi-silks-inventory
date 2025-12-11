@@ -269,4 +269,212 @@ app.post('/rename-photo', requireLogin('admin'), async (req, res) => {
 // Admin delete photo
 app.post('/delete-photo', requireLogin('admin'), async (req, res) => {
   const { brand, person, date, filename } = req.body;
-  if (!brand || !person || !date
+  if (!brand || !person || !date || !filename) {
+    return res.status(400).send('Missing data');
+  }
+
+  const safeBrand = brand.replace(/\s+/g, '-');
+  const safePerson = person.replace(/\s+/g, '-');
+  const safeDate = date.replace(/\s+/g, '-');
+
+  const photosMeta = await getPhotosMetadata();
+  const files = photosMeta?.[safeBrand]?.[safePerson]?.[safeDate];
+  if (!files) return res.redirect('/admin-gallery');
+
+  const index = files.findIndex((f) => f.name === filename);
+  if (index === -1) return res.redirect('/admin-gallery');
+
+  const file = files[index];
+
+  try {
+    await s3.send(
+      new DeleteObjectCommand({
+        Bucket: S3_BUCKET,
+        Key: file.s3Key,
+      })
+    );
+    console.log(`Deleted from S3: ${file.s3Key}`);
+  } catch (err) {
+    console.error('S3 delete error:', err);
+  }
+
+  files.splice(index, 1);
+  await savePhotosMetadata(photosMeta);
+  console.log(`Deleted from metadata: ${filename}`);
+
+  res.redirect('/admin-gallery');
+});
+
+// Add Google Sheet
+app.post('/add-sheet', requireLogin('admin'), async (req, res) => {
+  const { brand, person, date, sheetId, sheetName } = req.body;
+  if (!brand || !person || !date || !sheetId) {
+    return res.status(400).send('Missing data');
+  }
+
+  const sheetsData = await getSheetsMetadata();
+  const key = `${brand}/${person}/${date}`;
+
+  if (!sheetsData[key]) {
+    sheetsData[key] = {};
+  }
+
+  sheetsData[key].sheetId = sheetId;
+  sheetsData[key].sheetName = sheetName || 'Sales Data';
+  sheetsData[key].embedUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/edit`;
+
+  await saveSheetsMetadata(sheetsData);
+  console.log(`Added sheet: ${key}`);
+
+  res.redirect('/admin-sheets');
+});
+
+// Remove Google Sheet
+app.post('/remove-sheet', requireLogin('admin'), async (req, res) => {
+  const { brand, person, date } = req.body;
+  if (!brand || !person || !date) {
+    return res.status(400).send('Missing data');
+  }
+
+  const sheetsData = await getSheetsMetadata();
+  const key = `${brand}/${person}/${date}`;
+
+  if (sheetsData[key]) {
+    delete sheetsData[key].sheetId;
+    delete sheetsData[key].sheetName;
+    delete sheetsData[key].embedUrl;
+  }
+
+  await saveSheetsMetadata(sheetsData);
+  console.log(`Removed sheet: ${key}`);
+
+  res.redirect('/admin-sheets');
+});
+
+// Boss sheets view
+app.get('/sheets', requireLogin('boss'), async (req, res) => {
+  const sheetsMetadata = await getSheetsMetadata();
+
+  const sheets = Object.entries(sheetsMetadata)
+    .filter(([_, data]) => data.sheetId)
+    .map(([key, data]) => {
+      const [brand, person, date] = key.split('/');
+      return {
+        brand,
+        person,
+        date,
+        sheetId: data.sheetId,
+        sheetName: data.sheetName || 'Sales Data',
+        embedUrl: data.embedUrl,
+      };
+    });
+
+  res.render('sheets-album', { sheets, isAdmin: false });
+});
+
+// Admin sheets view
+app.get('/admin-sheets', requireLogin('admin'), async (req, res) => {
+  const sheetsMetadata = await getSheetsMetadata();
+
+  const sheets = Object.entries(sheetsMetadata)
+    .filter(([_, data]) => data.sheetId)
+    .map(([key, data]) => {
+      const [brand, person, date] = key.split('/');
+      return {
+        brand,
+        person,
+        date,
+        sheetId: data.sheetId,
+        sheetName: data.sheetName || 'Sales Data',
+        embedUrl: data.embedUrl,
+      };
+    });
+
+  res.render('sheets-album', { sheets, isAdmin: true });
+});
+
+// Boss main gallery (main photos only, hide some brands)
+app.get('/gallery', requireLogin('boss'), async (req, res) => {
+  const photosMeta = await getPhotosMetadata();
+
+  const HIDE_BRANDS_FROM_MAIN = ['Salem/Sathyamangalam'];
+
+  const brands = Object.keys(photosMeta)
+    .filter((brandName) => !HIDE_BRANDS_FROM_MAIN.includes(brandName))
+    .map((brandName) => {
+      const personsMeta = photosMeta[brandName];
+      const persons = Object.keys(personsMeta).map((personName) => {
+        const datesMeta = personsMeta[personName];
+        const dates = Object.keys(datesMeta)
+          .map((dateName) => {
+            const files = datesMeta[dateName]
+              .filter((f) => !f.galleryType || f.galleryType === 'main')
+              .map((f) => ({
+                src: f.url,
+                name: f.name,
+              }));
+            return { name: dateName, files };
+          })
+          .filter((d) => d.files.length > 0);
+        return { name: personName, dates };
+      }).filter((p) => p.dates.length > 0);
+      return { name: brandName, persons };
+    }).filter((b) => b.persons.length > 0);
+
+  res.render('gallery', { brands, isAdmin: false, galleryTitle: 'Your Gallery' });
+});
+
+// Boss OTHER ALBUMS gallery (only other)
+app.get('/other-gallery', requireLogin('boss'), async (req, res) => {
+  const photosMeta = await getPhotosMetadata();
+
+  const brands = Object.keys(photosMeta)
+    .map((brandName) => {
+      const personsMeta = photosMeta[brandName];
+      const persons = Object.keys(personsMeta).map((personName) => {
+        const datesMeta = personsMeta[personName];
+        const dates = Object.keys(datesMeta)
+          .map((dateName) => {
+            const files = datesMeta[dateName]
+              .filter((f) => f.galleryType === 'other')
+              .map((f) => ({
+                src: f.url,
+                name: f.name,
+              }));
+            return { name: dateName, files };
+          })
+          .filter((d) => d.files.length > 0);
+        return { name: personName, dates };
+      }).filter((p) => p.dates.length > 0);
+      return { name: brandName, persons };
+    }).filter((b) => b.persons.length > 0);
+
+  res.render('gallery', { brands, isAdmin: false, galleryTitle: 'Other Albums' });
+});
+
+// Boss SALES gallery (only sales)
+app.get('/sales-gallery', requireLogin('boss'), async (req, res) => {
+  const photosMeta = await getPhotosMetadata();
+
+  const brands = Object.keys(photosMeta)
+    .map((brandName) => {
+      const personsMeta = photosMeta[brandName];
+      const persons = Object.keys(personsMeta).map((personName) => {
+        const datesMeta = personsMeta[personName];
+        const dates = Object.keys(datesMeta)
+          .map((dateName) => {
+            const files = datesMeta[dateName]
+              .filter((f) => f.galleryType === 'sales')
+              .map((f) => ({
+                src: f.url,
+                name: f.name,
+              }));
+            return { name: dateName, files };
+          })
+          .filter((d) => d.files.length > 0);
+        return { name: personName, dates };
+      }).filter((p) => p.dates.length > 0);
+      return { name: brandName, persons };
+    }).filter((b) => b.persons.length > 0);
+
+  res.render('gallery', { brands, isAdmin: false, galleryTitle 
