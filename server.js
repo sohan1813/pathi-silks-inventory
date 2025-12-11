@@ -477,4 +477,10 @@ app.get('/sales-gallery', requireLogin('boss'), async (req, res) => {
       return { name: brandName, persons };
     }).filter((b) => b.persons.length > 0);
 
-  res.render('gallery', { brands, isAdmin: false, galleryTitle 
+  res.render('gallery', { brands, isAdmin: false, galleryTitle: 'Sales Gallery' });
+});
+
+// --- START SERVER ---
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
