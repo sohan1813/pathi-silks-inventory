@@ -8,6 +8,8 @@
   <meta name="theme-color" content="#201a2c" />
 </head>
 <body>
+  <% if (typeof isAdmin === 'undefined') { isAdmin = false; } %>
+
   <header>
     <div class="header-left">
       <img src="/public/pathi-logo.jpg" alt="Pathi Silks logo" class="header-logo">
@@ -15,7 +17,7 @@
     </div>
     <nav>
       <!-- Boss links -->
-      <% if (typeof isAdmin === 'undefined' || !isAdmin) { %>
+      <% if (!isAdmin) { %>
         <a href="/gallery">📸 Main Gallery</a>
         <a href="/other-gallery">🗂️ Other Albums</a>
         <a href="/sales-gallery">💰 Sales</a>
