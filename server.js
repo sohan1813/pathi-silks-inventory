@@ -267,4 +267,6 @@ app.post('/rename-photo', requireLogin('admin'), async (req, res) => {
 });
 
 // Admin delete photo
-app.post('/delete-photo', requireLogin('admin'), async (req, res)
+app.post('/delete-photo', requireLogin('admin'), async (req, res) => {
+  const { brand, person, date, filename } = req.body;
+  if (!brand || !person || !date
