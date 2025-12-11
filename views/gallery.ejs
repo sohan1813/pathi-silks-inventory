@@ -1,5 +1,5 @@
 <%- include('layout', { body: `
-  <h2>Your Gallery</h2>
+  <h2>${typeof galleryTitle !== 'undefined' ? galleryTitle : 'Your Gallery'}</h2>
 
   <div class="search-bar">
     <input
@@ -172,5 +172,4 @@
         searchInput.addEventListener('input', applySearch);
       }
     });
-  </script>
-` }) %>
+  </script

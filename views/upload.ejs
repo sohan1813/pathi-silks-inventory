@@ -4,13 +4,20 @@
   <form method="POST" action="/upload" enctype="multipart/form-data">
     <fieldset class="upload-gallery-type">
       <legend>Upload to</legend>
+
       <label>
         <input type="radio" name="galleryType" value="main" checked />
         Main gallery
       </label>
+
       <label>
         <input type="radio" name="galleryType" value="other" />
         Other albums
+      </label>
+
+      <label>
+        <input type="radio" name="galleryType" value="sales" />
+        Sales
       </label>
     </fieldset>
 
