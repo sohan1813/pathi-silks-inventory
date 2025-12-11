@@ -432,6 +432,62 @@ app.get('/admin-gallery', requireLogin('admin'), async (req, res) => {
   res.render('gallery', { brands, isAdmin: true, galleryTitle: 'Admin – All Photos' });
 });
 
+// Admin OTHER ALBUMS gallery (only other)
+app.get('/admin-other-gallery', requireLogin('admin'), async (req, res) => {
+  const photosMeta = await getPhotosMetadata();
+
+  const brands = Object.keys(photosMeta)
+    .map((brandName) => {
+      const personsMeta = photosMeta[brandName];
+      const persons = Object.keys(personsMeta).map((personName) => {
+        const datesMeta = personsMeta[personName];
+        const dates = Object.keys(datesMeta)
+          .map((dateName) => {
+            const files = datesMeta[dateName]
+              .filter((f) => f.galleryType === 'other')
+              .map((f) => ({
+                src: f.url,
+                name: f.name,
+              }));
+            return { name: dateName, files };
+          })
+          .filter((d) => d.files.length > 0);
+        return { name: personName, dates };
+      }).filter((p) => p.dates.length > 0);
+      return { name: brandName, persons };
+    }).filter((b) => b.persons.length > 0);
+
+  res.render('gallery', { brands, isAdmin: true, galleryTitle: 'Admin – Other Albums' });
+});
+
+// Admin SALES gallery (only sales)
+app.get('/admin-sales-gallery', requireLogin('admin'), async (req, res) => {
+  const photosMeta = await getPhotosMetadata();
+
+  const brands = Object.keys(photosMeta)
+    .map((brandName) => {
+      const personsMeta = photosMeta[brandName];
+      const persons = Object.keys(personsMeta).map((personName) => {
+        const datesMeta = personsMeta[personName];
+        const dates = Object.keys(datesMeta)
+          .map((dateName) => {
+            const files = datesMeta[dateName]
+              .filter((f) => f.galleryType === 'sales')
+              .map((f) => ({
+                src: f.url,
+                name: f.name,
+              }));
+            return { name: dateName, files };
+          })
+          .filter((d) => d.files.length > 0);
+        return { name: personName, dates };
+      }).filter((p) => p.dates.length > 0);
+      return { name: brandName, persons };
+    }).filter((b) => b.persons.length > 0);
+
+  res.render('gallery', { brands, isAdmin: true, galleryTitle: 'Admin – Sales Gallery' });
+});
+
 // Boss main gallery (main photos only, hide some brands)
 app.get('/gallery', requireLogin('boss'), async (req, res) => {
   const photosMeta = await getPhotosMetadata();
