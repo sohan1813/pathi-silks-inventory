@@ -444,7 +444,7 @@ button {
   left: 32px;
 }
 
-.lightbox-next {
+lightbox-next {
   right: 32px;
 }
 
@@ -511,7 +511,7 @@ button {
   box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.18);
 }
 
-/* ---------- Nav image cards (SmoothUI-style) ---------- */
+/* ---------- Nav image cards (SmoothUI-style, transparent) ---------- */
 
 .nav-cards {
   display: flex;
@@ -529,7 +529,7 @@ button {
   border-radius: 24px;
   border: none;
   padding: 0;
-  background: transparent;
+  background: transparent;        /* no panel color */
   overflow: hidden;
   cursor: pointer;
   box-shadow: 0 20px 45px rgba(15, 23, 42, 0.45);
