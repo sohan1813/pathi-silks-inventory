@@ -396,7 +396,7 @@ button {
   z-index: 9999;
 }
 
-.lightbox-content {
+lightbox-content {
   width: 90vw;
   height: 90vh;
   display: flex;
@@ -511,7 +511,7 @@ lightbox-next {
   box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.18);
 }
 
-/* ---------- Nav image cards (no overlay, zoom hover) ---------- */
+/* ---------- Nav image cards (no shadow, zoom hover) ---------- */
 
 .nav-cards {
   display: flex;
@@ -532,8 +532,8 @@ lightbox-next {
   background: transparent;
   overflow: hidden;
   cursor: pointer;
-  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.45);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: none;
+  transition: transform 0.2s ease;
 }
 
 .nav-card-img {
@@ -582,7 +582,6 @@ lightbox-next {
 
 .nav-card:hover {
   transform: translateY(-6px) scale(1.02);
-  box-shadow: 0 26px 60px rgba(15, 23, 42, 0.7);
 }
 
 /* zoom the image on hover */
