@@ -325,8 +325,7 @@ button {
   margin-top: 4px;
 }
 
-.rename-form {
-  display: flex;
+.rename-form isplay: flex;
   gap: 4px;
   width: 100%;
 }
@@ -527,7 +526,7 @@ main {
   }
 }
 
-/* ---------- Dark mode ---------- */
+/* ---------- Dark mode (purple) ---------- */
 
 body.dark-mode {
   background-image: radial-gradient(
@@ -568,4 +567,89 @@ body.dark-mode .search-bar input {
   background: #020617;
   color: #e5e7eb;
   border-color: #4b5563;
+}
+
+/* ---------- Brown / Crimson mode ---------- */
+
+body.brown-mode {
+  background-image: radial-gradient(
+    125% 125% at 50% 10%,
+    #000000 40%,
+    #2b0707 100%
+  );
+  background-size: 100% 100%;
+  background-attachment: fixed;
+  color: #f9fafb;
+}
+
+body.brown-mode header {
+  background: rgba(15, 15, 20, 0.95);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.8);
+}
+
+body.brown-mode .jumper-bar,
+body.brown-mode .person-block {
+  background: rgba(24, 11, 11, 0.95);
+  border-color: rgba(148, 119, 91, 0.6);
+}
+
+body.brown-mode .person-block h3,
+body.brown-mode .date-block h4,
+body.brown-mode .photo-filename {
+  color: #fde68a;
+}
+
+body.brown-mode .photo-card {
+  background: linear-gradient(180deg, #111827, #1f2937);
+  border-color: rgba(148, 119, 91, 0.9);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.8);
+}
+
+body.brown-mode .jumper-bar select,
+body.brown-mode .search-bar input {
+  background: #111827;
+  color: #fef3c7;
+  border-color: #7c2d12;
+}
+
+/* ---------- Blue / Deep Ocean mode ---------- */
+
+body.blue-mode {
+  background:
+    radial-gradient(70% 55% at 50% 50%, #2a5d77 0%, #184058 18%, #0f2a43 34%, #0a1b30 50%, #071226 66%, #040d1c 80%, #020814 92%, #01040d 97%, #000309 100%),
+    radial-gradient(160% 130% at 10% 10%, rgba(0,0,0,0) 38%, #000309 76%, #000208 100%),
+    radial-gradient(160% 130% at 90% 90%, rgba(0,0,0,0) 38%, #000309 76%, #000208 100%);
+  background-size: 100% 100%;
+  background-attachment: fixed;
+  color: #e5f2ff;
+}
+
+body.blue-mode header {
+  background: rgba(8, 25, 48, 0.95);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.85);
+}
+
+body.blue-mode .jumper-bar,
+body.blue-mode .person-block {
+  background: rgba(10, 27, 48, 0.96);
+  border-color: rgba(96, 165, 250, 0.6);
+}
+
+body.blue-mode .person-block h3,
+body.blue-mode .date-block h4,
+body.blue-mode .photo-filename {
+  color: #dbeafe;
+}
+
+body.blue-mode .photo-card {
+  background: linear-gradient(180deg, #020617, #020617);
+  border-color: rgba(59, 130, 246, 0.9);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.9);
+}
+
+body.blue-mode .jumper-bar select,
+body.blue-mode .search-bar input {
+  background: #020617;
+  color: #dbeafe;
+  border-color: #1d4ed8;
 }

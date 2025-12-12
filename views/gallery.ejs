@@ -168,21 +168,38 @@
   <script src="/public/lightbox.js"></script>
 
   <script>
-    // Theme toggle
+    // Theme toggle: light -> dark -> brown -> blue -> light
     (function () {
       const themeBtn = document.getElementById('themeToggle');
-      const stored = localStorage.getItem('theme');
+      const themes = ['light', 'dark', 'brown', 'blue'];
+      const labels = {
+        light: '🌙 Dark',
+        dark: '🤎 Brown',
+        brown: '💙 Blue',
+        blue: '☀️ Light',
+      };
 
-      if (stored === 'dark') {
-        document.body.classList.add('dark-mode');
-        if (themeBtn) themeBtn.textContent = '☀️ Light';
+      function applyTheme(theme) {
+        document.body.classList.remove('dark-mode', 'brown-mode', 'blue-mode');
+
+        if (theme === 'dark') document.body.classList.add('dark-mode');
+        if (theme === 'brown') document.body.classList.add('brown-mode');
+        if (theme === 'blue') document.body.classList.add('blue-mode');
+
+        if (themeBtn) themeBtn.textContent = labels[theme] || '🌙 Dark';
+        localStorage.setItem('theme', theme);
       }
+
+      let current = localStorage.getItem('theme') || 'light';
+      if (!themes.includes(current)) current = 'light';
+      applyTheme(current);
 
       if (themeBtn) {
         themeBtn.addEventListener('click', () => {
-          const isDark = document.body.classList.toggle('dark-mode');
-          themeBtn.textContent = isDark ? '☀️ Light' : '🌙 Dark';
-          localStorage.setItem('theme', isDark ? 'dark' : 'light');
+          const idx = themes.indexOf(current);
+          const next = themes[(idx + 1) % themes.length];
+          current = next;
+          applyTheme(current);
         });
       }
     })();
