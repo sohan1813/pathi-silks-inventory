@@ -34,8 +34,14 @@ body {
 main {
   max-width: 1140px;
   margin: 0 auto;
-  padding: 24px 16px 44px;
+  padding: 8px 16px 44px; /* reduced top padding so gallery starts higher */
   background: transparent; /* let gradient show behind content */
+}
+
+/* Ensure first headings do not add extra gap */
+main > h1,
+main > h2 {
+  margin-top: 8px;
 }
 
 /* Header with Pathi Silks branding */
@@ -419,7 +425,7 @@ button {
 }
 
 /* Lightbox arrows */
-.lightbox-arrow {
+lightbox-arrow {
   position: fixed;
   top: 50%;
   transform: translateY(-50%);
