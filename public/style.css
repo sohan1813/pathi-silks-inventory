@@ -34,14 +34,14 @@ body {
 main {
   max-width: 1140px;
   margin: 0 auto;
-  padding: 8px 16px 44px; /* reduced top padding so gallery starts higher */
+  padding: 0 16px 44px; /* no top padding */
   background: transparent; /* let gradient show behind content */
 }
 
-/* Ensure first headings do not add extra gap */
+/* Absolutely no extra gap for first heading */
 main > h1,
 main > h2 {
-  margin-top: 8px;
+  margin-top: 0;
 }
 
 /* Header with Pathi Silks branding */
@@ -217,6 +217,7 @@ button {
   display: flex;
   flex-direction: column;
   gap: 30px;
+  margin-top: 0; /* no extra gap above albums */
 }
 
 /* Album wrapper (Pathi-Silks block) */
