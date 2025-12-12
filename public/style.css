@@ -213,6 +213,11 @@ button {
   gap: 30px;
 }
 
+/* Album wrapper (Pathi-Silks block) */
+.album {
+  background: transparent;
+}
+
 .album h2,
 .album h3 {
   margin-bottom: 8px;
@@ -223,9 +228,10 @@ button {
   margin-top: 6px;
   padding: 14px 14px 20px;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.96); /* slightly see-through */
+  background: rgba(255, 255, 255, 0.4); /* glass over gradient */
+  backdrop-filter: blur(14px);
   border: 1px solid rgba(209, 213, 219, 0.8);
-  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.04);
 }
 
 .person-block h3 {
