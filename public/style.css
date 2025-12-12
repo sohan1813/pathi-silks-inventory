@@ -511,7 +511,7 @@ lightbox-next {
   box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.18);
 }
 
-/* ---------- Nav image cards (SmoothUI-style, transparent) ---------- */
+/* ---------- Nav image cards (no overlay, zoom hover) ---------- */
 
 .nav-cards {
   display: flex;
@@ -529,7 +529,7 @@ lightbox-next {
   border-radius: 24px;
   border: none;
   padding: 0;
-  background: transparent;        /* no panel color */
+  background: transparent;
   overflow: hidden;
   cursor: pointer;
   box-shadow: 0 20px 45px rgba(15, 23, 42, 0.45);
@@ -541,9 +541,11 @@ lightbox-next {
   height: 100%;
   object-fit: cover;
   display: block;
-  filter: saturate(1.05);
+  transform: scale(1);
+  transition: transform 0.25s ease;
 }
 
+/* text only, no dark overlay */
 .nav-card-overlay {
   position: absolute;
   inset: 0;
@@ -551,8 +553,9 @@ lightbox-next {
   flex-direction: column;
   justify-content: flex-end;
   padding: 16px 18px;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.1), transparent);
-  color: #f9fafb;
+  background: transparent;
+  color: #ffffff;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
 }
 
 .nav-card-title {
@@ -573,12 +576,18 @@ lightbox-next {
   right: 14px;
   bottom: 16px;
   font-size: 18px;
-  opacity: 0.85;
+  opacity: 0.9;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
 }
 
 .nav-card:hover {
   transform: translateY(-6px) scale(1.02);
   box-shadow: 0 26px 60px rgba(15, 23, 42, 0.7);
+}
+
+/* zoom the image on hover */
+.nav-card:hover .nav-card-img {
+  transform: scale(1.06);
 }
 
 /* Simple page fade-in */
