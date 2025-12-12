@@ -1,85 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Pathi Silks Inventory</title>
-  <link rel="stylesheet" href="/public/style.css" />
-  <link rel="manifest" href="/public/manifest.webmanifest" />
-  <meta name="theme-color" content="#201a2c" />
+  <meta charset="UTF-8" />
+  <title>Pathi Silks Inventory</title>
+  <link rel="stylesheet" href="/public/style.css" />
+    <link rel="stylesheet" href="/public/styles/style-premium.css" /> 
+  <link rel="manifest" href="/public/manifest.webmanifest" />
+  <meta name="theme-color" content="#201a2c" />
 </head>
 <body>
-  <% if (typeof isAdmin === 'undefined') { isAdmin = false; } %>
+  <% if (typeof isAdmin === 'undefined') { isAdmin = false; } %>
 
-  <header>
-    <div class="header-left">
-      <img src="/public/pathi-logo.jpg" alt="Pathi Silks logo" class="header-logo">
-      <div class="header-title">Pathi Silks Inventory</div>
-    </div>
-    <nav>
-      <!-- Boss links -->
-      <% if (!isAdmin) { %>
-        <a href="/gallery">📸 Main Gallery</a>
-        <a href="/other-gallery">🗂️ Other Albums</a>
-        <a href="/sales-gallery">💰 Sales</a>
-        <a href="/sheets">📊 Sheets</a>
-      <% } %>
+  <header>
+    <div class="header-left">
+      <img src="/public/pathi-logo.jpg" alt="Pathi Silks logo" class="header-logo">
+      <div class="header-title">Pathi Silks Inventory</div>
+    </div>
+    <nav>
+            <% if (!isAdmin) { %>
+        <a href="/gallery">📸 Main Gallery</a>
+        <a href="/other-gallery">🗂️ Other Albums</a>
+        <a href="/sales-gallery">💰 Sales</a>
+        <a href="/sheets">📊 Sheets</a>
+      <% } %>
 
-      <!-- Admin links -->
-      <% if (isAdmin) { %>
-        <a href="/admin-gallery">📸 Admin Gallery</a>
-        <a href="/admin-main-gallery">📸 Admin Main</a>
-        <a href="/admin-other-gallery">🗂️ Admin Other</a>
-        <a href="/admin-sales-gallery">💰 Admin Sales</a>
-        <a href="/admin-sheets">📊 Admin Sheets</a>
-        <a href="/upload">⬆️ Upload</a>
-      <% } %>
+            <% if (isAdmin) { %>
+        <a href="/admin-gallery">📸 Admin Gallery</a>
+        <a href="/admin-main-gallery">📸 Admin Main</a>
+        <a href="/admin-other-gallery">🗂️ Admin Other</a>
+        <a href="/admin-sales-gallery">💰 Admin Sales</a>
+        <a href="/admin-sheets">📊 Admin Sheets</a>
+        <a href="/upload">⬆️ Upload</a>
+      <% } %>
 
-      <a href="/logout">🚪 Logout</a>
-      <button id="installAppBtn" class="install-btn" style="display:none;">Install app</button>
-    </nav>
-  </header>
+      <a href="/logout">🚪 Logout</a>
+      <button id="installAppBtn" class="install-btn" style="display:none;">Install app</button>
+    </nav>
+  </header>
 
-  <main>
-    <%- typeof body === 'string' ? body : '' %>
-  </main>
+  <main>
+    <%- typeof body === 'string' ? body : '' %>
+  </main>
 
-  <!-- Image lightbox -->
-  <div id="lightbox" class="lightbox">
-    <span id="lightbox-close" class="lightbox-close">&times;</span>
-    <span id="lightbox-prev" class="lightbox-arrow lightbox-prev">❮</span>
-    <span id="lightbox-next" class="lightbox-arrow lightbox-next">❯</span>
-    <div class="lightbox-content">
-      <img id="lightbox-img" src="" alt="">
-    </div>
-  </div>
+    <div id="lightbox" class="lightbox">
+    <span id="lightbox-close" class="lightbox-close">&times;</span>
+    <span id="lightbox-prev" class="lightbox-arrow lightbox-prev">❮</span>
+    <span id="lightbox-next" class="lightbox-arrow lightbox-next">❯</span>
+    <div class="lightbox-content">
+      <img id="lightbox-img" src="" alt="">
+    </div>
+  </div>
 
-  <script src="/public/lightbox.js"></script>
+  <script src="/public/lightbox.js"></script>
 
-  <script>
-    // Register service worker for PWA
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/public/sw.js');
-    }
+  <script>
+    // Register service worker for PWA
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/public/sw.js');
+    }
 
-    // Custom install button handling
-    let deferredInstallPrompt = null;
-    const installBtn = document.getElementById('installAppBtn');
+    // Custom install button handling
+    let deferredInstallPrompt = null;
+    const installBtn = document.getElementById('installAppBtn');
 
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredInstallPrompt = e;
-      if (installBtn) installBtn.style.display = 'inline-block';
-    });
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      if (installBtn) installBtn.style.display = 'inline-block';
+    });
 
-    if (installBtn) {
-      installBtn.addEventListener('click', async () => {
-        if (!deferredInstallPrompt) return;
-        deferredInstallPrompt.prompt();
-        await deferredInstallPrompt.userChoice;
-        deferredInstallPrompt = null;
-        installBtn.style.display = 'none';
-      });
-    }
-  </script>
+    if (installBtn) {
+      installBtn.addEventListener('click', async () => {
+        if (!deferredInstallPrompt) return;
+        deferredInstallPrompt.prompt();
+        await deferredInstallPrompt.userChoice;
+        deferredInstallPrompt = null;
+        installBtn.style.display = 'none';
+      });
+    }
+  </script>
 </body>
 </html>
