@@ -5,17 +5,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const prevBtn = document.getElementById('lightbox-prev');
   const nextBtn = document.getElementById('lightbox-next');
 
-  if (!lightbox || !lightboxImg || !closeBtn || !prevBtn || !nextBtn) return;
-
-  // All images on page that open in lightbox
-  let images = Array.from(document.querySelectorAll('.lb-img'));
+  const thumbs = Array.from(document.querySelectorAll('.lb-img'));
   let currentIndex = -1;
 
   function openAt(index) {
-    if (index < 0 || index >= images.length) return;
+    if (index < 0 || index >= thumbs.length) return;
     currentIndex = index;
-    const img = images[currentIndex];
+    const img = thumbs[currentIndex];
     lightboxImg.src = img.src;
+    lightboxImg.alt = img.alt || '';
     lightbox.style.display = 'flex';
   }
 
@@ -27,47 +25,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function showNext() {
     if (currentIndex === -1) return;
-    const nextIndex = (currentIndex + 1) % images.length;
+    const nextIndex = (currentIndex + 1) % thumbs.length;
     openAt(nextIndex);
   }
 
   function showPrev() {
     if (currentIndex === -1) return;
-    const prevIndex = (currentIndex - 1 + images.length) % images.length;
+    const prevIndex = (currentIndex - 1 + thumbs.length) % thumbs.length;
     openAt(prevIndex);
   }
 
-  // Click any gallery image
-  images.forEach((img, index) => {
-    img.addEventListener('click', (e) => {
-      e.preventDefault();
-      openAt(index);
-    });
+  // Click on thumbnails
+  thumbs.forEach((img, index) => {
+    img.addEventListener('click', () => openAt(index));
   });
 
-  closeBtn.addEventListener('click', close);
+  // Buttons
+  if (closeBtn) closeBtn.addEventListener('click', close);
+  if (nextBtn) nextBtn.addEventListener('click', showNext);
+  if (prevBtn) prevBtn.addEventListener('click', showPrev);
 
+  // Click outside image closes
   lightbox.addEventListener('click', (e) => {
-    if (e.target === lightbox) {
-      close();
-    }
+    if (e.target === lightbox) close();
   });
 
-  nextBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    showNext();
-  });
-
-  prevBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    showPrev();
-  });
-
+  // Keyboard navigation
   document.addEventListener('keydown', (e) => {
-    if (lightbox.style.display === 'flex') {
-      if (e.key === 'Escape') close();
-      if (e.key === 'ArrowRight') showNext();
-      if (e.key === 'ArrowLeft') showPrev();
-    }
+    if (lightbox.style.display !== 'flex') return;
+    if (e.key === 'Escape') close();
+    if (e.key === 'ArrowRight') showNext();
+    if (e.key === 'ArrowLeft') showPrev();
   });
 });
