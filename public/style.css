@@ -511,49 +511,54 @@ button {
   box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.18);
 }
 
-/* ---------- Nav expandable cards ---------- */
+/* ---------- Nav image cards (SmoothUI-style) ---------- */
 
 .nav-cards {
   display: flex;
-  gap: 16px;
-  margin: 14px 0 18px;
+  gap: 18px;
+  margin: 14px 0 22px;
   overflow-x: auto;
   padding-bottom: 4px;
 }
 
 .nav-card {
-  min-width: 190px;
-  max-width: 220px;
-  border-radius: 18px;
-  border: 1px solid rgba(148, 163, 184, 0.45);
-  background: linear-gradient(145deg, rgba(15, 23, 42, 0.96), rgba(30, 64, 175, 0.9));
-  color: #f9fafb;
-  padding: 14px 16px 16px;
-  text-align: left;
-  cursor: pointer;
   position: relative;
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.55);
-  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  min-width: 220px;
+  max-width: 240px;
+  height: 300px;
+  border-radius: 24px;
+  border: none;
+  padding: 0;
+  background: transparent;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.45);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.nav-card::after {
-  content: '›';
+.nav-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: saturate(1.05);
+}
+
+.nav-card-overlay {
   position: absolute;
-  right: 14px;
-  bottom: 12px;
-  font-size: 18px;
-  opacity: 0.7;
-}
-
-.nav-card:hover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 24px 55px rgba(15, 23, 42, 0.8);
-  border-color: rgba(129, 140, 248, 0.95);
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 16px 18px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.1), transparent);
+  color: #f9fafb;
 }
 
 .nav-card-title {
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
   margin-bottom: 4px;
 }
 
@@ -562,11 +567,18 @@ button {
   opacity: 0.9;
 }
 
-/* Light theme version of cards */
-body:not(.dark-mode):not(.brown-mode):not(.blue-mode) .nav-card {
-  background: linear-gradient(145deg, #ffffff, #e5ecff);
-  color: #111827;
-  box-shadow: 0 16px 36px rgba(148, 163, 184, 0.45);
+.nav-card::after {
+  content: '▶';
+  position: absolute;
+  right: 14px;
+  bottom: 16px;
+  font-size: 18px;
+  opacity: 0.85;
+}
+
+.nav-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 26px 60px rgba(15, 23, 42, 0.7);
 }
 
 /* Simple page fade-in */
@@ -585,8 +597,65 @@ main {
   }
 }
 
-/* ---------- Dark mode (purple) ---------- */
+/* ---------- Dark themes shared styling ---------- */
 
+body.dark-mode,
+body.brown-mode,
+body.blue-mode {
+  color: #f9fafb;
+}
+
+body.dark-mode header,
+body.brown-mode header,
+body.blue-mode header {
+  background: rgba(15, 23, 42, 0.9);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.75);
+}
+
+body.dark-mode .jumper-bar,
+body.brown-mode .jumper-bar,
+body.blue-mode .jumper-bar,
+body.dark-mode .person-block,
+body.brown-mode .person-block,
+body.blue-mode .person-block {
+  background: rgba(15, 23, 42, 0.9);
+  border-color: rgba(148, 163, 184, 0.45);
+}
+
+body.dark-mode .person-block h3,
+body.brown-mode .person-block h3,
+body.blue-mode .person-block h3,
+body.dark-mode .date-block h4,
+body.brown-mode .date-block h4,
+body.blue-mode .date-block h4,
+body.dark-mode .photo-filename,
+body.brown-mode .photo-filename,
+body.blue-mode .photo-filename {
+  color: #e5e7eb;
+}
+
+body.dark-mode .photo-card,
+body.brown-mode .photo-card,
+body.blue-mode .photo-card {
+  background: linear-gradient(180deg, #020617, #020617);
+  border-color: rgba(75, 85, 99, 0.9);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85);
+}
+
+body.dark-mode .jumper-bar select,
+body.brown-mode .jumper-bar select,
+body.blue-mode .jumper-bar select,
+body.dark-mode .search-bar input,
+body.brown-mode .search-bar input,
+body.blue-mode .search-bar input {
+  background: #020617;
+  color: #e5e7eb;
+  border-color: #4b5563;
+}
+
+/* Individual backgrounds */
+
+/* Dark (purple) */
 body.dark-mode {
   background-image: radial-gradient(
     125% 125% at 50% 100%,
@@ -595,41 +664,9 @@ body.dark-mode {
   );
   background-size: 100% 100%;
   background-attachment: fixed;
-  color: #f9fafb;
 }
 
-body.dark-mode header {
-  background: rgba(15, 23, 42, 0.9);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.7);
-}
-
-body.dark-mode .jumper-bar,
-body.dark-mode .person-block {
-  background: rgba(15, 23, 42, 0.9);
-  border-color: rgba(148, 163, 184, 0.4);
-}
-
-body.dark-mode .person-block h3,
-body.dark-mode .date-block h4,
-body.dark-mode .photo-filename {
-  color: #e5e7eb;
-}
-
-body.dark-mode .photo-card {
-  background: linear-gradient(180deg, #020617, #0b1120);
-  border-color: rgba(75, 85, 99, 0.9);
-  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.75);
-}
-
-body.dark-mode .jumper-bar select,
-body.dark-mode .search-bar input {
-  background: #020617;
-  color: #e5e7eb;
-  border-color: #4b5563;
-}
-
-/* ---------- Brown / Crimson mode ---------- */
-
+/* Brown / crimson */
 body.brown-mode {
   background-image: radial-gradient(
     125% 125% at 50% 10%,
@@ -638,41 +675,9 @@ body.brown-mode {
   );
   background-size: 100% 100%;
   background-attachment: fixed;
-  color: #f9fafb;
 }
 
-body.brown-mode header {
-  background: rgba(15, 15, 20, 0.95);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.8);
-}
-
-body.brown-mode .jumper-bar,
-body.brown-mode .person-block {
-  background: rgba(24, 11, 11, 0.95);
-  border-color: rgba(148, 119, 91, 0.6);
-}
-
-body.brown-mode .person-block h3,
-body.brown-mode .date-block h4,
-body.brown-mode .photo-filename {
-  color: #fde68a;
-}
-
-body.brown-mode .photo-card {
-  background: linear-gradient(180deg, #111827, #1f2937);
-  border-color: rgba(148, 119, 91, 0.9);
-  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.8);
-}
-
-body.brown-mode .jumper-bar select,
-body.brown-mode .search-bar input {
-  background: #111827;
-  color: #fef3c7;
-  border-color: #7c2d12;
-}
-
-/* ---------- Blue / Deep Ocean mode ---------- */
-
+/* Blue / deep ocean */
 body.blue-mode {
   background:
     radial-gradient(70% 55% at 50% 50%, #2a5d77 0%, #184058 18%, #0f2a43 34%, #0a1b30 50%, #071226 66%, #040d1c 80%, #020814 92%, #01040d 97%, #000309 100%),
@@ -680,35 +685,4 @@ body.blue-mode {
     radial-gradient(160% 130% at 90% 90%, rgba(0,0,0,0) 38%, #000309 76%, #000208 100%);
   background-size: 100% 100%;
   background-attachment: fixed;
-  color: #e5f2ff;
-}
-
-body.blue-mode header {
-  background: rgba(8, 25, 48, 0.95);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.85);
-}
-
-body.blue-mode .jumper-bar,
-body.blue-mode .person-block {
-  background: rgba(10, 27, 48, 0.96);
-  border-color: rgba(96, 165, 250, 0.6);
-}
-
-body.blue-mode .person-block h3,
-body.blue-mode .date-block h4,
-body.blue-mode .photo-filename {
-  color: #dbeafe;
-}
-
-body.blue-mode .photo-card {
-  background: linear-gradient(180deg, #020617, #020617);
-  border-color: rgba(59, 130, 246, 0.9);
-  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.9);
-}
-
-body.blue-mode .jumper-bar select,
-body.blue-mode .search-bar input {
-  background: #020617;
-  color: #dbeafe;
-  border-color: #1d4ed8;
 }
