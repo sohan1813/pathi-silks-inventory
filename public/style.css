@@ -526,3 +526,46 @@ main {
     transform: translateY(0);
   }
 }
+
+/* ---------- Dark mode ---------- */
+
+body.dark-mode {
+  background-image: radial-gradient(
+    125% 125% at 50% 100%,
+    #000000 40%,
+    #350136 100%
+  );
+  background-size: 100% 100%;
+  background-attachment: fixed;
+  color: #f9fafb;
+}
+
+body.dark-mode header {
+  background: rgba(15, 23, 42, 0.9);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.7);
+}
+
+body.dark-mode .jumper-bar,
+body.dark-mode .person-block {
+  background: rgba(15, 23, 42, 0.9);
+  border-color: rgba(148, 163, 184, 0.4);
+}
+
+body.dark-mode .person-block h3,
+body.dark-mode .date-block h4,
+body.dark-mode .photo-filename {
+  color: #e5e7eb;
+}
+
+body.dark-mode .photo-card {
+  background: linear-gradient(180deg, #020617, #0b1120);
+  border-color: rgba(75, 85, 99, 0.9);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.75);
+}
+
+body.dark-mode .jumper-bar select,
+body.dark-mode .search-bar input {
+  background: #020617;
+  color: #e5e7eb;
+  border-color: #4b5563;
+}

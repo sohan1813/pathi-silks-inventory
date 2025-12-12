@@ -34,6 +34,7 @@
             <a href="/upload">⬆️ Upload</a>
           <% } %>
 
+          <button id="themeToggle" class="install-btn">🌙 Dark</button>
           <a href="/logout">🚪 Logout</a>
           <button id="installAppBtn" class="install-btn" style="display:none;">Install app</button>
         </nav>
@@ -167,6 +168,25 @@
   <script src="/public/lightbox.js"></script>
 
   <script>
+    // Theme toggle
+    (function () {
+      const themeBtn = document.getElementById('themeToggle');
+      const stored = localStorage.getItem('theme');
+
+      if (stored === 'dark') {
+        document.body.classList.add('dark-mode');
+        if (themeBtn) themeBtn.textContent = '☀️ Light';
+      }
+
+      if (themeBtn) {
+        themeBtn.addEventListener('click', () => {
+          const isDark = document.body.classList.toggle('dark-mode');
+          themeBtn.textContent = isDark ? '☀️ Light' : '🌙 Dark';
+          localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
+      }
+    })();
+
     // Jumpers + search
     document.addEventListener('DOMContentLoaded', function () {
       const brandSelect = document.getElementById('brandSelect');
