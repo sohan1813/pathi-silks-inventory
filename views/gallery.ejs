@@ -51,6 +51,29 @@
           />
         </div>
 
+        <!-- Nav expandable cards -->
+        <div class="nav-cards">
+          <button class="nav-card" onclick="window.location.href='<%= isAdmin ? '/admin-gallery' : '/gallery' %>'">
+            <div class="nav-card-title">Main Gallery</div>
+            <div class="nav-card-sub">All main saree & blouse sets</div>
+          </button>
+
+          <button class="nav-card" onclick="window.location.href='<%= isAdmin ? '/admin-other-gallery' : '/other-gallery' %>'">
+            <div class="nav-card-title">Other Albums</div>
+            <div class="nav-card-sub">Special shoots & extras</div>
+          </button>
+
+          <button class="nav-card" onclick="window.location.href='<%= isAdmin ? '/admin-sales-gallery' : '/sales-gallery' %>'">
+            <div class="nav-card-title">Sales</div>
+            <div class="nav-card-sub">Ready for billing</div>
+          </button>
+
+          <button class="nav-card" onclick="window.location.href='<%= isAdmin ? '/admin-sheets' : '/sheets' %>'">
+            <div class="nav-card-title">Sheets</div>
+            <div class="nav-card-sub">Sales & stock sheets</div>
+          </button>
+        </div>
+
         <% if (!brands || brands.length === 0) { %>
           <p>No folders yet.</p>
         <% } else { %>
