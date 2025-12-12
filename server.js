@@ -232,6 +232,7 @@ app.post('/upload', requireLogin('admin'), async (req, res) => {
           Key: s3Key,
           Body: img.data,
           ContentType: img.mimetype,
+          CacheControl: 'public, max-age=31536000', // <-- added for browser caching
         })
       );
 
