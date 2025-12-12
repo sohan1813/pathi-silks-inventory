@@ -425,30 +425,33 @@ button {
   z-index: 10000;
 }
 
-/* Lightbox arrows */
-lightbox-arrow {
+/* Lightbox arrows (fixed selector) */
+.lightbox-arrow {
   position: fixed;
   top: 50%;
   transform: translateY(-50%);
   font-size: 40px;
-  color: #fff;
+  color: #ffffff;
   cursor: pointer;
-  padding: 8px 12px;
+  padding: 8px 14px;
   user-select: none;
   z-index: 10000;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 999px;
 }
 
 .lightbox-prev {
-  left: 24px;
+  left: 32px;
 }
 
 .lightbox-next {
-  right: 24px;
+  right: 32px;
 }
 
 .lightbox-arrow:hover,
 .lightbox-close:hover {
-  color: #e5e7eb;
+  color: #f9fafb;
+  background: rgba(0, 0, 0, 0.55);
 }
 
 /* ---------- Filter / jumper bar ---------- */
