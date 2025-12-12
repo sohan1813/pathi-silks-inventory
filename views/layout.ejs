@@ -10,46 +10,53 @@
 <body>
   <% if (typeof isAdmin === 'undefined') { isAdmin = false; } %>
 
-  <header>
-    <div class="header-left">
-      <img src="/public/pathi-logo.jpg" alt="Pathi Silks logo" class="header-logo">
-      <div class="header-title">Pathi Silks Inventory</div>
-    </div>
-    <nav>
-      <!-- Boss links -->
-      <% if (!isAdmin) { %>
-        <a href="/gallery">📸 Main Gallery</a>
-        <a href="/other-gallery">🗂️ Other Albums</a>
-        <a href="/sales-gallery">💰 Sales</a>
-        <a href="/sheets">📊 Sheets</a>
-      <% } %>
+  <!-- Background wrapper -->
+  <div class="page">
+    <div class="page-bg"></div>
 
-      <!-- Admin links -->
-      <% if (isAdmin) { %>
-        <a href="/admin-gallery">📸 Admin Gallery</a>
-        <a href="/admin-main-gallery">📸 Admin Main</a>
-        <a href="/admin-other-gallery">🗂️ Admin Other</a>
-        <a href="/admin-sales-gallery">💰 Admin Sales</a>
-        <a href="/admin-sheets">📊 Admin Sheets</a>
-        <a href="/upload">⬆️ Upload</a>
-      <% } %>
+    <div class="page-inner">
+      <header>
+        <div class="header-left">
+          <img src="/public/pathi-logo.jpg" alt="Pathi Silks logo" class="header-logo">
+          <div class="header-title">Pathi Silks Inventory</div>
+        </div>
+        <nav>
+          <!-- Boss links -->
+          <% if (!isAdmin) { %>
+            <a href="/gallery">📸 Main Gallery</a>
+            <a href="/other-gallery">🗂️ Other Albums</a>
+            <a href="/sales-gallery">💰 Sales</a>
+            <a href="/sheets">📊 Sheets</a>
+          <% } %>
 
-      <a href="/logout">🚪 Logout</a>
-      <button id="installAppBtn" class="install-btn" style="display:none;">Install app</button>
-    </nav>
-  </header>
+          <!-- Admin links -->
+          <% if (isAdmin) { %>
+            <a href="/admin-gallery">📸 Admin Gallery</a>
+            <a href="/admin-main-gallery">📸 Admin Main</a>
+            <a href="/admin-other-gallery">🗂️ Admin Other</a>
+            <a href="/admin-sales-gallery">💰 Admin Sales</a>
+            <a href="/admin-sheets">📊 Admin Sheets</a>
+            <a href="/upload">⬆️ Upload</a>
+          <% } %>
 
-  <main>
-    <%- typeof body === 'string' ? body : '' %>
-  </main>
+          <a href="/logout">🚪 Logout</a>
+          <button id="installAppBtn" class="install-btn" style="display:none;">Install app</button>
+        </nav>
+      </header>
 
-  <!-- Image lightbox -->
-  <div id="lightbox" class="lightbox">
-    <span id="lightbox-close" class="lightbox-close">&times;</span>
-    <span id="lightbox-prev" class="lightbox-arrow lightbox-prev">❮</span>
-    <span id="lightbox-next" class="lightbox-arrow lightbox-next">❯</span>
-    <div class="lightbox-content">
-      <img id="lightbox-img" src="" alt="">
+      <main>
+        <%- typeof body === 'string' ? body : '' %>
+      </main>
+
+      <!-- Image lightbox -->
+      <div id="lightbox" class="lightbox">
+        <span id="lightbox-close" class="lightbox-close">&times;</span>
+        <span id="lightbox-prev" class="lightbox-arrow lightbox-prev">❮</span>
+        <span id="lightbox-next" class="lightbox-arrow lightbox-next">❯</span>
+        <div class="lightbox-content">
+          <img id="lightbox-img" src="" alt="">
+        </div>
+      </div>
     </div>
   </div>
 
