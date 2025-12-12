@@ -51,26 +51,38 @@
           />
         </div>
 
-        <!-- Nav expandable cards -->
+        <!-- Nav image cards -->
         <div class="nav-cards">
           <button class="nav-card" onclick="window.location.href='<%= isAdmin ? '/admin-gallery' : '/gallery' %>'">
-            <div class="nav-card-title">Main Gallery</div>
-            <div class="nav-card-sub">All main saree & blouse sets</div>
+            <img src="/public/nav-main.jpg" alt="Main Gallery" class="nav-card-img" />
+            <div class="nav-card-overlay">
+              <div class="nav-card-title">Main Gallery</div>
+              <div class="nav-card-sub">All main saree & blouse sets</div>
+            </div>
           </button>
 
           <button class="nav-card" onclick="window.location.href='<%= isAdmin ? '/admin-other-gallery' : '/other-gallery' %>'">
-            <div class="nav-card-title">Other Albums</div>
-            <div class="nav-card-sub">Special shoots & extras</div>
+            <img src="/public/nav-other.jpg" alt="Other Albums" class="nav-card-img" />
+            <div class="nav-card-overlay">
+              <div class="nav-card-title">Other Albums</div>
+              <div class="nav-card-sub">Special shoots & extras</div>
+            </div>
           </button>
 
           <button class="nav-card" onclick="window.location.href='<%= isAdmin ? '/admin-sales-gallery' : '/sales-gallery' %>'">
-            <div class="nav-card-title">Sales</div>
-            <div class="nav-card-sub">Ready for billing</div>
+            <img src="/public/nav-sales.jpg" alt="Sales" class="nav-card-img" />
+            <div class="nav-card-overlay">
+              <div class="nav-card-title">Sales</div>
+              <div class="nav-card-sub">Ready for billing</div>
+            </div>
           </button>
 
           <button class="nav-card" onclick="window.location.href='<%= isAdmin ? '/admin-sheets' : '/sheets' %>'">
-            <div class="nav-card-title">Sheets</div>
-            <div class="nav-card-sub">Sales & stock sheets</div>
+            <img src="/public/nav-sheets.jpg" alt="Sheets" class="nav-card-img" />
+            <div class="nav-card-overlay">
+              <div class="nav-card-title">Sheets</div>
+              <div class="nav-card-sub">Sales & stock sheets</div>
+            </div>
           </button>
         </div>
 
