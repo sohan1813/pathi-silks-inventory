@@ -3,50 +3,58 @@
     const brandsData = typeof brands !== 'undefined' ? brands : [];
     const title = typeof galleryTitle !== 'undefined' ? galleryTitle : 'Your Gallery';
     const admin = typeof isAdmin !== 'undefined' ? isAdmin : false;
-    
-    // START CAPTURING GALLERY CONTENT
-    let content = `
-    
-<h2 class="gallery-header-title">${title}</h2>
+%>
 
-<div class="search-bar-premium">
-  <div class="search-container">
-    <input
-      type="text"
-      id="gallerySearch"
-      placeholder="Search brand, person, or date… (e.g. Pathi, Tanya, 2024-02-22)"
-      role="combobox"
-      aria-autocomplete="list"
-      aria-expanded="false"
-    />
-        <div id="suggestion-dropdown" class="suggestion-dropdown">
-          </div>
-  </div>
-  <div class="search-hint-bar">
-    <span>Press **Tab** to cycle suggestions</span>
-    <span>**ESC** to close</span>
-  </div>
-</div>
-`; // End of static content
+<%- include('layout', { 
+    body: renderGallery(brandsData, title, admin), 
+    galleryTitle: title, 
+    brands: brandsData, 
+    isAdmin: admin 
+}) %>
 
-    // Conditional rendering based on data
-    if (brandsData.length === 0) { 
-        content += `<p>No folders yet.</p>`;
+<% 
+function renderGallery(brands, title, admin) {
+    let html = `
+    <h2 class="gallery-header-title">${title}</h2>
+
+    <div class="search-bar-premium">
+        <div class="search-container">
+            <input
+                type="text"
+                id="gallerySearch"
+                placeholder="Search brand, person, or date… (e.g. Pathi, Tanya, 2024-02-22)"
+                role="combobox"
+                aria-autocomplete="list"
+                aria-expanded="false"
+            />
+            <div id="suggestion-dropdown" class="suggestion-dropdown">
+            </div>
+        </div>
+        <div class="search-hint-bar">
+            <span>Press **Tab** to cycle suggestions</span>
+            <span>**ESC** to close</span>
+        </div>
+    </div>
+    `;
+
+    if (brands.length === 0) {
+        html += `<p>No folders yet.</p>`;
     } else {
-        content += `
+        // --- Jumper Bar ---
+        html += `
         <div class="jumper-bar-premium">
             <div>
                 <label for="brandSelect">Jump to brand:</label>
                 <select id="brandSelect" class="custom-select">
                     <option value="">All brands</option>
-                    ${brandsData.map(b => `<option value="brand-${b.name.replace(/\s+/g, '-')}">${b.name}</option>`).join('')}
+                    ${brands.map(b => `<option value="brand-${b.name.replace(/\s+/g, '-')}">${b.name}</option>`).join('')}
                 </select>
             </div>
             <div>
                 <label for="personSelect">Jump to person:</label>
                 <select id="personSelect" class="custom-select">
                     <option value="">All persons</option>
-                    ${brandsData.map(b => b.persons.map(p => 
+                    ${brands.map(b => b.persons.map(p => 
                         `<option value="person-${b.name.replace(/\s+/g, '-')}-${p.name.replace(/\s+/g, '-')}">${b.name} – ${p.name}</option>`
                     ).join('')).join('')}
                 </select>
@@ -55,67 +63,94 @@
                 <label for="dateSelect">Jump to date:</label>
                 <select id="dateSelect" class="custom-select">
                     <option value="">All dates</option>
-                    ${brandsData.map(b => b.persons.map(p => p.dates.map(d => 
+                    ${brands.map(b => b.persons.map(p => p.dates.map(d => 
                         `<option value="date-${b.name.replace(/\s+/g, '-')}-${p.name.replace(/\s+/g, '-')}-${d.name}">${b.name} – ${p.name} – ${d.name}</option>`
                     ).join('')).join('')).join('')}
                 </select>
             </div>
         </div>
-
+        
         <div class="albums">
-            ${brandsData.map(brand => `
-                <section class="album" id="brand-${brand.name.replace(/\s+/g, '-')}">
-                    <h2 class="brand-title">${brand.name}</h2>
-                    ${brand.persons.map(person => `
-                        <section class="person-block" id="person-${brand.name.replace(/\s+/g, '-')}-${person.name.replace(/\s+/g, '-')}">
-                            <h3 class="person-name">${person.name}</h3>
-                            ${person.dates.map(date => `
-                                <div class="date-block" id="date-${brand.name.replace(/\s+/g, '-')}-${person.name.replace(/\s+/g, '-')}-${date.name}">
-                                    <h4 class="date-header">${date.name}</h4>
-                                    <div class="photos card-grid">
-                                        ${date.files.map(file => `
-                                            <a href="${file.src}" class="gallery-card" data-lightbox="gallery" data-title="${file.name}">
-                                                <div class="card-image-container">
-                                                    <img src="${file.src}" alt="${file.name}" loading="lazy" />
-                                                </div>
-                                                <div class="card-info">
-                                                    <h3>${file.name}</h3>
-                                                    <p>${person.name}, ${date.name}</p>
-                                                    ${admin ? `
-                                                        <div class="photo-actions-premium">
-                                                            <form method="POST" action="/rename-photo" class="rename-form">
-                                                                <input type="hidden" name="brand" value="${brand.name}" />
-                                                                <input type="hidden" name="person" value="${person.name}" />
-                                                                <input type="hidden" name="date" value="${date.name}" />
-                                                                <input type="hidden" name="oldfilename" value="${file.name}" />
-                                                                <input type="text" name="newfilename" placeholder="New name" class="rename-input" required />
-                                                                <button type="submit" class="action-btn rename-btn">Rename</button>
-                                                            </form>
-                                                            <form method="POST" action="/delete-photo" class="delete-form">
-                                                                <input type="hidden" name="brand" value="${brand.name}" />
-                                                                <input type="hidden" name="person" value="${person.name}" />
-                                                                <input type="hidden" name="date" value="${date.name}" />
-                                                                <input type="hidden" name="filename" value="${file.name}" />
-                                                                <button type="submit" class="action-btn delete-btn">Delete</button>
-                                                            </form>
-                                                        </div>
-                                                    ` : ''}
-                                                </div>
-                                            </a>
-                                        `).join('')}
+        `;
+        
+        // --- Brands, Persons, Dates, Photos (Iterative loop) ---
+        brands.forEach(brand => {
+            html += `
+            <section class="album" id="brand-${brand.name.replace(/\s+/g, '-')}">
+                <h2 class="brand-title">${brand.name}</h2>
+            `;
+            brand.persons.forEach(person => {
+                html += `
+                <section class="person-block" id="person-${brand.name.replace(/\s+/g, '-')}-${person.name.replace(/\s+/g, '-')}">
+                    <h3 class="person-name">${person.name}</h3>
+                `;
+                person.dates.forEach(date => {
+                    if (date.files.length > 0) {
+                        html += `
+                        <div class="date-block" id="date-${brand.name.replace(/\s+/g, '-')}-${person.name.replace(/\s+/g, '-')}-${date.name}">
+                            <h4 class="date-header">${date.name}</h4>
+                            <div class="photos card-grid">
+                        `;
+                        date.files.forEach(file => {
+                            let adminActions = '';
+                            if (admin) {
+                                adminActions = `
+                                    <div class="photo-actions-premium">
+                                        <form method="POST" action="/rename-photo" class="rename-form">
+                                            <input type="hidden" name="brand" value="${brand.name}" />
+                                            <input type="hidden" name="person" value="${person.name}" />
+                                            <input type="hidden" name="date" value="${date.name}" />
+                                            <input type="hidden" name="oldfilename" value="${file.name}" />
+                                            <input type="text" name="newfilename" placeholder="New name" class="rename-input" required />
+                                            <button type="submit" class="action-btn rename-btn">Rename</button>
+                                        </form>
+                                        <form method="POST" action="/delete-photo" class="delete-form">
+                                            <input type="hidden" name="brand" value="${brand.name}" />
+                                            <input type="hidden" name="person" value="${person.name}" />
+                                            <input type="hidden" name="date" value="${date.name}" />
+                                            <input type="hidden" name="filename" value="${file.name}" />
+                                            <button type="submit" class="action-btn delete-btn">Delete</button>
+                                        </form>
                                     </div>
+                                `;
+                            }
+                            html += `
+                            <a href="${file.src}" class="gallery-card" data-lightbox="gallery" data-title="${file.name}">
+                                <div class="card-image-container">
+                                    <img src="${file.src}" alt="${file.name}" loading="lazy" />
                                 </div>
-                            `).join('')}
-                        </section>
-                    `).join('')}
+                                <div class="card-info">
+                                    <h3>${file.name}</h3>
+                                    <p>${person.name}, ${date.name}</p>
+                                    ${adminActions}
+                                </div>
+                            </a>
+                            `;
+                        }); // end file loop
+                        html += `
+                            </div>
+                        </div>
+                        `;
+                    }
+                }); // end date loop
+                html += `
                 </section>
-            `).join('')}
+                `;
+            }); // end person loop
+            html += `
+            </section>
+            `;
+        }); // end brand loop
+
+        html += `
         </div>
         `;
-    }
+    } // end else (data exists)
     
-    // Add JavaScript at the end of the content block
-    content += `
+    // --- JavaScript Logic (must be passed through JSON.stringify) ---
+    const brandsDataJSON = JSON.stringify(brands);
+    
+    html += `
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // JUMPER LOGIC
@@ -304,9 +339,9 @@
 
             function applySearch() {
                 const term = searchInput.value.trim();
-                // 💥 NOTE: We use brandsData (the safe variable) here.
-                const brandsDataJSON = <%= JSON.stringify(brandsData) %>;
-                const suggestions = createSuggestionHTML(brandsDataJSON, term); 
+                // We parse the data injected from the server (brandsDataJSON)
+                const brandsData = JSON.parse(document.getElementById('brands-data-json').textContent);
+                const suggestions = createSuggestionHTML(brandsData, term); 
 
                 if (term.length > 0) {
                     renderDropdown(suggestions);
@@ -354,8 +389,8 @@
                 }
 
                 // Re-render to highlight the active item
-                const brandsDataJSON = <%= JSON.stringify(brandsData) %>;
-                const suggestions = createSuggestionHTML(brandsDataJSON, searchInput.value.trim());
+                const brandsData = JSON.parse(document.getElementById('brands-data-json').textContent);
+                const suggestions = createSuggestionHTML(brandsData, searchInput.value.trim());
 
                 renderDropdown(suggestions);
                 
@@ -400,6 +435,10 @@
         });
     </script>
     `; // End of script block
-%>
+    
+    // Inject the brands data as a script tag for the JavaScript to use
+    html += `<script id="brands-data-json" type="application/json">${brandsDataJSON}</script>`;
 
-<%- include('layout', { body: content, galleryTitle: title, brands: brandsData, isAdmin: admin }) %>
+    return html;
+}
+%>
