@@ -108,7 +108,7 @@
                         <div class="photos">
                           <% date.files.forEach(function (file) { %>
                             <div class="photo-card">
-                              <img src="<%= file.src %>" alt="<%= file.name %>" class="lb-img" />
+                              <img src="<%= file.src %>" alt="<%= file.name %>" class="lb-img" loading="lazy" />
                               <div class="photo-card-inner">
                                 <div class="photo-filename"><%= file.name %></div>
 
