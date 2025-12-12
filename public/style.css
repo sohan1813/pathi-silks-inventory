@@ -37,6 +37,7 @@ main {
   max-width: 1140px;
   margin: 0 auto;
   padding: 24px 16px 44px;
+  background: transparent; /* let gradient show behind content */
 }
 
 /* Header with Pathi Silks branding */
@@ -224,7 +225,7 @@ button {
   margin-top: 6px;
   padding: 14px 14px 20px;
   border-radius: 14px;
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.96); /* slightly see-through */
   border: 1px solid rgba(209, 213, 219, 0.8);
   box-shadow: 0 14px 30px rgba(15, 23, 42, 0.06);
 }
@@ -446,7 +447,7 @@ button {
   gap: 16px;
   margin-bottom: 18px;
   padding: 10px 12px;
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.96);
   border-radius: 12px;
   align-items: center;
   flex-wrap: wrap;
