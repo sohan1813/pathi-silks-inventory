@@ -5,440 +5,406 @@
     const admin = typeof isAdmin !== 'undefined' ? isAdmin : false;
 %>
 
-<%- include('layout', { 
-    body: renderGallery(brandsData, title, admin), 
-    galleryTitle: title, 
-    brands: brandsData, 
-    isAdmin: admin 
-}) %>
+<h2 class="gallery-header-title"><%= title %></h2>
 
-<% 
-function renderGallery(brands, title, admin) {
-    let html = `
-    <h2 class="gallery-header-title">${title}</h2>
-
-    <div class="search-bar-premium">
-        <div class="search-container">
-            <input
-                type="text"
-                id="gallerySearch"
-                placeholder="Search brand, person, or date… (e.g. Pathi, Tanya, 2024-02-22)"
-                role="combobox"
-                aria-autocomplete="list"
-                aria-expanded="false"
-            />
-            <div id="suggestion-dropdown" class="suggestion-dropdown">
-            </div>
-        </div>
-        <div class="search-hint-bar">
-            <span>Press **Tab** to cycle suggestions</span>
-            <span>**ESC** to close</span>
+<div class="search-bar-premium">
+    <div class="search-container">
+        <input
+            type="text"
+            id="gallerySearch"
+            placeholder="Search brand, person, or date… (e.g. Pathi, Tanya, 2024-02-22)"
+            role="combobox"
+            aria-autocomplete="list"
+            aria-expanded="false"
+        />
+        <div id="suggestion-dropdown" class="suggestion-dropdown">
         </div>
     </div>
-    `;
-
-    if (brands.length === 0) {
-        html += `<p>No folders yet.</p>`;
-    } else {
-        // --- Jumper Bar ---
-        html += `
-        <div class="jumper-bar-premium">
-            <div>
-                <label for="brandSelect">Jump to brand:</label>
-                <select id="brandSelect" class="custom-select">
-                    <option value="">All brands</option>
-                    ${brands.map(b => `<option value="brand-${b.name.replace(/\s+/g, '-')}">${b.name}</option>`).join('')}
-                </select>
-            </div>
-            <div>
-                <label for="personSelect">Jump to person:</label>
-                <select id="personSelect" class="custom-select">
-                    <option value="">All persons</option>
-                    ${brands.map(b => b.persons.map(p => 
-                        `<option value="person-${b.name.replace(/\s+/g, '-')}-${p.name.replace(/\s+/g, '-')}">${b.name} – ${p.name}</option>`
-                    ).join('')).join('')}
-                </select>
-            </div>
-            <div>
-                <label for="dateSelect">Jump to date:</label>
-                <select id="dateSelect" class="custom-select">
-                    <option value="">All dates</option>
-                    ${brands.map(b => b.persons.map(p => p.dates.map(d => 
-                        `<option value="date-${b.name.replace(/\s+/g, '-')}-${p.name.replace(/\s+/g, '-')}-${d.name}">${b.name} – ${p.name} – ${d.name}</option>`
-                    ).join('')).join('')).join('')}
-                </select>
-            </div>
+    <div class="search-hint-bar">
+        <span>Press **Tab** to cycle suggestions</span>
+        <span>**ESC** to close</span>
+    </div>
+</div>
+<% if (brandsData.length === 0) { %>
+    <p>No folders yet.</p>
+<% } else { %>
+    
+    <div class="jumper-bar-premium">
+        <div>
+            <label for="brandSelect">Jump to brand:</label>
+            <select id="brandSelect" class="custom-select">
+                <option value="">All brands</option>
+                <% brandsData.forEach(function(b) { %>
+                    <option value="brand-<%= b.name.replace(/\s+/g, '-') %>"><%= b.name %></option>
+                <% }); %>
+            </select>
         </div>
-        
-        <div class="albums">
-        `;
-        
-        // --- Brands, Persons, Dates, Photos (Iterative loop) ---
-        brands.forEach(brand => {
-            html += `
-            <section class="album" id="brand-${brand.name.replace(/\s+/g, '-')}">
-                <h2 class="brand-title">${brand.name}</h2>
-            `;
-            brand.persons.forEach(person => {
-                html += `
-                <section class="person-block" id="person-${brand.name.replace(/\s+/g, '-')}-${person.name.replace(/\s+/g, '-')}">
-                    <h3 class="person-name">${person.name}</h3>
-                `;
-                person.dates.forEach(date => {
-                    if (date.files.length > 0) {
-                        html += `
-                        <div class="date-block" id="date-${brand.name.replace(/\s+/g, '-')}-${person.name.replace(/\s+/g, '-')}-${date.name}">
-                            <h4 class="date-header">${date.name}</h4>
+        <div>
+            <label for="personSelect">Jump to person:</label>
+            <select id="personSelect" class="custom-select">
+                <option value="">All persons</option>
+                <% brandsData.forEach(function(b) { %>
+                    <% b.persons.forEach(function(p) { %>
+                        <option value="person-<%= b.name.replace(/\s+/g, '-') %>-<%= p.name.replace(/\s+/g, '-') %>"><%= b.name %> – <%= p.name %></option>
+                    <% }); %>
+                <% }); %>
+            </select>
+        </div>
+        <div>
+            <label for="dateSelect">Jump to date:</label>
+            <select id="dateSelect" class="custom-select">
+                <option value="">All dates</option>
+                <% brandsData.forEach(function(b) { %>
+                    <% b.persons.forEach(function(p) { %>
+                        <% p.dates.forEach(function(d) { %>
+                            <option value="date-<%= b.name.replace(/\s+/g, '-') %>-<%= p.name.replace(/\s+/g, '-') %>-<%= d.name %>"><%= b.name %> – <%= p.name %> – <%= d.name %></option>
+                        <% }); %>
+                    <% }); %>
+                <% }); %>
+            </select>
+        </div>
+    </div>
+    
+    <div class="albums">
+    <% brandsData.forEach(function(brand) { %>
+        <section class="album" id="brand-<%= brand.name.replace(/\s+/g, '-') %>">
+            <h2 class="brand-title"><%= brand.name %></h2>
+            <% brand.persons.forEach(function(person) { %>
+                <section class="person-block" id="person-<%= brand.name.replace(/\s+/g, '-') %>-<%= person.name.replace(/\s+/g, '-') %>">
+                    <h3 class="person-name"><%= person.name %></h3>
+                    <% person.dates.forEach(function(date) { %>
+                        <% if (date.files.length > 0) { %>
+                        <div class="date-block" id="date-<%= brand.name.replace(/\s+/g, '-') %>-<%= person.name.replace(/\s+/g, '-') %>-<%= date.name %>">
+                            <h4 class="date-header"><%= date.name %></h4>
                             <div class="photos card-grid">
-                        `;
-                        date.files.forEach(file => {
-                            let adminActions = '';
-                            if (admin) {
-                                adminActions = `
-                                    <div class="photo-actions-premium">
-                                        <form method="POST" action="/rename-photo" class="rename-form">
-                                            <input type="hidden" name="brand" value="${brand.name}" />
-                                            <input type="hidden" name="person" value="${person.name}" />
-                                            <input type="hidden" name="date" value="${date.name}" />
-                                            <input type="hidden" name="oldfilename" value="${file.name}" />
-                                            <input type="text" name="newfilename" placeholder="New name" class="rename-input" required />
-                                            <button type="submit" class="action-btn rename-btn">Rename</button>
-                                        </form>
-                                        <form method="POST" action="/delete-photo" class="delete-form">
-                                            <input type="hidden" name="brand" value="${brand.name}" />
-                                            <input type="hidden" name="person" value="${person.name}" />
-                                            <input type="hidden" name="date" value="${date.name}" />
-                                            <input type="hidden" name="filename" value="${file.name}" />
-                                            <button type="submit" class="action-btn delete-btn">Delete</button>
-                                        </form>
+                            <% date.files.forEach(function(file) { %>
+                                <a href="<%= file.src %>" class="gallery-card" data-lightbox="gallery" data-title="<%= file.name %>">
+                                    <div class="card-image-container">
+                                        <img src="<%= file.src %>" alt="<%= file.name %>" loading="lazy" />
                                     </div>
-                                `;
-                            }
-                            html += `
-                            <a href="${file.src}" class="gallery-card" data-lightbox="gallery" data-title="${file.name}">
-                                <div class="card-image-container">
-                                    <img src="${file.src}" alt="${file.name}" loading="lazy" />
-                                </div>
-                                <div class="card-info">
-                                    <h3>${file.name}</h3>
-                                    <p>${person.name}, ${date.name}</p>
-                                    ${adminActions}
-                                </div>
-                            </a>
-                            `;
-                        }); // end file loop
-                        html += `
+                                    <div class="card-info">
+                                        <h3><%= file.name %></h3>
+                                        <p><%= person.name %>, <%= date.name %></p>
+                                        <% if (admin) { %>
+                                            <div class="photo-actions-premium">
+                                                <form method="POST" action="/rename-photo" class="rename-form">
+                                                    <input type="hidden" name="brand" value="<%= brand.name %>" />
+                                                    <input type="hidden" name="person" value="<%= person.name %>" />
+                                                    <input type="hidden" name="date" value="<%= date.name %>" />
+                                                    <input type="hidden" name="oldfilename" value="<%= file.name %>" />
+                                                    <input type="text" name="newfilename" placeholder="New name" class="rename-input" required />
+                                                    <button type="submit" class="action-btn rename-btn">Rename</button>
+                                                </form>
+                                                <form method="POST" action="/delete-photo" class="delete-form">
+                                                    <input type="hidden" name="brand" value="<%= brand.name %>" />
+                                                    <input type="hidden" name="person" value="<%= person.name %>" />
+                                                    <input type="hidden" name="date" value="<%= date.name %>" />
+                                                    <input type="hidden" name="filename" value="<%= file.name %>" />
+                                                    <button type="submit" class="action-btn delete-btn">Delete</button>
+                                                </form>
+                                            </div>
+                                        <% } %>
+                                    </div>
+                                </a>
+                            <% }); %>
                             </div>
                         </div>
-                        `;
-                    }
-                }); // end date loop
-                html += `
+                        <% } %>
+                    <% }); %>
                 </section>
-                `;
-            }); // end person loop
-            html += `
-            </section>
-            `;
-        }); // end brand loop
+            <% }); %>
+        </section>
+    <% }); %>
+    </div>
+<% } %>
 
-        html += `
-        </div>
-        `;
-    } // end else (data exists)
-    
-    // --- JavaScript Logic (must be passed through JSON.stringify) ---
-    const brandsDataJSON = JSON.stringify(brands);
-    
-    html += `
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // JUMPER LOGIC
-            const brandSelect = document.getElementById('brandSelect');
-            const personSelect = document.getElementById('personSelect');
-            const dateSelect = document.getElementById('dateSelect');
+<script id="brands-data-json" type="application/json">
+    <%= JSON.stringify(brandsData) %>
+</script>
 
-            function jumpTo(id) {
-                if (!id) return;
-                const el = document.getElementById(id);
-                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        
+        // JUMPER LOGIC
+        const brandSelect = document.getElementById('brandSelect');
+        const personSelect = document.getElementById('personSelect');
+        const dateSelect = document.getElementById('dateSelect');
 
-            if (brandSelect) {
-                brandSelect.addEventListener('change', function () {
-                    jumpTo(this.value);
-                });
-            }
-            if (personSelect) {
-                personSelect.addEventListener('change', function () {
-                    jumpTo(this.value);
-                });
-            }
-            if (dateSelect) {
-                dateSelect.addEventListener('change', function () {
-                    jumpTo(this.value);
-                });
-            }
-            
-            // 💥 NEW SEARCH & ANIMATED SUGGESTION LOGIC START
+        function jumpTo(id) {
+            if (!id) return;
+            const el = document.getElementById(id);
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
 
-            const searchInput = document.getElementById('gallerySearch');
-            const suggestionDropdown = document.getElementById('suggestion-dropdown');
-            let activeSuggestionIndex = -1;
+        if (brandSelect) {
+            brandSelect.addEventListener('change', function () {
+                jumpTo(this.value);
+            });
+        }
+        if (personSelect) {
+            personSelect.addEventListener('change', function () {
+                jumpTo(this.value);
+            });
+        }
+        if (dateSelect) {
+            dateSelect.addEventListener('change', function () {
+                jumpTo(this.value);
+            });
+        }
+        
+        // 💥 NEW SEARCH & ANIMATED SUGGESTION LOGIC START
+        
+        // 🚨 CRITICAL: Retrieve data from the JSON script tag
+        const brandsData = JSON.parse(document.getElementById('brands-data-json').textContent.trim());
 
-            function normalize(str) {
-                return str.toLowerCase().trim();
-            }
-            
-            // Function to collect suggestions based on the data provided by EJS
-            function createSuggestionHTML(brands, term) {
-                if (!term) return [];
+        const searchInput = document.getElementById('gallerySearch');
+        const suggestionDropdown = document.getElementById('suggestion-dropdown');
+        let activeSuggestionIndex = -1;
 
-                const MAX_SUGGESTIONS = 8;
-                let suggestions = [];
-                const normalizedTerm = normalize(term);
+        function normalize(str) {
+            return str.toLowerCase().trim();
+        }
+        
+        // Function to collect suggestions based on the data provided by EJS
+        function createSuggestionHTML(brands, term) {
+            if (!term) return [];
 
-                // 1. Brand Suggestions
-                brands.forEach(brand => {
-                    const nBrandName = normalize(brand.name);
-                    if (nBrandName.includes(normalizedTerm)) {
+            const MAX_SUGGESTIONS = 8;
+            let suggestions = [];
+            const normalizedTerm = normalize(term);
+
+            // 1. Brand Suggestions
+            brands.forEach(brand => {
+                const nBrandName = normalize(brand.name);
+                if (nBrandName.includes(normalizedTerm)) {
+                    suggestions.push({
+                        type: 'Brand',
+                        label: brand.name,
+                        id: `brand-${brand.name.replace(/\s+/g, '-')}`,
+                        icon: '🏢' 
+                    });
+                }
+            });
+            if (suggestions.length >= MAX_SUGGESTIONS) return suggestions.slice(0, MAX_SUGGESTIONS);
+
+            // 2. Person Suggestions
+            brands.forEach(brand => {
+                brand.persons.forEach(person => {
+                    const nPersonName = normalize(person.name);
+                    if (nPersonName.includes(normalizedTerm)) {
                         suggestions.push({
-                            type: 'Brand',
-                            label: brand.name,
-                            id: \`brand-\${brand.name.replace(/\\s+/g, '-')}\`,
-                            icon: '🏢' 
+                            type: 'Person',
+                            label: person.name,
+                            description: `in ${brand.name}`,
+                            id: `person-${brand.name.replace(/\s+/g, '-')}-${person.name.replace(/\s+/g, '-')}`,
+                            icon: '👤'
                         });
                     }
                 });
-                if (suggestions.length >= MAX_SUGGESTIONS) return suggestions.slice(0, MAX_SUGGESTIONS);
+            });
+            if (suggestions.length >= MAX_SUGGESTIONS) return suggestions.slice(0, MAX_SUGGESTIONS);
 
-                // 2. Person Suggestions
-                brands.forEach(brand => {
-                    brand.persons.forEach(person => {
-                        const nPersonName = normalize(person.name);
-                        if (nPersonName.includes(normalizedTerm)) {
+            // 3. Date Suggestions
+            brands.forEach(brand => {
+                brand.persons.forEach(person => {
+                    person.dates.forEach(date => {
+                        const nDateName = normalize(date.name);
+                        if (nDateName.includes(normalizedTerm)) {
                             suggestions.push({
-                                type: 'Person',
-                                label: person.name,
-                                description: \`in \${brand.name}\`,
-                                id: \`person-\${brand.name.replace(/\\s+/g, '-')}-\${person.name.replace(/\\s+/g, '-')}\`,
-                                icon: '👤'
+                                type: 'Date',
+                                label: date.name,
+                                description: `${person.name} in ${brand.name}`,
+                                id: `date-${brand.name.replace(/\s+/g, '-')}-${person.name.replace(/\s+/g, '-')}-${date.name}`,
+                                icon: '📅'
                             });
                         }
                     });
                 });
-                if (suggestions.length >= MAX_SUGGESTIONS) return suggestions.slice(0, MAX_SUGGESTIONS);
-
-                // 3. Date Suggestions
-                brands.forEach(brand => {
-                    brand.persons.forEach(person => {
-                        person.dates.forEach(date => {
-                            const nDateName = normalize(date.name);
-                            if (nDateName.includes(normalizedTerm)) {
-                                suggestions.push({
-                                    type: 'Date',
-                                    label: date.name,
-                                    description: \`\${person.name} in \${brand.name}\`,
-                                    id: \`date-\${brand.name.replace(/\\s+/g, '-')}-\${person.name.replace(/\\s+/g, '-')}-\${date.name}\`,
-                                    icon: '📅'
-                                });
-                            }
-                        });
-                    });
-                });
-                
-                return suggestions.slice(0, MAX_SUGGESTIONS);
-            }
+            });
             
-            function renderDropdown(suggestions) {
-                if (suggestions.length === 0) {
-                    suggestionDropdown.classList.remove('active'); 
-                    searchInput.setAttribute('aria-expanded', 'false');
-                    return;
-                }
-
-                const listItems = suggestions.map((suggestion, index) => {
-                    const isActive = index === activeSuggestionIndex;
-                    const activeClass = isActive ? 'active-suggestion' : '';
-                    searchInput.setAttribute('aria-activedescendant', isActive ? suggestion.id : '');
-
-                    return \`
-                        <li 
-                            class="suggestion-item \${activeClass}" 
-                            id="\${suggestion.id}" 
-                            tabindex="-1"
-                            data-value="\${suggestion.label}"
-                            data-scroll-id="\${suggestion.id}"
-                        >
-                            <div class="suggestion-content">
-                                <span class="suggestion-icon">\${suggestion.icon}</span>
-                                <span class="suggestion-label">\${suggestion.label}</span>
-                                \${suggestion.description ? \`<span class="suggestion-description">\${suggestion.description}</span>\` : ''}
-                            </div>
-                            <span class="suggestion-type">\${suggestion.type}</span>
-                        </li>
-                    \`;
-                }).join('');
-
-                suggestionDropdown.innerHTML = \`<ul role="listbox">\${listItems}</ul>\`;
-                suggestionDropdown.classList.add('active'); 
-                searchInput.setAttribute('aria-expanded', 'true');
+            return suggestions.slice(0, MAX_SUGGESTIONS);
+        }
+        
+        function renderDropdown(suggestions) {
+            if (suggestions.length === 0) {
+                suggestionDropdown.classList.remove('active'); 
+                searchInput.setAttribute('aria-expanded', 'false');
+                return;
             }
 
-            function executeSearch(term) {
-                // This is your filtering logic
-                const normalizedTerm = normalize(term);
-                const brandSections = document.querySelectorAll('.album');
+            const listItems = suggestions.map((suggestion, index) => {
+                const isActive = index === activeSuggestionIndex;
+                const activeClass = isActive ? 'active-suggestion' : '';
+                searchInput.setAttribute('aria-activedescendant', isActive ? suggestion.id : '');
 
-                if (!normalizedTerm) {
-                    brandSections.forEach(sec => sec.style.display = '');
-                }
+                return `
+                    <li 
+                        class="suggestion-item ${activeClass}" 
+                        id="${suggestion.id}" 
+                        tabindex="-1"
+                        data-value="${suggestion.label}"
+                        data-scroll-id="${suggestion.id}"
+                    >
+                        <div class="suggestion-content">
+                            <span class="suggestion-icon">${suggestion.icon}</span>
+                            <span class="suggestion-label">${suggestion.label}</span>
+                            ${suggestion.description ? `<span class="suggestion-description">${suggestion.description}</span>` : ''}
+                        </div>
+                        <span class="suggestion-type">${suggestion.type}</span>
+                    </li>
+                `;
+            }).join('');
 
-                brandSections.forEach(sec => {
-                    const brandName = normalize(sec.querySelector('h2').textContent || '');
-                    const personBlocks = sec.querySelectorAll('.person-block');
-                    let brandHasMatch = false;
+            suggestionDropdown.innerHTML = `<ul role="listbox">${listItems}</ul>`;
+            suggestionDropdown.classList.add('active'); 
+            searchInput.setAttribute('aria-expanded', 'true');
+        }
 
-                    personBlocks.forEach(pb => {
-                        const personName = normalize(pb.querySelector('h3').textContent || '');
-                        const dateBlocks = pb.querySelectorAll('.date-block');
-                        let personHasMatch = false;
+        function executeSearch(term) {
+            // This is your filtering logic
+            const normalizedTerm = normalize(term);
+            const brandSections = document.querySelectorAll('.album');
 
-                        dateBlocks.forEach(db => {
-                            const dateText = normalize(db.querySelector('h4').textContent || '');
-                            const photoCards = db.querySelectorAll('.gallery-card');
-                            let dateHasMatch = false;
-                            
-                            // Filter photo cards (new logic for premium card structure)
-                            photoCards.forEach(card => {
-                                // The file name is now inside the <h3> tag in .card-info
-                                const filename = normalize(card.querySelector('.card-info h3').textContent || '');
-                                const cardCombined = brandName + ' ' + personName + ' ' + dateText + ' ' + filename;
-                                const match = cardCombined.includes(normalizedTerm);
-                                card.style.display = match ? 'block' : 'none'; 
-                                if (match) dateHasMatch = true;
-                            });
-                            
-                            // Show/hide date block
-                            db.style.display = dateHasMatch ? '' : 'none';
-                            if (dateHasMatch) personHasMatch = true;
-                        });
-
-                        // Show/hide person block
-                        pb.style.display = personHasMatch ? '' : 'none';
-                        if (personHasMatch) brandHasMatch = true;
-                    });
-
-                    // Show/hide brand section
-                    sec.style.display = brandHasMatch ? '' : 'none';
-                });
-                
-                // After executing search, close the dropdown
-                suggestionDropdown.classList.remove('active');
+            if (!normalizedTerm) {
+                brandSections.forEach(sec => sec.style.display = '');
             }
 
-            function applySearch() {
-                const term = searchInput.value.trim();
-                // We parse the data injected from the server (brandsDataJSON)
-                const brandsData = JSON.parse(document.getElementById('brands-data-json').textContent);
-                const suggestions = createSuggestionHTML(brandsData, term); 
+            brandSections.forEach(sec => {
+                const brandName = normalize(sec.querySelector('h2').textContent || '');
+                const personBlocks = sec.querySelectorAll('.person-block');
+                let brandHasMatch = false;
 
-                if (term.length > 0) {
-                    renderDropdown(suggestions);
-                } else {
-                    suggestionDropdown.classList.remove('active');
-                    executeSearch(''); // Show all items when search is empty
-                }
-                
-                // Always run the filtering on every input for basic search functionality
-                executeSearch(term); 
-            }
-            
-            function handleNavigation(e) {
-                const items = Array.from(suggestionDropdown.querySelectorAll('.suggestion-item'));
-                
-                if (items.length === 0) return;
-                
-                // Key logic for navigation
-                if (e.key === 'ArrowDown') {
-                    e.preventDefault();
-                    activeSuggestionIndex = (activeSuggestionIndex + 1) % items.length;
-                } else if (e.key === 'ArrowUp') {
-                    e.preventDefault();
-                    activeSuggestionIndex = (activeSuggestionIndex - 1 + items.length) % items.length;
-                } else if (e.key === 'Enter') {
-                    e.preventDefault();
-                    if (activeSuggestionIndex >= 0) {
-                        const selectedItem = items[activeSuggestionIndex];
-                        const jumpId = selectedItem.dataset.scrollId;
-                        const value = selectedItem.dataset.value;
+                personBlocks.forEach(pb => {
+                    const personName = normalize(pb.querySelector('h3').textContent || '');
+                    const dateBlocks = pb.querySelectorAll('.date-block');
+                    let personHasMatch = false;
+
+                    dateBlocks.forEach(db => {
+                        const dateText = normalize(db.querySelector('h4').textContent || '');
+                        const photoCards = db.querySelectorAll('.gallery-card');
+                        let dateHasMatch = false;
                         
-                        searchInput.value = value;
-                        jumpTo(jumpId); // Use the Jumper functionality
-                        executeSearch(value);
-                    } else {
-                        // Execute the text search if Enter is pressed without selecting an item
-                        executeSearch(searchInput.value);
-                    }
-                } else if (e.key === 'Escape') {
-                    e.preventDefault();
-                    suggestionDropdown.classList.remove('active');
-                } else if (e.key === 'Tab') {
-                    e.preventDefault(); // Prevent tab from leaving the input field initially
-                    activeSuggestionIndex = (activeSuggestionIndex + 1) % items.length;
-                }
+                        // Filter photo cards (new logic for premium card structure)
+                        photoCards.forEach(card => {
+                            // The file name is now inside the <h3> tag in .card-info
+                            const filename = normalize(card.querySelector('.card-info h3').textContent || '');
+                            const cardCombined = brandName + ' ' + personName + ' ' + dateText + ' ' + filename;
+                            const match = cardCombined.includes(normalizedTerm);
+                            card.style.display = match ? 'block' : 'none'; 
+                            if (match) dateHasMatch = true;
+                        });
+                        
+                        // Show/hide date block
+                        db.style.display = dateHasMatch ? '' : 'none';
+                        if (dateHasMatch) personHasMatch = true;
+                    });
 
-                // Re-render to highlight the active item
-                const brandsData = JSON.parse(document.getElementById('brands-data-json').textContent);
-                const suggestions = createSuggestionHTML(brandsData, searchInput.value.trim());
+                    // Show/hide person block
+                    pb.style.display = personHasMatch ? '' : 'none';
+                    if (personHasMatch) brandHasMatch = true;
+                });
 
+                // Show/hide brand section
+                sec.style.display = brandHasMatch ? '' : 'none';
+            });
+            
+            // After executing search, close the dropdown
+            suggestionDropdown.classList.remove('active');
+        }
+
+        function applySearch() {
+            const term = searchInput.value.trim();
+            const suggestions = createSuggestionHTML(brandsData, term); 
+
+            if (term.length > 0) {
                 renderDropdown(suggestions);
-                
-                // Ensure the active item is visible in the dropdown
-                const updatedItems = Array.from(suggestionDropdown.querySelectorAll('.suggestion-item'));
-                if (activeSuggestionIndex >= 0 && updatedItems[activeSuggestionIndex]) {
-                    updatedItems[activeSuggestionIndex].scrollIntoView({ block: 'nearest' });
-                }
+            } else {
+                suggestionDropdown.classList.remove('active');
+                executeSearch(''); // Show all items when search is empty
             }
             
-            // Event Listeners
-            if (searchInput) {
-                let searchTimeout;
-                searchInput.addEventListener('input', function() {
-                    clearTimeout(searchTimeout);
-                    // Debounce the main search/suggestion creation
-                    searchTimeout = setTimeout(applySearch, 150);
-                });
-                
-                searchInput.addEventListener('keydown', handleNavigation);
-                
-                // Click listener on the dropdown for immediate selection
-                suggestionDropdown.addEventListener('click', function(e) {
-                    const item = e.target.closest('.suggestion-item');
-                    if (item) {
-                        const jumpId = item.dataset.scrollId;
-                        const value = item.dataset.value;
-                        
-                        searchInput.value = value;
-                        jumpTo(jumpId);
-                        executeSearch(value);
-                    }
-                });
-                
-                // Hide dropdown when clicking outside
-                document.addEventListener('click', function(e) {
-                    if (!searchInput.contains(e.target) && !suggestionDropdown.contains(e.target)) {
-                        suggestionDropdown.classList.remove('active');
-                    }
-                });
+            // Always run the filtering on every input for basic search functionality
+            executeSearch(term); 
+        }
+        
+        function handleNavigation(e) {
+            const items = Array.from(suggestionDropdown.querySelectorAll('.suggestion-item'));
+            
+            if (items.length === 0) return;
+            
+            // Key logic for navigation
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                activeSuggestionIndex = (activeSuggestionIndex + 1) % items.length;
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                activeSuggestionIndex = (activeSuggestionIndex - 1 + items.length) % items.length;
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                if (activeSuggestionIndex >= 0) {
+                    const selectedItem = items[activeSuggestionIndex];
+                    const jumpId = selectedItem.dataset.scrollId;
+                    const value = selectedItem.dataset.value;
+                    
+                    searchInput.value = value;
+                    jumpTo(jumpId); // Use the Jumper functionality
+                    executeSearch(value);
+                } else {
+                    // Execute the text search if Enter is pressed without selecting an item
+                    executeSearch(searchInput.value);
+                }
+            } else if (e.key === 'Escape') {
+                e.preventDefault();
+                suggestionDropdown.classList.remove('active');
+            } else if (e.key === 'Tab') {
+                e.preventDefault(); // Prevent tab from leaving the input field initially
+                activeSuggestionIndex = (activeSuggestionIndex + 1) % items.length;
             }
-        });
-    </script>
-    `; // End of script block
-    
-    // Inject the brands data as a script tag for the JavaScript to use
-    html += `<script id="brands-data-json" type="application/json">${brandsDataJSON}</script>`;
 
-    return html;
-}
-%>
+            // Re-render to highlight the active item
+            const suggestions = createSuggestionHTML(brandsData, searchInput.value.trim());
+
+            renderDropdown(suggestions);
+            
+            // Ensure the active item is visible in the dropdown
+            const updatedItems = Array.from(suggestionDropdown.querySelectorAll('.suggestion-item'));
+            if (activeSuggestionIndex >= 0 && updatedItems[activeSuggestionIndex]) {
+                updatedItems[activeSuggestionIndex].scrollIntoView({ block: 'nearest' });
+            }
+        }
+        
+        // Event Listeners
+        if (searchInput) {
+            let searchTimeout;
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                // Debounce the main search/suggestion creation
+                searchTimeout = setTimeout(applySearch, 150);
+            });
+            
+            searchInput.addEventListener('keydown', handleNavigation);
+            
+            // Click listener on the dropdown for immediate selection
+            suggestionDropdown.addEventListener('click', function(e) {
+                const item = e.target.closest('.suggestion-item');
+                if (item) {
+                    const jumpId = item.dataset.scrollId;
+                    const value = item.dataset.value;
+                    
+                    searchInput.value = value;
+                    jumpTo(jumpId);
+                    executeSearch(value);
+                }
+            });
+            
+            // Hide dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !suggestionDropdown.contains(e.target)) {
+                    suggestionDropdown.classList.remove('active');
+                }
+            });
+        }
+    });
+</script>
+
+<%- include('layout', { body: '', galleryTitle: title, brands: brandsData, isAdmin: admin }) %>
