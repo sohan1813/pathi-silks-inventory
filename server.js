@@ -664,8 +664,8 @@ app.get('/sales-gallery', requireLogin('boss'), async (req, res) => {
   res.render('gallery', { brands, isAdmin: false, galleryTitle: 'Sales Gallery' });
 });
 
-// Boss Stock Purchase page
-app.get('/purchases', requireLogin('boss'), async (req, res) => {
+// Stock Purchase page (boss + admin)
+app.get('/purchases', requireLogin(), async (req, res) => {
   const purchasesMeta = await getPurchasesMetadata();
   const purchases = Object.values(purchasesMeta).sort((a, b) =>
     a.date.localeCompare(b.date)
