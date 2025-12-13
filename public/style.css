@@ -396,7 +396,8 @@ button {
   z-index: 9999;
 }
 
-lightbox-content {
+/* fixed: missing dot here */
+.lightbox-content {
   width: 90vw;
   height: 90vh;
   display: flex;
@@ -444,7 +445,8 @@ lightbox-content {
   left: 32px;
 }
 
-lightbox-next {
+/* fixed: missing dot here */
+.lightbox-next {
   right: 32px;
 }
 
