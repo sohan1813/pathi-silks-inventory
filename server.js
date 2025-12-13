@@ -296,33 +296,59 @@ app.post('/upload', requireLogin('admin'), async (req, res) => {
   }
 });
 
-// Handle stock purchase upload (single image + metadata)
+// Handle stock purchase upload (invoice + product image + metadata)
 app.post('/admin/upload-purchase', requireLogin('admin'), async (req, res) => {
   const { date, supplier, purchaseIds, returnInfo } = req.body;
 
+  // product image required, invoice optional
   if (!req.files || !req.files.image || !date || !supplier) {
     return res.status(400).send('Missing data or file');
   }
 
-  const img = req.files.image;
+  const productImg = req.files.image;
+  const invoiceImg = req.files.invoiceImage; // optional
+
   const timestamp = Date.now();
   const safeSupplier = supplier.trim().replace(/\s+/g, '-');
   const id = `${date}-${safeSupplier}-${timestamp}`;
-  const ext = path.extname(img.name) || '.jpg';
-  const s3Key = `purchases/${id}${ext}`;
+
+  let imageUrl = '';
+  let invoiceUrl = '';
 
   try {
+    // upload product photo
+    const prodExt = path.extname(productImg.name) || '.jpg';
+    const prodKey = `purchases/${id}-product${prodExt}`;
+
     await s3.send(
       new PutObjectCommand({
         Bucket: S3_BUCKET,
-        Key: s3Key,
-        Body: img.data,
-        ContentType: img.mimetype,
+        Key: prodKey,
+        Body: productImg.data,
+        ContentType: productImg.mimetype,
         CacheControl: 'public, max-age=31536000',
       })
     );
 
-    const imageUrl = `https://${S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${s3Key}`;
+    imageUrl = `https://${S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${prodKey}`;
+
+    // upload invoice photo if provided
+    if (invoiceImg) {
+      const invExt = path.extname(invoiceImg.name) || '.jpg';
+      const invKey = `purchases/${id}-invoice${invExt}`;
+
+      await s3.send(
+        new PutObjectCommand({
+          Bucket: S3_BUCKET,
+          Key: invKey,
+          Body: invoiceImg.data,
+          ContentType: invoiceImg.mimetype,
+          CacheControl: 'public, max-age=31536000',
+        })
+      );
+
+      invoiceUrl = `https://${S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${invKey}`;
+    }
 
     const purchasesMeta = await getPurchasesMetadata();
     purchasesMeta[id] = {
@@ -330,7 +356,8 @@ app.post('/admin/upload-purchase', requireLogin('admin'), async (req, res) => {
       date,
       supplier: supplier.trim(),
       purchaseIds: purchaseIds || '',
-      imageUrl,
+      imageUrl,   // product
+      invoiceUrl, // invoice
       returnInfo: returnInfo || '',
     };
     await savePurchasesMetadata(purchasesMeta);
