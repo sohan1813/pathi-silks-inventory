@@ -576,6 +576,11 @@ app.get('/sales-gallery', requireLogin('boss'), async (req, res) => {
   res.render('gallery', { brands, isAdmin: false, galleryTitle: 'Sales Gallery' });
 });
 
+// Boss invoices page (new)
+app.get('/invoices', requireLogin('boss'), (req, res) => {
+  res.render('invoices', { title: 'Invoices' });
+});
+
 // --- START SERVER ---
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

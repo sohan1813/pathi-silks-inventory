@@ -4,33 +4,39 @@
   <meta charset="UTF-8" />
   <title>Invoices - Pathi Silks Inventory</title>
   <link rel="stylesheet" href="/public/style.css" />
-  <meta name="theme-color" content="#201a2c" />
 </head>
 <body class="invoice-page">
-  <div class="invoice-layout">
-    <!-- Left column: navigation / list -->
-    <aside class="invoice-left">
-      <h2>Invoices</h2>
-      <ul class="invoice-list">
-        <li class="active">INV-001</li>
-        <li>INV-002</li>
-        <li>INV-003</li>
-      </ul>
-    </aside>
+  <div class="page">
+    <div class="page-inner">
+      <header>
+        <div class="header-left">
+          <img src="/public/pathi-logo.jpg" alt="Pathi Silks logo" class="header-logo">
+          <div class="header-title">Pathi Silks Inventory</div>
+        </div>
+        <nav>
+          <a href="/gallery">📸 Main Gallery</a>
+          <a href="/other-gallery">🗂️ Other Albums</a>
+          <a href="/sales-gallery">💰 Sales</a>
+          <a href="/sheets">📊 Sheets</a>
+          <a href="/invoices">🧾 Invoices</a>
+        </nav>
+      </header>
 
-    <!-- Center: big full-screen style image -->
-    <main class="invoice-center">
-      <img src="/public/sample/invoice-001.jpg" alt="Invoice preview" class="invoice-image" />
-    </main>
-
-    <!-- Right column: details / buttons -->
-    <aside class="invoice-right">
-      <h3>Invoice details</h3>
-      <p>Customer: Demo</p>
-      <p>Date: 2025-12-13</p>
-      <button>Download PDF</button>
-      <button>Share</button>
-    </aside>
+      <div class="invoice-layout">
+        <aside class="invoice-left">
+          <!-- later: list of invoices -->
+          <h2>Invoices</h2>
+        </aside>
+        <main class="invoice-center">
+          <!-- big full-screen style image -->
+          <img src="/public/sample/invoice-001.jpg" class="invoice-image" alt="Invoice" />
+        </main>
+        <aside class="invoice-right">
+          <!-- details column -->
+          <h3>Details</h3>
+        </aside>
+      </div>
+    </div>
   </div>
 </body>
 </html>
