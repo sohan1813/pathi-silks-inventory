@@ -100,6 +100,48 @@ async function saveSheetsMetadata(data) {
   await saveSheetsToS3(data);
 }
 
+// --- S3 HELPERS FOR PURCHASES METADATA ---
+async function loadPurchasesFromS3() {
+  try {
+    const command = new GetObjectCommand({
+      Bucket: S3_BUCKET,
+      Key: 'metadata/purchases.json',
+    });
+    const response = await s3.send(command);
+
+    const chunks = [];
+    for await (const chunk of response.Body) {
+      chunks.push(chunk);
+    }
+    const json = Buffer.concat(chunks).toString('utf8');
+    return JSON.parse(json);
+  } catch (err) {
+    if (err.name !== 'NoSuchKey' && err.$metadata?.httpStatusCode !== 404) {
+      console.error('loadPurchasesFromS3 error:', err);
+    }
+    return {};
+  }
+}
+
+async function savePurchasesToS3(data) {
+  const body = Buffer.from(JSON.stringify(data, null, 2), 'utf8');
+  const command = new PutObjectCommand({
+    Bucket: S3_BUCKET,
+    Key: 'metadata/purchases.json',
+    Body: body,
+    ContentType: 'application/json',
+  });
+  await s3.send(command);
+}
+
+async function getPurchasesMetadata() {
+  return await loadPurchasesFromS3();
+}
+
+async function savePurchasesMetadata(data) {
+  await savePurchasesToS3(data);
+}
+
 // --- PHOTOS METADATA HELPERS (S3 JSON) ---
 async function loadPhotosFromS3() {
   try {
@@ -251,6 +293,52 @@ app.post('/upload', requireLogin('admin'), async (req, res) => {
   } catch (err) {
     console.error('S3 upload error:', err);
     res.status(500).send('Upload failed');
+  }
+});
+
+// Handle stock purchase upload (single image + metadata)
+app.post('/admin/upload-purchase', requireLogin('admin'), async (req, res) => {
+  const { date, supplier, purchaseIds, returnInfo } = req.body;
+
+  if (!req.files || !req.files.image || !date || !supplier) {
+    return res.status(400).send('Missing data or file');
+  }
+
+  const img = req.files.image;
+  const timestamp = Date.now();
+  const safeSupplier = supplier.trim().replace(/\s+/g, '-');
+  const id = `${date}-${safeSupplier}-${timestamp}`;
+  const ext = path.extname(img.name) || '.jpg';
+  const s3Key = `purchases/${id}${ext}`;
+
+  try {
+    await s3.send(
+      new PutObjectCommand({
+        Bucket: S3_BUCKET,
+        Key: s3Key,
+        Body: img.data,
+        ContentType: img.mimetype,
+        CacheControl: 'public, max-age=31536000',
+      })
+    );
+
+    const imageUrl = `https://${S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${s3Key}`;
+
+    const purchasesMeta = await getPurchasesMetadata();
+    purchasesMeta[id] = {
+      id,
+      date,
+      supplier: supplier.trim(),
+      purchaseIds: purchaseIds || '',
+      imageUrl,
+      returnInfo: returnInfo || '',
+    };
+    await savePurchasesMetadata(purchasesMeta);
+
+    res.redirect('/purchases');
+  } catch (err) {
+    console.error('Upload purchase error:', err);
+    res.status(500).send('Upload purchase failed');
   }
 });
 
@@ -574,6 +662,15 @@ app.get('/sales-gallery', requireLogin('boss'), async (req, res) => {
     }).filter((b) => b.persons.length > 0);
 
   res.render('gallery', { brands, isAdmin: false, galleryTitle: 'Sales Gallery' });
+});
+
+// Boss Stock Purchase page
+app.get('/purchases', requireLogin('boss'), async (req, res) => {
+  const purchasesMeta = await getPurchasesMetadata();
+  const purchases = Object.values(purchasesMeta).sort((a, b) =>
+    a.date.localeCompare(b.date)
+  );
+  res.render('purchases', { purchases });
 });
 
 // Boss invoices page (new)

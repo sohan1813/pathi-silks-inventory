@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Stock Purchase - Pathi Silks Inventory</title>
+  <link rel="stylesheet" href="/public/style.css" />
+</head>
+<body>
+  <div class="page">
+    <div class="page-inner">
+      <header>
+        <div class="header-left">
+          <img src="/public/pathi-logo.jpg" class="header-logo" alt="Logo">
+          <div class="header-title">Pathi-Silks</div>
+        </div>
+        <nav>
+          <a href="/gallery">Main Gallery</a>
+          <a href="/other-gallery">Other Albums</a>
+          <a href="/sales-gallery">Sales</a>
+          <a href="/sheets">Sheets</a>
+          <a href="/purchases">Stock Purchase</a>
+          <button id="themeToggle" class="install-btn">🌙</button>
+          <a href="/logout">Logout</a>
+        </nav>
+      </header>
+
+      <main>
+        <h2>Stock Purchase</h2>
+
+        <div class="search-bar">
+          <input id="purchaseSearch" type="text" placeholder="Search by date, supplier or purchase id…">
+        </div>
+
+        <table class="invoice-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Supplier Name</th>
+              <th>Purchase IDs</th>
+              <th>Product Photo</th>
+              <th>Return</th>
+            </tr>
+          </thead>
+          <tbody id="purchaseTableBody">
+            <% purchases.forEach(function(p) { %>
+              <tr>
+                <td><%= p.date %></td>
+                <td><%= p.supplier %></td>
+                <td><%= p.purchaseIds %></td>
+                <td>
+                  <% if (p.imageUrl) { %>
+                    <a href="<%= p.imageUrl %>" target="_blank">View</a>
+                  <% } %>
+                </td>
+                <td><%= p.returnInfo %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const search = document.getElementById('purchaseSearch');
+    const rows = document.querySelectorAll('#purchaseTableBody tr');
+    if (search) {
+      search.addEventListener('input', () => {
+        const term = search.value.toLowerCase();
+        rows.forEach(row => {
+          const text = row.textContent.toLowerCase();
+          row.style.display = text.includes(term) ? '' : 'none';
+        });
+      });
+    }
+  </script>
+</body>
+</html>

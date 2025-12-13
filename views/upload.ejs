@@ -1,6 +1,7 @@
 <%- include('layout', { body: `
   <h2>Upload Photos</h2>
 
+  <!-- Regular gallery upload -->
   <form method="POST" action="/upload" enctype="multipart/form-data">
     <fieldset class="upload-gallery-type">
       <legend>Upload to</legend>
@@ -34,5 +35,29 @@
     <input type="file" name="images" multiple accept="image/*" required />
 
     <button type="submit">Upload</button>
+  </form>
+
+  <hr style="margin: 32px 0;" />
+
+  <h2>Stock Purchase</h2>
+
+  <!-- Stock purchase upload -->
+  <form method="POST" action="/admin/upload-purchase" enctype="multipart/form-data">
+    <label>Date</label>
+    <input type="date" name="date" required />
+
+    <label>Supplier Name</label>
+    <input type="text" name="supplier" placeholder="e.g. Kanchipuram Supplier" required />
+
+    <label>Purchase IDs (you can add multiple)</label>
+    <textarea name="purchaseIds" rows="2" placeholder="P123, P124, P125"></textarea>
+
+    <label>Product photo</label>
+    <input type="file" name="image" accept="image/*" required />
+
+    <label>Return</label>
+    <input type="text" name="returnInfo" placeholder="None / 1 saree returned" />
+
+    <button type="submit">Save Purchase</button>
   </form>
 ` }) %>
