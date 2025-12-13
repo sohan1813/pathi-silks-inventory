@@ -673,7 +673,40 @@ app.get('/purchases', requireLogin('boss'), async (req, res) => {
   res.render('purchases', { purchases });
 });
 
-// Boss invoices page (new)
+// Admin delete purchase
+app.post('/admin/delete-purchase', requireLogin('admin'), async (req, res) => {
+  const { id } = req.body;
+  if (!id) return res.status(400).send('Missing id');
+
+  const purchasesMeta = await getPurchasesMetadata();
+  const purchase = purchasesMeta[id];
+
+  // delete image from S3 if we can get the key
+  if (purchase && purchase.imageUrl) {
+    const split = purchase.imageUrl.split('.amazonaws.com/');
+    if (split[1]) {
+      const key = split[1];
+      try {
+        await s3.send(
+          new DeleteObjectCommand({
+            Bucket: S3_BUCKET,
+            Key: key,
+          })
+        );
+        console.log('Deleted purchase image from S3:', key);
+      } catch (err) {
+        console.error('Delete purchase image error:', err);
+      }
+    }
+  }
+
+  delete purchasesMeta[id];
+  await savePurchasesMetadata(purchasesMeta);
+
+  res.redirect('/purchases');
+});
+
+// Boss invoices page (placeholder)
 app.get('/invoices', requireLogin('boss'), (req, res) => {
   res.render('invoices', { title: 'Invoices' });
 });
