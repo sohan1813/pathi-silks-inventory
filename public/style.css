@@ -1,734 +1,717 @@
-/* Global layout and brand feel */
-body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  margin: 0;
-  padding: 0;
-  background-image: radial-gradient(
-    125% 125% at 50% 10%,
-    #ffffff 40%,
-    #ec4899 100%
-  );
-  background-size: 100% 100%;
-  background-attachment: fixed;
-  color: #1f2933;
-}
-
-/* Full-page gradient wrapper (used in layout.ejs) */
-.page {
-  min-height: 100vh;
-  width: 100%;
-  position: relative;
-  overflow: hidden;
-  background: transparent;
-}
-
-.page-bg {
-  display: none; /* gradient is now on body */
-}
-
-.page-inner {
-  position: relative;
-  z-index: 1;
-}
-
-main {
-  max-width: 1140px;
-  margin: 0 auto;
-  padding: 0 16px 44px; /* no top padding */
-  background: transparent; /* let gradient show behind content */
-}
-
-/* Absolutely no extra gap for first heading */
-main > h1,
-main > h2 {
-  margin-top: 0;
-}
-
-/* Header with Pathi Silks branding */
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 18px;
-  background: #000000;       /* BLACK in light mode */
-  color: #fff;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
-  position: sticky;
-  top: 0;
-  z-index: 40;
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.header-logo {
-  height: 34px;
-  width: auto;
-  border-radius: 8px;
-}
-
-.header-title {
-  font-size: 20px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-/* Top nav */
-header nav {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-header nav a {
-  color: #f9fafb;
-  text-decoration: none;
-  font-size: 14px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  transition: background 0.18s ease, color 0.18s ease;
-}
-
-header nav a:hover {
-  background: rgba(249, 250, 251, 0.14);
-  color: #ffffff;
-}
-
-/* Install button */
-#installAppBtn,
-.install-btn {
-  padding: 6px 12px;
-  border-radius: 999px;
-  border: 1px solid #fff;
-  background: transparent;
-  color: #fff;
-  font-size: 13px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-#installAppBtn:hover,
-.install-btn:hover {
-  background: rgba(255, 255, 255, 0.13);
-}
-
-/* ---------- Auth / login layout ---------- */
-
-.auth-wrapper {
-  min-height: calc(100vh - 64px); /* minus header */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 24px 16px;
-}
-
-.auth-card {
-  width: 100%;
-  max-width: 380px;
-  background: #ffffff;
-  border-radius: 18px;
-  padding: 26px 24px 28px;
-  box-shadow: 0 20px 55px rgba(15, 23, 42, 0.2);
-  border: 1px solid rgba(148, 163, 184, 0.25);
-}
-
-.auth-card h2 {
-  margin-top: 0;
-  margin-bottom: 14px;
-  font-size: 22px;
-}
-
-.auth-card form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.auth-card label {
-  font-size: 13px;
-  color: #4b5563;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.auth-card input {
-  width: 100%;
-  padding: 9px 10px;
-  border-radius: 10px;
-  border: 1px solid #d0d4dc;
-  font-size: 14px;
-  background: #f9fafb;
-}
-
-.auth-card input:focus {
-  outline: none;
-  border-color: #7c3aed;
-  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.16);
-}
-
-/* Primary button */
-.btn-primary {
-  margin-top: 6px;
-  width: 100%;
-  padding: 9px 0;
-  border-radius: 999px;
-  border: none;
-  background: linear-gradient(90deg, #7c3aed, #ec4899);
-  color: #fff;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 14px 32px rgba(236, 72, 153, 0.38);
-  transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
-}
-
-.btn-primary:hover {
-  filter: brightness(1.06);
-  transform: translateY(-1px);
-  box-shadow: 0 18px 40px rgba(124, 58, 237, 0.45);
-}
-
-.auth-error {
-  margin-top: 0;
-  margin-bottom: 10px;
-  font-size: 13px;
-  color: #b91c1c;
-}
-
-.auth-hint {
-  margin-top: 10px;
-  font-size: 12px;
-  color: #9ca3af;
-}
-
-/* Generic inputs & buttons (for other forms like upload) */
-input,
-button {
-  font-family: inherit;
-}
-
-/* ---------- Albums and photos ---------- */
-
-.albums {
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-  margin-top: 0; /* no extra gap above albums */
-}
-
-/* Album wrapper (Pathi-Silks block) */
-.album {
-  background: transparent;
-}
-
-.album h2,
-.album h3 {
-  margin-bottom: 8px;
-}
-
-/* Person section card */
-.person-block {
-  margin-top: 6px;
-  padding: 14px 14px 20px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.4); /* glass over gradient */
-  backdrop-filter: blur(14px);
-  border: 1px solid rgba(209, 213, 219, 0.8);
-  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.04);
-}
-
-.person-block h3 {
-  font-size: 16px;
-  margin-bottom: 4px;
-}
-
-/* Date row */
-.date-block {
-  margin-top: 10px;
-}
-
-.date-block h4 {
-  font-size: 13px;
-  font-weight: 600;
-  color: #6b7280;
-  margin-bottom: 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-/* Modern photo grid */
-.photos {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 12px;
-}
-
-/* Photo card – modern look */
-.photo-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  background: linear-gradient(180deg, #ffffff, #f9fafb);
-  border-radius: 14px;
-  overflow: hidden;
-  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.16);
-  cursor: pointer;
-  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
-  border: 1px solid rgba(209, 213, 219, 0.9);
-}
-
-.photo-card img {
-  width: 100%;
-  height: 150px;
-  object-fit: cover;
-  display: block;
-}
-
-/* Bottom text strip */
-.photo-card-inner {
-  padding: 6px 8px 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.photo-filename {
-  font-size: 11px;
-  color: #374151;
-  font-weight: 600;
-  word-break: break-word;
-  width: 100%;
-  text-align: left;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  line-height: 1.3;
-}
-
-/* Hover effect */
-.photo-card:hover {
-  transform: translateY(-4px) scale(1.01);
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.28);
-  border-color: rgba(124, 58, 237, 0.8);
-}
-
-/* Photo actions (rename + delete for admin) */
-.photo-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  width: 100%;
-  margin-top: 4px;
-}
-
-.rename-form {
-  display: flex;
-  gap: 4px;
-  width: 100%;
-}
-
-.rename-input {
-  flex: 1;
-  padding: 4px 6px;
-  font-size: 11px;
-  border: 1px solid #d0d4dc;
-  border-radius: 6px;
-  background: #ffffff;
-}
-
-.rename-input:focus {
-  outline: none;
-  border-color: #7c3aed;
-  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.12);
-}
-
-.rename-btn {
-  padding: 4px 8px;
-  background: #207c8f;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 11px;
-  font-weight: 500;
-  transition: background 0.2s ease;
-}
-
-.rename-btn:hover {
-  background: #186177;
-}
-
-.delete-form {
-  width: 100%;
-}
-
-/* Delete button (admin) */
-.delete-btn {
-  width: 100%;
-  padding: 4px 0 6px;
-  font-size: 11px;
-  background: #c0392b;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.2s ease;
-  font-weight: 500;
-}
-
-.delete-btn:hover {
-  background: #a83224;
-}
-
-/* ---------- Lightbox overlay ---------- */
-
-.lightbox {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.9);
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
-
-.lightbox-content {
-  width: 90vw;
-  height: 90vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.lightbox-content img {
-  max-width: 100%;
-  max-height: 100%;
-  width: auto;
-  height: auto;
-  object-fit: contain;
-  display: block;
-  border-radius: 10px;
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.7);
-}
-
-.lightbox-close {
-  position: fixed;
-  top: 16px;
-  right: 24px;
-  font-size: 32px;
-  color: #fff;
-  cursor: pointer;
-  z-index: 10000;
-}
-
-/* Lightbox arrows */
-.lightbox-arrow {
-  position: fixed;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 40px;
-  color: #ffffff;
-  cursor: pointer;
-  padding: 8px 14px;
-  user-select: none;
-  z-index: 10000;
-  background: rgba(0, 0, 0, 0.35);
-  border-radius: 999px;
-}
-
-.lightbox-prev {
-  left: 32px;
-}
-
-.lightbox-next {
-  right: 32px;
-}
-
-.lightbox-arrow:hover,
-.lightbox-close:hover {
-  color: #f9fafb;
-  background: rgba(0, 0, 0, 0.55);
-}
-
-/* ---------- Filter / jumper bar ---------- */
-
-.jumper-bar {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 18px;
-  padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.96);
-  border-radius: 12px;
-  align-items: center;
-  flex-wrap: wrap;
-  box-shadow: 0 1px 6px rgba(15, 23, 42, 0.06);
-  border: 1px solid rgba(209, 213, 219, 0.7);
-}
-
-.jumper-bar label {
-  margin-right: 4px;
-  font-size: 13px;
-  color: #4b5563;
-}
-
-.jumper-bar select {
-  padding: 6px 8px;
-  border-radius: 999px;
-  border: 1px solid #d0d4dc;
-  background: #f9fafb;
-  font-size: 13px;
-  color: #111827;
-}
-
-.jumper-bar select:focus {
-  outline: none;
-  border-color: #7c3aed;
-  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.18);
-}
-
-/* Search bar */
-.search-bar {
-  margin-bottom: 10px;
-}
-
-.search-bar input {
-  width: 100%;
-  max-width: 360px;
-  padding: 8px 12px;
-  border-radius: 999px;
-  border: 1px solid #d0d4dc;
-  background: #ffffff;
-  font-size: 14px;
-}
-
-.search-bar input:focus {
-  outline: none;
-  border-color: #7c3aed;
-  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.18);
-}
-
-/* ---------- Nav image cards (no shadow, zoom hover) ---------- */
-
-.nav-cards {
-  display: flex;
-  gap: 18px;
-  margin: 14px 0 22px;
-  overflow-x: auto;
-  padding-bottom: 4px;
-}
-
-.nav-card {
-  position: relative;
-  min-width: 220px;
-  max-width: 240px;
-  height: 300px;
-  border-radius: 24px;
-  border: none;
-  padding: 0;
-  background: transparent;
-  overflow: hidden;
-  cursor: pointer;
-  box-shadow: none;
-  transition: transform 0.2s ease;
-}
-
-.nav-card-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  transform: scale(1);
-  transition: transform 0.25s ease;
-}
-
-/* text only, no dark overlay */
-.nav-card-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: 16px 18px;
-  background: transparent;
-  color: #ffffff;
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
-}
-
-.nav-card-title {
-  font-size: 18px;
-  font-weight: 800;
-  letter-spacing: 0.03em;
-  margin-bottom: 4px;
-}
-
-.nav-card-sub {
-  font-size: 12px;
-  opacity: 0.9;
-}
-
-.nav-card::after {
-  content: '▶';
-  position: absolute;
-  right: 14px;
-  bottom: 16px;
-  font-size: 18px;
-  opacity: 0.9;
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
-}
-
-.nav-card:hover {
-  transform: translateY(-6px) scale(1.02);
-}
-
-/* zoom the image on hover */
-.nav-card:hover .nav-card-img {
-  transform: scale(1.06);
-}
-
-/* Simple page fade-in */
-main {
-  animation: pageFade 0.22s ease-out;
-}
-
-@keyframes pageFade {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+console.log('ENV REGION =', process.env.AWS_REGION);
+require('dotenv').config();
+const express = require('express');
+const fileUpload = require('express-fileupload');
+const session = require('express-session');
+const fs = require('fs');
+const path = require('path');
+const {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+  DeleteObjectCommand,
+} = require('@aws-sdk/client-s3');
+
+const app = express();
+
+// --- S3 CONFIG ---
+const s3 = new S3Client({
+  region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
+});
+
+const S3_BUCKET = process.env.S3_BUCKET_NAME;
+
+// --- CONFIG ---
+const PORT = process.env.PORT || 3000;
+const ADMIN_USER = 'you';
+const ADMIN_PASS = 'yourpassword';
+const BOSS_USER = 'boss';
+const BOSS_PASS = 'bosspassword';
+
+// --- MIDDLEWARE ---
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+app.use(express.urlencoded({ extended: true }));
+app.use(fileUpload());
+app.use('/public', express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+app.use(
+  session({
+    secret: 'supersecret',
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
+// --- AUTH HELPERS ---
+function requireLogin(role) {
+  return (req, res, next) => {
+    if (!req.session.user) return res.redirect('/login');
+    if (role && req.session.role !== role) return res.status(403).send('Forbidden');
+    next();
+  };
+}
+
+// --- S3 HELPERS FOR SHEETS METADATA ---
+async function loadSheetsFromS3() {
+  try {
+    const command = new GetObjectCommand({
+      Bucket: S3_BUCKET,
+      Key: 'metadata/sheets.json',
+    });
+    const response = await s3.send(command);
+
+    const chunks = [];
+    for await (const chunk of response.Body) {
+      chunks.push(chunk);
+    }
+    const json = Buffer.concat(chunks).toString('utf8');
+    return JSON.parse(json);
+  } catch (err) {
+    if (err.name !== 'NoSuchKey' && err.$metadata?.httpStatusCode !== 404) {
+      console.error('loadSheetsFromS3 error:', err);
+    }
+    return {};
   }
 }
 
-/* ---------- Dark themes shared styling ---------- */
-
-body.dark-mode,
-body.brown-mode,
-body.blue-mode {
-  color: #f9fafb;
+async function saveSheetsToS3(data) {
+  const body = Buffer.from(JSON.stringify(data, null, 2), 'utf8');
+  const command = new PutObjectCommand({
+    Bucket: S3_BUCKET,
+    Key: 'metadata/sheets.json',
+    Body: body,
+    ContentType: 'application/json',
+  });
+  await s3.send(command);
 }
 
-/* header bar per mode */
-body.dark-mode header {
-  background: rgba(15, 23, 42, 0.85);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+async function getSheetsMetadata() {
+  return await loadSheetsFromS3();
 }
 
-body.brown-mode header {
-  background: rgba(43, 7, 7, 0.85);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+async function saveSheetsMetadata(data) {
+  await saveSheetsToS3(data);
 }
 
-body.blue-mode header {
-  background: rgba(3, 15, 32, 0.88);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.75);
+// --- S3 HELPERS FOR PURCHASES METADATA ---
+async function loadPurchasesFromS3() {
+  try {
+    const command = new GetObjectCommand({
+      Bucket: S3_BUCKET,
+      Key: 'metadata/purchases.json',
+    });
+    const response = await s3.send(command);
+
+    const chunks = [];
+    for await (const chunk of response.Body) {
+      chunks.push(chunk);
+    }
+    const json = Buffer.concat(chunks).toString('utf8');
+    return JSON.parse(json);
+  } catch (err) {
+    if (err.name !== 'NoSuchKey' && err.$metadata?.httpStatusCode !== 404) {
+      console.error('loadPurchasesFromS3 error:', err);
+    }
+    return {};
+  }
 }
 
-body.dark-mode .jumper-bar,
-body.brown-mode .jumper-bar,
-body.blue-mode .jumper-bar,
-body.dark-mode .person-block,
-body.brown-mode .person-block,
-body.blue-mode .person-block {
-  background: rgba(15, 23, 42, 0.9);
-  border-color: rgba(148, 163, 184, 0.45);
+async function savePurchasesToS3(data) {
+  const body = Buffer.from(JSON.stringify(data, null, 2), 'utf8');
+  const command = new PutObjectCommand({
+    Bucket: S3_BUCKET,
+    Key: 'metadata/purchases.json',
+    Body: body,
+    ContentType: 'application/json',
+  });
+  await s3.send(command);
 }
 
-body.dark-mode .person-block h3,
-body.brown-mode .person-block h3,
-body.blue-mode .person-block h3,
-body.dark-mode .date-block h4,
-body.brown-mode .date-block h4,
-body.blue-mode .date-block h4,
-body.dark-mode .photo-filename,
-body.brown-mode .photo-filename,
-body.blue-mode .photo-filename {
-  color: #e5e7eb;
+async function getPurchasesMetadata() {
+  return await loadPurchasesFromS3();
 }
 
-body.dark-mode .photo-card,
-body.brown-mode .photo-card,
-body.blue-mode .photo-card {
-  background: linear-gradient(180deg, #020617, #020617);
-  border-color: rgba(75, 85, 99, 0.9);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85);
+async function savePurchasesMetadata(data) {
+  await savePurchasesToS3(data);
 }
 
-body.dark-mode .jumper-bar select,
-body.brown-mode .jumper-bar select,
-body.blue-mode .jumper-bar select,
-body.dark-mode .search-bar input,
-body.brown-mode .search-bar input,
-body.blue-mode .search-bar input {
-  background: #020617;
-  color: #e5e7eb;
-  border-color: #4b5563;
+// --- PHOTOS METADATA HELPERS (S3 JSON) ---
+async function loadPhotosFromS3() {
+  try {
+    const command = new GetObjectCommand({
+      Bucket: S3_BUCKET,
+      Key: 'metadata/photos.json',
+    });
+    const response = await s3.send(command);
+
+    const chunks = [];
+    for await (const chunk of response.Body) {
+      chunks.push(chunk);
+    }
+    const json = Buffer.concat(chunks).toString('utf8');
+    return JSON.parse(json);
+  } catch (err) {
+    if (err.name !== 'NoSuchKey' && err.$metadata?.httpStatusCode !== 404) {
+      console.error('loadPhotosFromS3 error:', err);
+    }
+    return {};
+  }
 }
 
-/* Individual backgrounds */
+async function savePhotosToS3(data) {
+  const body = Buffer.from(JSON.stringify(data, null, 2), 'utf8');
+  const command = new PutObjectCommand({
+    Bucket: S3_BUCKET,
+    Key: 'metadata/photos.json',
+    Body: body,
+    ContentType: 'application/json',
+  });
+  await s3.send(command);
+}
 
-/* Dark (purple) */
-body.dark-mode {
-  background-image: radial-gradient(
-    125% 125% at 50% 100%,
-    #000000 40%,
-    #350136 100%
+// normalize metadata so every file has galleryType
+async function getPhotosMetadata() {
+  const meta = await loadPhotosFromS3();
+
+  Object.values(meta).forEach((persons) => {
+    Object.values(persons).forEach((dates) => {
+      Object.values(dates).forEach((files) => {
+        files.forEach((f) => {
+          if (!f.galleryType) f.galleryType = 'main';
+        });
+      });
+    });
+  });
+
+  return meta;
+}
+
+async function savePhotosMetadata(data) {
+  await savePhotosToS3(data);
+}
+
+// --- ROUTES ---
+
+app.get('/', (req, res) => {
+  res.redirect('/login');
+});
+
+app.get('/login', (req, res) => {
+  res.render('login', { error: null });
+});
+
+app.post('/login', (req, res) => {
+  const { username, password } = req.body;
+  if (username === ADMIN_USER && password === ADMIN_PASS) {
+    req.session.user = username;
+    req.session.role = 'admin';
+    return res.redirect('/upload');
+  }
+  if (username === BOSS_USER && password === BOSS_PASS) {
+    req.session.user = username;
+    req.session.role = 'boss';
+    return res.redirect('/gallery');
+  }
+  res.render('login', { error: 'Invalid credentials' });
+});
+
+app.get('/logout', (req, res) => {
+  req.session.destroy(() => {
+    res.redirect('/login');
+  });
+});
+
+// Admin upload page
+app.get('/upload', requireLogin('admin'), (req, res) => {
+  res.render('upload');
+});
+
+// Handle upload TO S3 (supports main / other / sales)
+app.post('/upload', requireLogin('admin'), async (req, res) => {
+  let { brand, person, date, galleryType } = req.body;
+  brand = (brand || 'DefaultBrand').trim();
+  person = (person || 'DefaultPerson').trim();
+  date = (date || 'NoDate').trim();
+
+  if (!['main', 'other', 'sales'].includes(galleryType)) {
+    galleryType = 'main';
+  }
+
+  if (!req.files || !req.files.images) {
+    return res.status(400).send('No files uploaded');
+  }
+
+  let images = req.files.images;
+  if (!Array.isArray(images)) images = [images];
+
+  const safeBrand = brand.replace(/\s+/g, '-');
+  const safePerson = person.replace(/\s+/g, '-');
+  const safeDate = date.replace(/\s+/g, '-');
+
+  const photosMeta = await getPhotosMetadata();
+  if (!photosMeta[safeBrand]) photosMeta[safeBrand] = {};
+  if (!photosMeta[safeBrand][safePerson]) photosMeta[safeBrand][safePerson] = {};
+  if (!photosMeta[safeBrand][safePerson][safeDate]) {
+    photosMeta[safeBrand][safePerson][safeDate] = [];
+  }
+
+  try {
+    for (const img of images) {
+      const timestamp = Date.now();
+      const fileName = `${timestamp}_${img.name}`;
+      const s3Key = `photos/${safeBrand}/${safePerson}/${safeDate}/${fileName}`;
+
+      await s3.send(
+        new PutObjectCommand({
+          Bucket: S3_BUCKET,
+          Key: s3Key,
+          Body: img.data,
+          ContentType: img.mimetype,
+          CacheControl: 'public, max-age=31536000',
+        })
+      );
+
+      const url = `https://${S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${s3Key}`;
+
+      photosMeta[safeBrand][safePerson][safeDate].push({
+        name: fileName,
+        url,
+        s3Key,
+        galleryType, // main / other / sales
+      });
+    }
+
+    await savePhotosMetadata(photosMeta);
+    return res.redirect('/upload');
+  } catch (err) {
+    console.error('S3 upload error:', err);
+    res.status(500).send('Upload failed');
+  }
+});
+
+// Handle stock purchase upload (single image + metadata)
+app.post('/admin/upload-purchase', requireLogin('admin'), async (req, res) => {
+  const { date, supplier, purchaseIds, returnInfo } = req.body;
+
+  if (!req.files || !req.files.image || !date || !supplier) {
+    return res.status(400).send('Missing data or file');
+  }
+
+  const img = req.files.image;
+  const timestamp = Date.now();
+  const safeSupplier = supplier.trim().replace(/\s+/g, '-');
+  const id = `${date}-${safeSupplier}-${timestamp}`;
+  const ext = path.extname(img.name) || '.jpg';
+  const s3Key = `purchases/${id}${ext}`;
+
+  try {
+    await s3.send(
+      new PutObjectCommand({
+        Bucket: S3_BUCKET,
+        Key: s3Key,
+        Body: img.data,
+        ContentType: img.mimetype,
+        CacheControl: 'public, max-age=31536000',
+      })
+    );
+
+    const imageUrl = `https://${S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${s3Key}`;
+
+    const purchasesMeta = await getPurchasesMetadata();
+    purchasesMeta[id] = {
+      id,
+      date,
+      supplier: supplier.trim(),
+      purchaseIds: purchaseIds || '',
+      imageUrl,
+      returnInfo: returnInfo || '',
+    };
+    await savePurchasesMetadata(purchasesMeta);
+
+    res.redirect('/purchases');
+  } catch (err) {
+    console.error('Upload purchase error:', err);
+    res.status(500).send('Upload purchase failed');
+  }
+});
+
+// Admin rename photo
+app.post('/rename-photo', requireLogin('admin'), async (req, res) => {
+  const { brand, person, date, oldfilename, newfilename } = req.body;
+  if (!brand || !person || !date || !oldfilename || !newfilename) {
+    return res.status(400).send('Missing data');
+  }
+
+  const safeBrand = brand.replace(/\s+/g, '-');
+  const safePerson = person.replace(/\s+/g, '-');
+  const safeDate = date.replace(/\s+/g, '-');
+
+  const photosMeta = await getPhotosMetadata();
+  const files = photosMeta?.[safeBrand]?.[safePerson]?.[safeDate];
+  if (!files) return res.redirect('/admin-gallery');
+
+  const file = files.find((f) => f.name === oldfilename);
+  if (file) {
+    const ext = path.extname(file.name);
+    file.name = newfilename.includes('.') ? newfilename : newfilename + ext;
+    await savePhotosMetadata(photosMeta);
+    console.log(`Renamed (meta): ${oldfilename} → ${file.name}`);
+  }
+
+  res.redirect('/admin-gallery');
+});
+
+// Admin delete photo
+app.post('/delete-photo', requireLogin('admin'), async (req, res) => {
+  const { brand, person, date, filename } = req.body;
+  if (!brand || !person || !date || !filename) {
+    return res.status(400).send('Missing data');
+  }
+
+  const safeBrand = brand.replace(/\s+/g, '-');
+  const safePerson = person.replace(/\s+/g, '-');
+  const safeDate = date.replace(/\s+/g, '-');
+
+  const photosMeta = await getPhotosMetadata();
+  const files = photosMeta?.[safeBrand]?.[safePerson]?.[safeDate];
+  if (!files) return res.redirect('/admin-gallery');
+
+  const index = files.findIndex((f) => f.name === filename);
+  if (index === -1) return res.redirect('/admin-gallery');
+
+  const file = files[index];
+
+  try {
+    await s3.send(
+      new DeleteObjectCommand({
+        Bucket: S3_BUCKET,
+        Key: file.s3Key,
+      })
+    );
+    console.log(`Deleted from S3: ${file.s3Key}`);
+  } catch (err) {
+    console.error('S3 delete error:', err);
+  }
+
+  files.splice(index, 1);
+  await savePhotosMetadata(photosMeta);
+  console.log(`Deleted from metadata: ${filename}`);
+
+  res.redirect('/admin-gallery');
+});
+
+// Add Google Sheet
+app.post('/add-sheet', requireLogin('admin'), async (req, res) => {
+  const { brand, person, date, sheetId, sheetName } = req.body;
+  if (!brand || !person || !date || !sheetId) {
+    return res.status(400).send('Missing data');
+  }
+
+  const sheetsData = await getSheetsMetadata();
+  const key = `${brand}/${person}/${date}`;
+
+  if (!sheetsData[key]) {
+    sheetsData[key] = {};
+  }
+
+  sheetsData[key].sheetId = sheetId;
+  sheetsData[key].sheetName = sheetName || 'Sales Data';
+  sheetsData[key].embedUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/edit`;
+
+  await saveSheetsMetadata(sheetsData);
+  console.log(`Added sheet: ${key}`);
+
+  res.redirect('/admin-sheets');
+});
+
+// Remove Google Sheet
+app.post('/remove-sheet', requireLogin('admin'), async (req, res) => {
+  const { brand, person, date } = req.body;
+  if (!brand || !person || !date) {
+    return res.status(400).send('Missing data');
+  }
+
+  const sheetsData = await getSheetsMetadata();
+  const key = `${brand}/${person}/${date}`;
+
+  if (sheetsData[key]) {
+    delete sheetsData[key].sheetId;
+    delete sheetsData[key].sheetName;
+    delete sheetsData[key].embedUrl;
+  }
+
+  await saveSheetsMetadata(sheetsData);
+  console.log(`Removed sheet: ${key}`);
+
+  res.redirect('/admin-sheets');
+});
+
+// Boss sheets view
+app.get('/sheets', requireLogin('boss'), async (req, res) => {
+  const sheetsMetadata = await getSheetsMetadata();
+
+  const sheets = Object.entries(sheetsMetadata)
+    .filter(([_, data]) => data.sheetId)
+    .map(([key, data]) => {
+      const [brand, person, date] = key.split('/');
+      return {
+        brand,
+        person,
+        date,
+        sheetId: data.sheetId,
+        sheetName: data.sheetName || 'Sales Data',
+        embedUrl: data.embedUrl,
+      };
+    });
+
+  res.render('sheets-album', { sheets, isAdmin: false });
+});
+
+// Admin sheets view
+app.get('/admin-sheets', requireLogin('admin'), async (req, res) => {
+  const sheetsMetadata = await getSheetsMetadata();
+
+  const sheets = Object.entries(sheetsMetadata)
+    .filter(([_, data]) => data.sheetId)
+    .map(([key, data]) => {
+      const [brand, person, date] = key.split('/');
+      return {
+        brand,
+        person,
+        date,
+        sheetId: data.sheetId,
+        sheetName: data.sheetName || 'Sales Data',
+        embedUrl: data.embedUrl,
+      };
+    });
+
+  res.render('sheets-album', { sheets, isAdmin: true });
+});
+
+// Admin gallery view (all photos, with edit/delete)
+app.get('/admin-gallery', requireLogin('admin'), async (req, res) => {
+  const photosMeta = await getPhotosMetadata();
+
+  const brands = Object.keys(photosMeta)
+    .map((brandName) => {
+      const personsMeta = photosMeta[brandName];
+      const persons = Object.keys(personsMeta).map((personName) => {
+        const datesMeta = personsMeta[personName];
+        const dates = Object.keys(datesMeta)
+          .map((dateName) => {
+            const files = datesMeta[dateName].map((f) => ({
+              src: f.url,
+              name: f.name,
+            }));
+            return { name: dateName, files };
+          })
+          .filter((d) => d.files.length > 0);
+        return { name: personName, dates };
+      }).filter((p) => p.dates.length > 0);
+      return { name: brandName, persons };
+    }).filter((b) => b.persons.length > 0);
+
+  res.render('gallery', { brands, isAdmin: true, galleryTitle: 'Admin – All Photos' });
+});
+
+// Admin OTHER ALBUMS gallery (only other)
+app.get('/admin-other-gallery', requireLogin('admin'), async (req, res) => {
+  const photosMeta = await getPhotosMetadata();
+
+  const brands = Object.keys(photosMeta)
+    .map((brandName) => {
+      const personsMeta = photosMeta[brandName];
+      const persons = Object.keys(personsMeta).map((personName) => {
+        const datesMeta = personsMeta[personName];
+        const dates = Object.keys(datesMeta)
+          .map((dateName) => {
+            const files = datesMeta[dateName]
+              .filter((f) => f.galleryType === 'other')
+              .map((f) => ({
+                src: f.url,
+                name: f.name,
+              }));
+            return { name: dateName, files };
+          })
+          .filter((d) => d.files.length > 0);
+        return { name: personName, dates };
+      }).filter((p) => p.dates.length > 0);
+      return { name: brandName, persons };
+    }).filter((b) => b.persons.length > 0);
+
+  res.render('gallery', { brands, isAdmin: true, galleryTitle: 'Admin – Other Albums' });
+});
+
+// Admin SALES gallery (only sales)
+app.get('/admin-sales-gallery', requireLogin('admin'), async (req, res) => {
+  const photosMeta = await getPhotosMetadata();
+
+  const brands = Object.keys(photosMeta)
+    .map((brandName) => {
+      const personsMeta = photosMeta[brandName];
+      const persons = Object.keys(personsMeta).map((personName) => {
+        const datesMeta = personsMeta[personName];
+        const dates = Object.keys(datesMeta)
+          .map((dateName) => {
+            const files = datesMeta[dateName]
+              .filter((f) => f.galleryType === 'sales')
+              .map((f) => ({
+                src: f.url,
+                name: f.name,
+              }));
+            return { name: dateName, files };
+          })
+          .filter((d) => d.files.length > 0);
+        return { name: personName, dates };
+      }).filter((p) => p.dates.length > 0);
+      return { name: brandName, persons };
+    }).filter((b) => b.persons.length > 0);
+
+  res.render('gallery', { brands, isAdmin: true, galleryTitle: 'Admin – Sales Gallery' });
+});
+
+// Boss main gallery (main photos only, hide some brands)
+app.get('/gallery', requireLogin('boss'), async (req, res) => {
+  const photosMeta = await getPhotosMetadata();
+
+  const HIDE_BRANDS_FROM_MAIN = ['Salem/Sathyamangalam'];
+
+  const brands = Object.keys(photosMeta)
+    .filter((brandName) => !HIDE_BRANDS_FROM_MAIN.includes(brandName))
+    .map((brandName) => {
+      const personsMeta = photosMeta[brandName];
+      const persons = Object.keys(personsMeta).map((personName) => {
+        const datesMeta = personsMeta[personName];
+        const dates = Object.keys(datesMeta)
+          .map((dateName) => {
+            const files = datesMeta[dateName]
+              .filter((f) => !f.galleryType || f.galleryType === 'main')
+              .map((f) => ({
+                src: f.url,
+                name: f.name,
+              }));
+            return { name: dateName, files };
+          })
+          .filter((d) => d.files.length > 0);
+        return { name: personName, dates };
+      }).filter((p) => p.dates.length > 0);
+      return { name: brandName, persons };
+    }).filter((b) => b.persons.length > 0);
+
+  res.render('gallery', { brands, isAdmin: false, galleryTitle: 'Your Gallery' });
+});
+
+// Boss OTHER ALBUMS gallery (only other)
+app.get('/other-gallery', requireLogin('boss'), async (req, res) => {
+  const photosMeta = await getPhotosMetadata();
+
+  const brands = Object.keys(photosMeta)
+    .map((brandName) => {
+      const personsMeta = photosMeta[brandName];
+      const persons = Object.keys(personsMeta).map((personName) => {
+        const datesMeta = personsMeta[personName];
+        const dates = Object.keys(datesMeta)
+          .map((dateName) => {
+            const files = datesMeta[dateName]
+              .filter((f) => f.galleryType === 'other')
+              .map((f) => ({
+                src: f.url,
+                name: f.name,
+              }));
+            return { name: dateName, files };
+          })
+          .filter((d) => d.files.length > 0);
+        return { name: personName, dates };
+      }).filter((p) => p.dates.length > 0);
+      return { name: brandName, persons };
+    }).filter((b) => b.persons.length > 0);
+
+  res.render('gallery', { brands, isAdmin: false, galleryTitle: 'Other Albums' });
+});
+
+// Boss SALES gallery (only sales)
+app.get('/sales-gallery', requireLogin('boss'), async (req, res) => {
+  const photosMeta = await getPhotosMetadata();
+
+  const brands = Object.keys(photosMeta)
+    .map((brandName) => {
+      const personsMeta = photosMeta[brandName];
+      const persons = Object.keys(personsMeta).map((personName) => {
+        const datesMeta = personsMeta[personName];
+        const dates = Object.keys(datesMeta)
+          .map((dateName) => {
+            const files = datesMeta[dateName]
+              .filter((f) => f.galleryType === 'sales')
+              .map((f) => ({
+                src: f.url,
+                name: f.name,
+              }));
+            return { name: dateName, files };
+          })
+          .filter((d) => d.files.length > 0);
+        return { name: personName, dates };
+      }).filter((p) => p.dates.length > 0);
+      return { name: brandName, persons };
+    }).filter((b) => b.persons.length > 0);
+
+  res.render('gallery', { brands, isAdmin: false, galleryTitle: 'Sales Gallery' });
+});
+
+// Boss Stock Purchase page
+app.get('/purchases', requireLogin('boss'), async (req, res) => {
+  const purchasesMeta = await getPurchasesMetadata();
+  const purchases = Object.values(purchasesMeta).sort((a, b) =>
+    a.date.localeCompare(b.date)
   );
-  background-size: 100% 100%;
-  background-attachment: fixed;
-}
+  res.render('purchases', { purchases });
+});
 
-/* Brown / crimson */
-body.brown-mode {
-  background-image: radial-gradient(
-    125% 125% at 50% 10%,
-    #000000 40%,
-    #2b0707 100%
-  );
-  background-size: 100% 100%;
-  background-attachment: fixed;
-}
+// Admin delete purchase
+app.post('/admin/delete-purchase', requireLogin('admin'), async (req, res) => {
+  const { id } = req.body;
+  if (!id) return res.status(400).send('Missing id');
 
-/* Blue / deep ocean */
-body.blue-mode {
-  background:
-    radial-gradient(70% 55% at 50% 50%, #2a5d77 0%, #184058 18%, #0f2a43 34%, #0a1b30 50%, #071226 66%, #040d1c 80%, #020814 92%, #01040d 97%, #000309 100%),
-    radial-gradient(160% 130% at 10% 10%, rgba(0,0,0,0) 38%, #000309 76%, #000208 100%),
-    radial-gradient(160% 130% at 90% 90%, rgba(0,0,0,0) 38%, #000309 76%, #000208 100%);
-  background-size: 100% 100%;
-  background-attachment: fixed;
-}
+  const purchasesMeta = await getPurchasesMetadata();
+  const purchase = purchasesMeta[id];
 
-/* ---------- Tables (Sheets / Purchases) ---------- */
+  // delete image from S3 if we can get the key
+  if (purchase && purchase.imageUrl) {
+    const split = purchase.imageUrl.split('.amazonaws.com/');
+    if (split[1]) {
+      const key = split[1];
+      try {
+        await s3.send(
+          new DeleteObjectCommand({
+            Bucket: S3_BUCKET,
+            Key: key,
+          })
+        );
+        console.log('Deleted purchase image from S3:', key);
+      } catch (err) {
+        console.error('Delete purchase image error:', err);
+      }
+    }
+  }
 
-.invoice-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 12px;
-  font-size: 13px;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 12px;
-  overflow: hidden;
-}
+  delete purchasesMeta[id];
+  await savePurchasesMetadata(purchasesMeta);
 
-.invoice-table thead {
-  background: #111827;
-  color: #f9fafb;
-}
+  res.redirect('/purchases');
+});
 
-.invoice-table th,
-.invoice-table td {
-  padding: 8px 10px;
-  border-bottom: 1px solid rgba(209, 213, 219, 0.7);
-  text-align: left;
-}
+// Boss invoices page (placeholder)
+app.get('/invoices', requireLogin('boss'), (req, res) => {
+  res.render('invoices', { title: 'Invoices' });
+});
 
-.invoice-table tbody tr:nth-child(even) {
-  background: rgba(249, 250, 251, 0.9);
-}
-
+// --- START SERVER ---
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
