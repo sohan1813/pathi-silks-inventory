@@ -50,9 +50,9 @@ header {
   justify-content: space-between;
   align-items: center;
   padding: 10px 18px;
-  background: #201a2c; /* deep plum */
+  background: transparent; /* base: no solid bar in light mode */
   color: #fff;
-  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.4);
+  box-shadow: none;
   position: sticky;
   top: 0;
   z-index: 40;
@@ -396,7 +396,6 @@ button {
   z-index: 9999;
 }
 
-/* fixed: missing dot here */
 .lightbox-content {
   width: 90vw;
   height: 90vh;
@@ -426,7 +425,7 @@ button {
   z-index: 10000;
 }
 
-/* Lightbox arrows (fixed selector) */
+/* Lightbox arrows */
 .lightbox-arrow {
   position: fixed;
   top: 50%;
@@ -445,7 +444,6 @@ button {
   left: 32px;
 }
 
-/* fixed: missing dot here */
 .lightbox-next {
   right: 32px;
 }
@@ -615,11 +613,20 @@ body.blue-mode {
   color: #f9fafb;
 }
 
-body.dark-mode header,
-body.brown-mode header,
+/* header bar per mode */
+body.dark-mode header {
+  background: rgba(15, 23, 42, 0.85);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+}
+
+body.brown-mode header {
+  background: rgba(43, 7, 7, 0.85);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+}
+
 body.blue-mode header {
-  background: rgba(15, 23, 42, 0.9);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.75);
+  background: rgba(3, 15, 32, 0.88);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.75);
 }
 
 body.dark-mode .jumper-bar,
