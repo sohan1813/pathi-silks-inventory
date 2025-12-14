@@ -298,15 +298,15 @@ app.post('/upload', requireLogin('admin'), async (req, res) => {
 
 // Handle stock purchase upload (invoice + product image + metadata)
 app.post('/admin/upload-purchase', requireLogin('admin'), async (req, res) => {
-  const { date, supplier, purchaseIds, returnInfo } = req.body;
+  const { date, supplier, purchaseIds, returnInfo, totalPurchase } = req.body;
 
-  // product image required, invoice optional
+  // product image is required, invoice image optional
   if (!req.files || !req.files.image || !date || !supplier) {
     return res.status(400).send('Missing data or file');
   }
 
   const productImg = req.files.image;
-  const invoiceImg = req.files.invoiceImage; // optional
+  const invoiceImg = req.files.invoiceImage; // may be undefined
 
   const timestamp = Date.now();
   const safeSupplier = supplier.trim().replace(/\s+/g, '-');
@@ -356,8 +356,9 @@ app.post('/admin/upload-purchase', requireLogin('admin'), async (req, res) => {
       date,
       supplier: supplier.trim(),
       purchaseIds: purchaseIds || '',
-      imageUrl,   // product
-      invoiceUrl, // invoice
+      imageUrl,          // product
+      invoiceUrl,        // invoice
+      totalPurchase: totalPurchase || '',
       returnInfo: returnInfo || '',
     };
     await savePurchasesMetadata(purchasesMeta);
