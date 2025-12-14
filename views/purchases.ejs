@@ -39,6 +39,7 @@
               <th>Purchase IDs</th>
               <th>Invoice Bill</th>
               <th>Product Photo</th>
+              <th>Total Purchase</th>
               <th>Return</th>
               <th>Delete</th>
             </tr>
@@ -59,6 +60,7 @@
                     <a href="<%= p.imageUrl %>" target="_blank">View</a>
                   <% } %>
                 </td>
+                <td><%= p.totalPurchase || '' %></td>
                 <td><%= p.returnInfo %></td>
                 <td>
                   <form method="POST" action="/admin/delete-purchase">
