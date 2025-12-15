@@ -300,13 +300,12 @@ app.post('/upload', requireLogin('admin'), async (req, res) => {
 app.post('/admin/upload-purchase', requireLogin('admin'), async (req, res) => {
   const { date, supplier, purchaseIds, returnInfo, totalPurchase } = req.body;
 
-  // product image is required, invoice image optional
   if (!req.files || !req.files.image || !date || !supplier) {
     return res.status(400).send('Missing data or file');
   }
 
   const productImg = req.files.image;
-  const invoiceImg = req.files.invoiceImage; // may be undefined
+  const invoiceImg = req.files.invoiceImage;
 
   const timestamp = Date.now();
   const safeSupplier = supplier.trim().replace(/\s+/g, '-');
@@ -316,7 +315,6 @@ app.post('/admin/upload-purchase', requireLogin('admin'), async (req, res) => {
   let invoiceUrl = '';
 
   try {
-    // upload product photo
     const prodExt = path.extname(productImg.name) || '.jpg';
     const prodKey = `purchases/${id}-product${prodExt}`;
 
@@ -332,7 +330,6 @@ app.post('/admin/upload-purchase', requireLogin('admin'), async (req, res) => {
 
     imageUrl = `https://${S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${prodKey}`;
 
-    // upload invoice photo if provided
     if (invoiceImg) {
       const invExt = path.extname(invoiceImg.name) || '.jpg';
       const invKey = `purchases/${id}-invoice${invExt}`;
@@ -356,8 +353,8 @@ app.post('/admin/upload-purchase', requireLogin('admin'), async (req, res) => {
       date,
       supplier: supplier.trim(),
       purchaseIds: purchaseIds || '',
-      imageUrl,          // product
-      invoiceUrl,        // invoice
+      imageUrl,
+      invoiceUrl,
       totalPurchase: totalPurchase || '',
       returnInfo: returnInfo || '',
     };
@@ -577,6 +574,34 @@ app.get('/admin-other-gallery', requireLogin('admin'), async (req, res) => {
   res.render('gallery', { brands, isAdmin: true, galleryTitle: 'Admin – Other Albums' });
 });
 
+// Admin OTHER ALBUMS 2 gallery (only other2)
+app.get('/admin-other2-gallery', requireLogin('admin'), async (req, res) => {
+  const photosMeta = await getPhotosMetadata();
+
+  const brands = Object.keys(photosMeta)
+    .map((brandName) => {
+      const personsMeta = photosMeta[brandName];
+      const persons = Object.keys(personsMeta).map((personName) => {
+        const datesMeta = personsMeta[personName];
+        const dates = Object.keys(datesMeta)
+          .map((dateName) => {
+            const files = datesMeta[dateName]
+              .filter((f) => f.galleryType === 'other2')
+              .map((f) => ({
+                src: f.url,
+                name: f.name,
+              }));
+            return { name: dateName, files };
+          })
+          .filter((d) => d.files.length > 0);
+        return { name: personName, dates };
+      }).filter((p) => p.dates.length > 0);
+      return { name: brandName, persons };
+    }).filter((b) => b.persons.length > 0);
+
+  res.render('gallery', { brands, isAdmin: true, galleryTitle: 'Admin – Other Albums 2' });
+});
+
 // Admin SALES gallery (only sales)
 app.get('/admin-sales-gallery', requireLogin('admin'), async (req, res) => {
   const photosMeta = await getPhotosMetadata();
@@ -664,6 +689,34 @@ app.get('/other-gallery', requireLogin('boss'), async (req, res) => {
   res.render('gallery', { brands, isAdmin: false, galleryTitle: 'Other Albums' });
 });
 
+// Boss OTHER ALBUMS 2 gallery (only other2)
+app.get('/other-gallery-2', requireLogin('boss'), async (req, res) => {
+  const photosMeta = await getPhotosMetadata();
+
+  const brands = Object.keys(photosMeta)
+    .map((brandName) => {
+      const personsMeta = photosMeta[brandName];
+      const persons = Object.keys(personsMeta).map((personName) => {
+        const datesMeta = personsMeta[personName];
+        const dates = Object.keys(datesMeta)
+          .map((dateName) => {
+            const files = datesMeta[dateName]
+              .filter((f) => f.galleryType === 'other2')
+              .map((f) => ({
+                src: f.url,
+                name: f.name,
+              }));
+            return { name: dateName, files };
+          })
+          .filter((d) => d.files.length > 0);
+        return { name: personName, dates };
+      }).filter((p) => p.dates.length > 0);
+      return { name: brandName, persons };
+    }).filter((b) => b.persons.length > 0);
+
+  res.render('gallery', { brands, isAdmin: false, galleryTitle: 'Other Albums 2' });
+});
+
 // Boss SALES gallery (only sales)
 app.get('/sales-gallery', requireLogin('boss'), async (req, res) => {
   const photosMeta = await getPhotosMetadata();
@@ -709,7 +762,6 @@ app.post('/admin/delete-purchase', requireLogin('admin'), async (req, res) => {
   const purchasesMeta = await getPurchasesMetadata();
   const purchase = purchasesMeta[id];
 
-  // delete image from S3 if we can get the key
   if (purchase && purchase.imageUrl) {
     const split = purchase.imageUrl.split('.amazonaws.com/');
     if (split[1]) {
