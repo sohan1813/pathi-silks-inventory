@@ -97,47 +97,49 @@
             </div>
           </div>
 
-          <!-- Nav image cards -->
-          <div class="nav-cards">
-            <button class="nav-card" onclick="window.location.href='<%= isAdmin ? '/admin-gallery' : '/gallery' %>'">
-              <img src="/public/nav-main.jpg" alt="Main Gallery" class="nav-card-img" />
-              <div class="nav-card-overlay">
-                <div class="nav-card-title">Main Gallery</div>
-                <div class="nav-card-sub">All main saree & blouse sets</div>
-              </div>
-            </button>
+          <!-- Nav image cards (inside scroll wrapper for carousel effect) -->
+          <div class="nav-cards-scroll">
+            <div class="nav-cards">
+              <button class="nav-card" onclick="window.location.href='<%= isAdmin ? '/admin-gallery' : '/gallery' %>'">
+                <img src="/public/nav-main.jpg" alt="Main Gallery" class="nav-card-img" />
+                <div class="nav-card-overlay">
+                  <div class="nav-card-title">Main Gallery</div>
+                  <div class="nav-card-sub">All main saree & blouse sets</div>
+                </div>
+              </button>
 
-            <button class="nav-card" onclick="window.location.href='<%= isAdmin ? '/admin-other-gallery' : '/other-gallery' %>'">
-              <img src="/public/nav-other.jpg" alt="Other Albums" class="nav-card-img" />
-              <div class="nav-card-overlay">
-                <div class="nav-card-title">Other Albums</div>
-                <div class="nav-card-sub">Special shoots & extras</div>
-              </div>
-            </button>
+              <button class="nav-card" onclick="window.location.href='<%= isAdmin ? '/admin-other-gallery' : '/other-gallery' %>'">
+                <img src="/public/nav-other.jpg" alt="Other Albums" class="nav-card-img" />
+                <div class="nav-card-overlay">
+                  <div class="nav-card-title">Other Albums</div>
+                  <div class="nav-card-sub">Special shoots & extras</div>
+                </div>
+              </button>
 
-            <button class="nav-card" onclick="window.location.href='<%= isAdmin ? '/admin-other2-gallery' : '/other-gallery-2' %>'">
-              <img src="/public/nav-other2.jpg" alt="Other Albums 2" class="nav-card-img" />
-              <div class="nav-card-overlay">
-                <div class="nav-card-title">Other Albums 2</div>
-                <div class="nav-card-sub">More special shoots</div>
-              </div>
-            </button>
+              <button class="nav-card" onclick="window.location.href='<%= isAdmin ? '/admin-other2-gallery' : '/other-gallery-2' %>'">
+                <img src="/public/nav-other2.jpg" alt="Other Albums 2" class="nav-card-img" />
+                <div class="nav-card-overlay">
+                  <div class="nav-card-title">Other Albums 2</div>
+                  <div class="nav-card-sub">More special shoots</div>
+                </div>
+              </button>
 
-            <button class="nav-card" onclick="window.location.href='<%= isAdmin ? '/admin-sales-gallery' : '/sales-gallery' %>'">
-              <img src="/public/nav-sales.jpg" alt="Sales" class="nav-card-img" />
-              <div class="nav-card-overlay">
-                <div class="nav-card-title">Sales</div>
-                <div class="nav-card-sub">Ready for billing</div>
-              </div>
-            </button>
+              <button class="nav-card" onclick="window.location.href='<%= isAdmin ? '/admin-sales-gallery' : '/sales-gallery' %>'">
+                <img src="/public/nav-sales.jpg" alt="Sales" class="nav-card-img" />
+                <div class="nav-card-overlay">
+                  <div class="nav-card-title">Sales</div>
+                  <div class="nav-card-sub">Ready for billing</div>
+                </div>
+              </button>
 
-            <button class="nav-card" onclick="window.location.href='<%= isAdmin ? '/admin-sheets' : '/sheets' %>'">
-              <img src="/public/nav-sheets.jpg" alt="Sheets" class="nav-card-img" />
-              <div class="nav-card-overlay">
-                <div class="nav-card-title">Sheets</div>
-                <div class="nav-card-sub">Sales & stock sheets</div>
-              </div>
-            </button>
+              <button class="nav-card" onclick="window.location.href='<%= isAdmin ? '/admin-sheets' : '/sheets' %>'">
+                <img src="/public/nav-sheets.jpg" alt="Sheets" class="nav-card-img" />
+                <div class="nav-card-overlay">
+                  <div class="nav-card-title">Sheets</div>
+                  <div class="nav-card-sub">Sales & stock sheets</div>
+                </div>
+              </button>
+            </div>
           </div>
 
           <div class="albums">
