@@ -396,7 +396,7 @@ button {
   z-index: 9999;
 }
 
-.lightbox-content {
+lightbox-content {
   width: 90vw;
   height: 90vh;
   display: flex;
@@ -444,7 +444,7 @@ button {
   left: 32px;
 }
 
-.lightbox-next {
+lightbox-next {
   right: 32px;
 }
 
@@ -513,11 +513,21 @@ button {
 
 /* ---------- Nav image cards (no shadow, zoom hover) ---------- */
 
+/* wrapper that can scroll horizontally but hides scrollbar */
+.nav-cards-scroll {
+  overflow-x: auto;
+  overflow-y: visible;
+  scrollbar-width: none;           /* Firefox */
+}
+
+.nav-cards-scroll::-webkit-scrollbar {
+  display: none;                   /* Chrome, Edge, Safari */
+}
+
 .nav-cards {
   display: flex;
   gap: 18px;
   margin: 14px 0 22px;
-  overflow-x: auto;
   padding-bottom: 4px;
 }
 
@@ -731,4 +741,3 @@ body.blue-mode {
 .invoice-table tbody tr:nth-child(even) {
   background: rgba(249, 250, 251, 0.9);
 }
-

@@ -58,7 +58,7 @@
         <% if (!brands || brands.length === 0) { %>
           <p>No folders yet.</p>
         <% } else { %>
-          <!-- Jumper bar moved up: now after search bar -->
+          <!-- Jumper bar after search bar -->
           <div class="jumper-bar">
             <div>
               <label for="brandSelect">Jump to brand:</label>
@@ -99,7 +99,7 @@
             </div>
           </div>
 
-          <!-- Nav image cards now after jumper bar -->
+          <!-- Nav image cards -->
           <div class="nav-cards">
             <button class="nav-card" onclick="window.location.href='<%= isAdmin ? '/admin-gallery' : '/gallery' %>'">
               <img src="/public/nav-main.jpg" alt="Main Gallery" class="nav-card-img" />
