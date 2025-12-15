@@ -233,14 +233,14 @@ app.get('/upload', requireLogin('admin'), (req, res) => {
   res.render('upload');
 });
 
-// Handle upload TO S3 (supports main / other / sales)
+// Handle upload TO S3 (supports main / other / other2 / sales)
 app.post('/upload', requireLogin('admin'), async (req, res) => {
   let { brand, person, date, galleryType } = req.body;
   brand = (brand || 'DefaultBrand').trim();
   person = (person || 'DefaultPerson').trim();
   date = (date || 'NoDate').trim();
 
-  if (!['main', 'other', 'sales'].includes(galleryType)) {
+  if (!['main', 'other', 'other2', 'sales'].includes(galleryType)) {
     galleryType = 'main';
   }
 
@@ -284,7 +284,7 @@ app.post('/upload', requireLogin('admin'), async (req, res) => {
         name: fileName,
         url,
         s3Key,
-        galleryType, // main / other / sales
+        galleryType, // main / other / other2 / sales
       });
     }
 
