@@ -741,3 +741,86 @@ body.blue-mode {
 .invoice-table tbody tr:nth-child(even) {
   background: rgba(249, 250, 251, 0.9);
 }
+
+/* ---------- Mobile tweaks ---------- */
+@media (max-width: 600px) {
+  body {
+    font-size: 16px;
+  }
+
+  header {
+    padding: 8px 10px;
+  }
+
+  .header-logo {
+    height: 30px;
+  }
+
+  .header-title {
+    font-size: 16px;
+  }
+
+  header nav {
+    gap: 6px;
+  }
+
+  header nav a {
+    font-size: 12px;
+    padding: 4px 8px;
+  }
+
+  #installAppBtn,
+  .install-btn {
+    font-size: 12px;
+    padding: 4px 8px;
+  }
+
+  main {
+    padding: 0 10px 32px;
+  }
+
+  .nav-cards {
+    gap: 12px;
+    margin: 10px 0 18px;
+  }
+
+  .nav-card {
+    min-width: 190px;
+    max-width: 210px;
+    height: 260px;
+  }
+
+  .nav-card-title {
+    font-size: 16px;
+  }
+
+  .nav-card-sub {
+    font-size: 11px;
+  }
+
+  .person-block {
+    padding: 12px 10px 16px;
+  }
+
+  .photos {
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 10px;
+  }
+
+  .photo-card img {
+    height: 130px;
+  }
+
+  .photo-filename {
+    font-size: 12px;
+  }
+
+  .jumper-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .search-bar input {
+    max-width: 100%;
+  }
+}
