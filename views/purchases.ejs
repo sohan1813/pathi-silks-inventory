@@ -54,7 +54,7 @@
                 <!-- Multiple invoice photos -->
                 <td>
                   <% if (p.invoicePhotoUrls && p.invoicePhotoUrls.length) { %>
-                    <a href="/purchases/<%= p.id %>/invoice-photos" target="_blank">
+                    <a href="/purchases/<%= p.id %>/invoice-photos?i=0">
                       View (<%= p.invoicePhotoUrls.length %>)
                     </a>
                   <% } else { %>
@@ -65,7 +65,7 @@
                 <!-- Multiple product photos -->
                 <td>
                   <% if (p.productPhotoUrls && p.productPhotoUrls.length) { %>
-                    <a href="/purchases/<%= p.id %>/product-photos" target="_blank">
+                    <a href="/purchases/<%= p.id %>/product-photos?i=0">
                       View (<%= p.productPhotoUrls.length %>)
                     </a>
                   <% } else { %>

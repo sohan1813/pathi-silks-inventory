@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %> - Pathi Silks Inventory</title>
+  <link rel="stylesheet" href="/public/style.css" />
+  <style>
+    /* Grid */
+    .thumb-grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+    .thumb{
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,0.12);
+      cursor: pointer;
+      background: rgba(255,255,255,0.7);
+    }
+
+    /* Lightbox overlay slider */
+    .overlay{
+      display:none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      z-index: 9999;
+      padding: 22px;
+    }
+    .overlay.active{ display:block; }
+
+    .viewer{
+      position: relative;
+      max-width: 1100px;
+      margin: 70px auto 0;
+      background: rgba(255,255,255,0.95);
+      border-radius: 16px;
+      box-shadow: 0 14px 50px rgba(0,0,0,0.45);
+      padding: 18px;
+    }
+    .main-photo{
+      width: 100%;
+      height: 72vh;
+      object-fit: contain;
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .close-btn{
+      position: fixed;
+      top: 18px;
+      right: 22px;
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0,0,0,0.65);
+      color: #fff;
+      font-size: 26px;
+      cursor: pointer;
+      z-index: 10000;
+    }
+    .close-btn:hover{ background: rgba(0,0,0,0.85); }
+
+    .nav-btn{
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0,0,0,0.55);
+      color: #fff;
+      font-size: 34px;
+      cursor: pointer;
+      user-select: none;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index: 10000;
+    }
+    .nav-btn:hover{ background: rgba(0,0,0,0.75); }
+    .nav-btn.prev{ left: 18px; }
+    .nav-btn.next{ right: 18px; }
+
+    .counter{
+      position: fixed;
+      bottom: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.65);
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 18px;
+      font-size: 14px;
+      z-index: 10000;
+    }
+
+    @media (max-width: 768px){
+      .thumb{ height: 150px; }
+      .main-photo{ height: 62vh; }
+      .nav-btn{ width: 46px; height: 46px; font-size: 28px; }
+      .nav-btn.prev{ left: 10px; }
+      .nav-btn.next{ right: 10px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <div class="page-inner">
+      <header>
+        <div class="header-left">
+          <img src="/public/pathi-logo.jpg" class="header-logo" alt="Logo" />
+          <div class="header-title">Pathi-Silks</div>
+        </div>
+        <nav>
+          <a href="/gallery">Main Gallery</a>
+          <a href="/other-gallery">Other Albums</a>
+          <a href="/sales-gallery">Sales</a>
+          <a href="/sheets">Sheets</a>
+          <a href="/purchases">Stock Purchase</a>
+          <a href="/logout">Logout</a>
+        </nav>
+      </header>
+
+      <main>
+        <h2><%= title %></h2>
+
+        <% if (!photos || !photos.length) { %>
+          <p style="margin-top:18px;">No photos found.</p>
+        <% } else { %>
+
+          <!-- GRID -->
+          <div class="thumb-grid" id="thumbGrid">
+            <% photos.forEach(function(url, index){ %>
+              <img class="thumb" src="<%= url %>" data-index="<%= index %>" alt="photo <%= index+1 %>">
+            <% }) %>
+          </div>
+
+          <!-- OVERLAY SLIDER -->
+          <div class="overlay" id="overlay">
+            <button class="close-btn" id="closeBtn" type="button" aria-label="Close">×</button>
+            <button class="nav-btn prev" id="prevBtn" type="button" aria-label="Previous">‹</button>
+            <button class="nav-btn next" id="nextBtn" type="button" aria-label="Next">›</button>
+            <div class="counter" id="counter">1 / <%= photos.length %></div>
+
+            <div class="viewer" id="viewerBox">
+              <img id="mainPhoto" class="main-photo" src="" alt="<%= title %>">
+            </div>
+          </div>
+
+          <script>
+            const photos = <%- JSON.stringify(photos) %>;
+            const overlay = document.getElementById('overlay');
+            const mainPhoto = document.getElementById('mainPhoto');
+            const counterEl = document.getElementById('counter');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const closeBtn = document.getElementById('closeBtn');
+            const viewerBox = document.getElementById('viewerBox');
+
+            let idx = 0;
+
+            function render(){
+              mainPhoto.src = photos[idx];
+              counterEl.textContent = (idx + 1) + ' / ' + photos.length;
+            }
+
+            function openAt(i){
+              idx = i;
+              overlay.classList.add('active');
+              render();
+            }
+
+            function closeOverlay(){
+              overlay.classList.remove('active');
+            }
+
+            function next(){
+              idx = (idx + 1) % photos.length;
+              render();
+            }
+
+            function prev(){
+              idx = (idx - 1 + photos.length) % photos.length;
+              render();
+            }
+
+            // open when click any thumbnail
+            document.getElementById('thumbGrid').addEventListener('click', (e) => {
+              const el = e.target.closest('.thumb');
+              if (!el) return;
+              openAt(Number(el.dataset.index || 0));
+            });
+
+            // buttons
+            nextBtn.addEventListener('click', next);
+            prevBtn.addEventListener('click', prev);
+            closeBtn.addEventListener('click', closeOverlay);
+
+            // click outside viewer closes
+            overlay.addEventListener('click', (e) => {
+              if (e.target === overlay) closeOverlay();
+            });
+
+            // ESC closes, arrows navigate
+            document.addEventListener('keydown', (e) => {
+              if (!overlay.classList.contains('active')) return;
+              if (e.key === 'Escape') closeOverlay();
+              if (e.key === 'ArrowRight') next();
+              if (e.key === 'ArrowLeft') prev();
+            });
+
+            // swipe inside viewer
+            let startX = 0;
+            viewerBox.addEventListener('touchstart', (e) => {
+              startX = e.touches[0].clientX;
+            }, { passive: true });
+
+            viewerBox.addEventListener('touchend', (e) => {
+              const endX = e.changedTouches[0].clientX;
+              const diff = endX - startX;
+              if (Math.abs(diff) < 40) return;
+              if (diff < 0) next(); else prev();
+            }, { passive: true });
+
+            // If URL has ?i=NUMBER open directly
+            const urlIndex = new URLSearchParams(window.location.search).get('i');
+            if (urlIndex !== null) {
+              const i = Number(urlIndex);
+              if (!Number.isNaN(i) && i >= 0 && i < photos.length) {
+                openAt(i);
+              }
+            }
+          </script>
+
+        <% } %>
+      </main>
+    </div>
+  </div>
+</body>
+</html>
