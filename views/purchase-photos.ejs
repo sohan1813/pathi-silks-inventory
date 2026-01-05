@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title><%= title %></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> - Pathi Silks Inventory</title>
   <link rel="stylesheet" href="/public/style.css" />
   <style>
     .photo-grid {
@@ -17,6 +18,90 @@
       object-fit: cover;
       border-radius: 8px;
       border: 1px solid #ddd;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .photo-grid img:hover {
+      transform: scale(1.02);
+    }
+
+    /* Lightbox */
+    .lightbox {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.9);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .lightbox.active {
+      display: flex;
+    }
+    .lightbox-img {
+      max-width: 90%;
+      max-height: 90%;
+      object-fit: contain;
+      border-radius: 12px;
+    }
+    .lightbox-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 3rem;
+      color: white;
+      background: rgba(0,0,0,0.5);
+      border: none;
+      padding: 16px 24px;
+      cursor: pointer;
+      user-select: none;
+      border-radius: 50%;
+      transition: background 0.2s;
+    }
+    .lightbox-nav:hover {
+      background: rgba(0,0,0,0.8);
+    }
+    .lightbox-nav.prev {
+      left: 24px;
+    }
+    .lightbox-nav.next {
+      right: 24px;
+    }
+    .lightbox-close {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      font-size: 2.5rem;
+      color: white;
+      background: rgba(0,0,0,0.5);
+      border: none;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    .lightbox-close:hover {
+      background: rgba(0,0,0,0.8);
+    }
+    .photo-count {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: white;
+      font-size: 1.2rem;
+      background: rgba(0,0,0,0.7);
+      padding: 8px 16px;
+      border-radius: 20px;
+    }
+    @media (max-width: 768px) {
+      .lightbox-nav {
+        font-size: 2rem;
+        padding: 12px 16px;
+      }
     }
   </style>
 </head>
@@ -24,35 +109,4 @@
   <div class="page">
     <div class="page-inner">
       <header>
-        <div class="header-left">
-          <img src="/public/pathi-logo.jpg" class="header-logo" alt="Logo">
-          <div class="header-title">Pathi-Silks</div>
-        </div>
-        <nav>
-          <a href="/gallery">Main Gallery</a>
-          <a href="/other-gallery">Other Albums</a>
-          <a href="/sales-gallery">Sales</a>
-          <a href="/sheets">Sheets</a>
-          <a href="/purchases">Stock Purchase</a>
-        </nav>
-      </header>
-
-      <main>
-        <h2><%= title %></h2>
-
-        <% if (!photos || !photos.length) { %>
-          <p>No photos found.</p>
-        <% } else { %>
-          <div class="photo-grid">
-            <% photos.forEach(function (url) { %>
-              <a href="<%= url %>" target="_blank">
-                <img src="<%= url %>" alt="Purchase photo">
-              </a>
-            <% }) %>
-          </div>
-        <% } %>
-      </main>
-    </div>
-  </div>
-</body>
-</html>
+        <div class="header
