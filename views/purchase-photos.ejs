@@ -1,34 +1,174 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title><%= title %> - Pathi Silks Inventory</title>
   <link rel="stylesheet" href="/public/style.css" />
   <style>
-    .main-photo {
-      width: 90%;
-      max-width: 800px;
-      height: 70vh;
-      object-fit: contain;
-      background: #f8f8f8;
-      border-radius: 12px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    .viewer-wrap{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      margin-top: 18px;
+      min-height: 70vh;
+      position: relative;
     }
-    .nav-arrows {
-      position: fixed;
+
+    .main-photo{
+      width: 92%;
+      max-width: 980px;
+      height: 72vh;
+      object-fit: contain;
+      background: rgba(255,255,255,0.85);
+      border-radius: 14px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.35);
+    }
+
+    .nav-btn{
+      position: absolute;
       top: 50%;
       transform: translateY(-50%);
-      font-size: 3rem;
-      color: white;
-      background: rgba(0,0,0,0.6);
-      border: none;
-      padding: 20px 30px;
-      cursor: pointer;
+      width: 56px;
+      height: 56px;
       border-radius: 50%;
+      border: none;
+      background: rgba(0,0,0,0.55);
+      color: #fff;
+      font-size: 34px;
+      cursor: pointer;
+      user-select: none;
+      display:flex;
+      align-items:center;
+      justify-content:center;
       z-index: 10;
-      transition: all 0.3s;
     }
-    .nav-arrows:hover {
-      background: rgba(0,0);
-}
+    .nav-btn:hover{ background: rgba(0,0,0,0.75); }
+    .nav-btn.prev{ left: 18px; }
+    .nav-btn.next{ right: 18px; }
+
+    .counter{
+      position:absolute;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.65);
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 18px;
+      font-size: 14px;
+      z-index: 10;
+    }
+
+    .hint{
+      margin-top: 10px;
+      font-size: 13px;
+      opacity: 0.75;
+    }
+
+    @media (max-width: 768px){
+      .main-photo{ height: 64vh; }
+      .nav-btn{ width: 46px; height: 46px; font-size: 28px; }
+      .nav-btn.prev{ left: 10px; }
+      .nav-btn.next{ right: 10px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <div class="page-inner">
+      <header>
+        <div class="header-left">
+          <img src="/public/pathi-logo.jpg" class="header-logo" alt="Logo">
+          <div class="header-title">Pathi-Silks</div>
+        </div>
+        <nav>
+          <a href="/gallery">Main Gallery</a>
+          <a href="/other-gallery">Other Albums</a>
+          <a href="/sales-gallery">Sales</a>
+          <a href="/sheets">Sheets</a>
+          <a href="/purchases">Stock Purchase</a>
+          <a href="/logout">Logout</a>
+        </nav>
+      </header>
+
+      <main>
+        <h2><%= title %></h2>
+
+        <% if (!photos || !photos.length) { %>
+          <p style="margin-top:18px;">No photos found.</p>
+        <% } else { %>
+
+          <div class="viewer-wrap" id="viewerWrap">
+            <button class="nav-btn prev" id="prevBtn" type="button" aria-label="Previous">‹</button>
+
+            <img
+              id="mainPhoto"
+              class="main-photo"
+              src="<%= photos[0] %>"
+              alt="<%= title %>"
+            />
+
+            <button class="nav-btn next" id="nextBtn" type="button" aria-label="Next">›</button>
+
+            <div class="counter" id="counter">1 / <%= photos.length %></div>
+          </div>
+
+          <div class="hint">Tip: Use ← → keys on laptop, swipe on mobile.</div>
+
+          <script>
+            // Use <%- ... %> so JSON isn't HTML-escaped by EJS.[web:79][web:89]
+            const photos = <%- JSON.stringify(photos) %>;
+
+            let idx = 0;
+            const imgEl = document.getElementById('mainPhoto');
+            const counterEl = document.getElementById('counter');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const wrap = document.getElementById('viewerWrap');
+
+            function render(){
+              imgEl.src = photos[idx];
+              counterEl.textContent = (idx + 1) + ' / ' + photos.length;
+            }
+
+            function next(){
+              idx = (idx + 1) % photos.length;
+              render();
+            }
+
+            function prev(){
+              idx = (idx - 1 + photos.length) % photos.length;
+              render();
+            }
+
+            nextBtn.addEventListener('click', next);
+            prevBtn.addEventListener('click', prev);
+
+            document.addEventListener('keydown', (e) => {
+              if (e.key === 'ArrowRight') next();
+              if (e.key === 'ArrowLeft') prev();
+              if (e.key === 'Escape') window.history.back();
+            });
+
+            // Swipe support
+            let startX = 0;
+            wrap.addEventListener('touchstart', (e) => {
+              startX = e.touches[0].clientX;
+            }, { passive: true });
+
+            wrap.addEventListener('touchend', (e) => {
+              const endX = e.changedTouches[0].clientX;
+              const diff = endX - startX;
+              if (Math.abs(diff) < 40) return;
+              if (diff < 0) next(); else prev();
+            }, { passive: true });
+          </script>
+
+        <% } %>
+      </main>
+    </div>
+  </div>
+</body>
+</html>
