@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/public/style.css" />
+  <style>
+    .photo-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 24px;
+    }
+    .photo-grid img {
+      width: 220px;
+      height: 220px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="page-inner">
+      <header>
+        <div class="header-left">
+          <img src="/public/pathi-logo.jpg" class="header-logo" alt="Logo">
+          <div class="header-title">Pathi-Silks</div>
+        </div>
+        <nav>
+          <a href="/gallery">Main Gallery</a>
+          <a href="/other-gallery">Other Albums</a>
+          <a href="/sales-gallery">Sales</a>
+          <a href="/sheets">Sheets</a>
+          <a href="/purchases">Stock Purchase</a>
+        </nav>
+      </header>
+
+      <main>
+        <h2><%= title %></h2>
+
+        <% if (!photos || !photos.length) { %>
+          <p>No photos found.</p>
+        <% } else { %>
+          <div class="photo-grid">
+            <% photos.forEach(function (url) { %>
+              <a href="<%= url %>" target="_blank">
+                <img src="<%= url %>" alt="Purchase photo">
+              </a>
+            <% }) %>
+          </div>
+        <% } %>
+      </main>
+    </div>
+  </div>
+</body>
+</html>
