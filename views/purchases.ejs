@@ -37,8 +37,8 @@
               <th>Date</th>
               <th>Supplier Name</th>
               <th>Purchase IDs</th>
-              <th>Invoice Bill</th>
-              <th>Product Photo</th>
+              <th>Invoice Bills</th>
+              <th>Product Photos</th>
               <th>Total Purchase</th>
               <th>Return</th>
               <th>Delete</th>
@@ -50,16 +50,29 @@
                 <td><%= p.date %></td>
                 <td><%= p.supplier %></td>
                 <td><%= p.purchaseIds %></td>
+
+                <!-- Multiple invoice photos -->
                 <td>
-                  <% if (p.invoiceUrl) { %>
-                    <a href="<%= p.invoiceUrl %>" target="_blank">View</a>
+                  <% if (p.invoicePhotoUrls && p.invoicePhotoUrls.length) { %>
+                    <a href="/purchases/<%= p.id %>/invoice-photos" target="_blank">
+                      View (<%= p.invoicePhotoUrls.length %>)
+                    </a>
+                  <% } else { %>
+                    -
                   <% } %>
                 </td>
+
+                <!-- Multiple product photos -->
                 <td>
-                  <% if (p.imageUrl) { %>
-                    <a href="<%= p.imageUrl %>" target="_blank">View</a>
+                  <% if (p.productPhotoUrls && p.productPhotoUrls.length) { %>
+                    <a href="/purchases/<%= p.id %>/product-photos" target="_blank">
+                      View (<%= p.productPhotoUrls.length %>)
+                    </a>
+                  <% } else { %>
+                    -
                   <% } %>
                 </td>
+
                 <td><%= p.totalPurchase || '' %></td>
                 <td><%= p.returnInfo %></td>
                 <td>

@@ -296,55 +296,73 @@ app.post('/upload', requireLogin('admin'), async (req, res) => {
   }
 });
 
-// Handle stock purchase upload (invoice + product image + metadata)
+// Helper to upload a single file to S3 and return URL
+async function uploadToS3AndGetUrl(file, keyPrefix) {
+  const ext = path.extname(file.name) || '.jpg';
+  const key = `${keyPrefix}${ext}`;
+  await s3.send(
+    new PutObjectCommand({
+      Bucket: S3_BUCKET,
+      Key: key,
+      Body: file.data,
+      ContentType: file.mimetype,
+      CacheControl: 'public, max-age=31536000',
+    })
+  );
+  return `https://${S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+}
+
+// Handle stock purchase upload (MULTIPLE invoice + product photos + metadata)
 app.post('/admin/upload-purchase', requireLogin('admin'), async (req, res) => {
   const { date, supplier, purchaseIds, returnInfo, totalPurchase } = req.body;
 
-  if (!req.files || !req.files.image || !date || !supplier) {
-    return res.status(400).send('Missing data or file');
+  if (!date || !supplier) {
+    return res.status(400).send('Missing date or supplier');
   }
 
-  const productImg = req.files.image;
-  const invoiceImg = req.files.invoiceImage;
+  // Prepare arrays from express-fileupload
+  const invoiceFiles = Array.isArray(req.files?.invoicePhotos)
+    ? req.files.invoicePhotos
+    : req.files?.invoicePhotos
+      ? [req.files.invoicePhotos]
+      : [];
+
+  const productFiles = Array.isArray(req.files?.productPhotos)
+    ? req.files.productPhotos
+    : req.files?.productPhotos
+      ? [req.files.productPhotos]
+      : [];
+
+  if (!productFiles.length) {
+    return res.status(400).send('At least one product photo is required');
+  }
 
   const timestamp = Date.now();
   const safeSupplier = supplier.trim().replace(/\s+/g, '-');
   const id = `${date}-${safeSupplier}-${timestamp}`;
 
-  let imageUrl = '';
-  let invoiceUrl = '';
+  const invoicePhotoUrls = [];
+  const productPhotoUrls = [];
 
   try {
-    const prodExt = path.extname(productImg.name) || '.jpg';
-    const prodKey = `purchases/${id}-product${prodExt}`;
-
-    await s3.send(
-      new PutObjectCommand({
-        Bucket: S3_BUCKET,
-        Key: prodKey,
-        Body: productImg.data,
-        ContentType: productImg.mimetype,
-        CacheControl: 'public, max-age=31536000',
-      })
-    );
-
-    imageUrl = `https://${S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${prodKey}`;
-
-    if (invoiceImg) {
-      const invExt = path.extname(invoiceImg.name) || '.jpg';
-      const invKey = `purchases/${id}-invoice${invExt}`;
-
-      await s3.send(
-        new PutObjectCommand({
-          Bucket: S3_BUCKET,
-          Key: invKey,
-          Body: invoiceImg.data,
-          ContentType: invoiceImg.mimetype,
-          CacheControl: 'public, max-age=31536000',
-        })
+    // upload product photos
+    for (let i = 0; i < productFiles.length; i++) {
+      const f = productFiles[i];
+      const url = await uploadToS3AndGetUrl(
+        f,
+        `purchases/${id}-product-${i + 1}`
       );
+      productPhotoUrls.push(url);
+    }
 
-      invoiceUrl = `https://${S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${invKey}`;
+    // upload invoice photos (if any)
+    for (let i = 0; i < invoiceFiles.length; i++) {
+      const f = invoiceFiles[i];
+      const url = await uploadToS3AndGetUrl(
+        f,
+        `purchases/${id}-invoice-${i + 1}`
+      );
+      invoicePhotoUrls.push(url);
     }
 
     const purchasesMeta = await getPurchasesMetadata();
@@ -353,8 +371,8 @@ app.post('/admin/upload-purchase', requireLogin('admin'), async (req, res) => {
       date,
       supplier: supplier.trim(),
       purchaseIds: purchaseIds || '',
-      imageUrl,
-      invoiceUrl,
+      invoicePhotoUrls,   // array of strings
+      productPhotoUrls,   // array of strings
       totalPurchase: totalPurchase || '',
       returnInfo: returnInfo || '',
     };
@@ -754,7 +772,31 @@ app.get('/purchases', requireLogin(), async (req, res) => {
   res.render('purchases', { purchases });
 });
 
-// Admin delete purchase
+// View all invoice photos for one purchase
+app.get('/purchases/:id/invoice-photos', requireLogin(), async (req, res) => {
+  const purchasesMeta = await getPurchasesMetadata();
+  const purchase = purchasesMeta[req.params.id];
+  if (!purchase) return res.status(404).send('Purchase not found');
+
+  res.render('purchase-photos', {
+    title: 'Invoice photos',
+    photos: purchase.invoicePhotoUrls || [],
+  });
+});
+
+// View all product photos for one purchase
+app.get('/purchases/:id/product-photos', requireLogin(), async (req, res) => {
+  const purchasesMeta = await getPurchasesMetadata();
+  const purchase = purchasesMeta[req.params.id];
+  if (!purchase) return res.status(404).send('Purchase not found');
+
+  res.render('purchase-photos', {
+    title: 'Product photos',
+    photos: purchase.productPhotoUrls || [],
+  });
+});
+
+// Admin delete purchase (deletes first product image only; can be extended)
 app.post('/admin/delete-purchase', requireLogin('admin'), async (req, res) => {
   const { id } = req.body;
   if (!id) return res.status(400).send('Missing id');
@@ -762,8 +804,10 @@ app.post('/admin/delete-purchase', requireLogin('admin'), async (req, res) => {
   const purchasesMeta = await getPurchasesMetadata();
   const purchase = purchasesMeta[id];
 
-  if (purchase && purchase.imageUrl) {
-    const split = purchase.imageUrl.split('.amazonaws.com/');
+  // Optional: delete first product photo from S3 (old behaviour)
+  if (purchase && purchase.productPhotoUrls && purchase.productPhotoUrls.length) {
+    const firstUrl = purchase.productPhotoUrls[0];
+    const split = firstUrl.split('.amazonaws.com/');
     if (split[1]) {
       const key = split[1];
       try {

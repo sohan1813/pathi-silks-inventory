@@ -57,11 +57,24 @@
     <label>Purchase IDs (you can add multiple)</label>
     <textarea name="purchaseIds" rows="2" placeholder="P123, P124, P125"></textarea>
 
-    <label>Invoice bill photo</label>
-    <input type="file" name="invoiceImage" accept="image/*" />
+    <!-- MULTIPLE invoice bill photos -->
+    <label>Invoice bill photos</label>
+    <input
+      type="file"
+      name="invoicePhotos"
+      accept="image/*"
+      multiple
+    />
 
-    <label>Product photo</label>
-    <input type="file" name="image" accept="image/*" required />
+    <!-- MULTIPLE product photos -->
+    <label>Product photos</label>
+    <input
+      type="file"
+      name="productPhotos"
+      accept="image/*"
+      multiple
+      required
+    />
 
     <label>Total purchase</label>
     <input type="number" name="totalPurchase" step="0.01" placeholder="e.g. 125000" />
