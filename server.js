@@ -385,12 +385,9 @@ app.post('/admin/upload-purchase', requireLogin('admin'), async (req, res) => {
   }
 });
 
-// Admin rename photo (UPDATED: returns JSON for fetch/AJAX, redirects for normal form submit)
+// Admin rename photo (AJAX + normal submit)
 app.post('/rename-photo', requireLogin('admin'), async (req, res) => {
   const { brand, person, date, oldfilename, newfilename } = req.body;
-
-  // If fetch sends Accept: application/json, respond in JSON.
-  // Otherwise (normal browser form submit), keep redirect behavior.
   const wantsJSON = (req.headers.accept || '').includes('application/json');
 
   if (!brand || !person || !date || !oldfilename || !newfilename) {
@@ -427,10 +424,14 @@ app.post('/rename-photo', requireLogin('admin'), async (req, res) => {
   return res.redirect('/admin-gallery');
 });
 
-// Admin delete photo
+// Admin delete photo (UPDATED: returns JSON for fetch/AJAX, redirects for normal submit)
 app.post('/delete-photo', requireLogin('admin'), async (req, res) => {
   const { brand, person, date, filename } = req.body;
+
+  const wantsJSON = (req.headers.accept || '').includes('application/json');
+
   if (!brand || !person || !date || !filename) {
+    if (wantsJSON) return res.status(400).json({ ok: false, error: 'Missing data' });
     return res.status(400).send('Missing data');
   }
 
@@ -440,10 +441,17 @@ app.post('/delete-photo', requireLogin('admin'), async (req, res) => {
 
   const photosMeta = await getPhotosMetadata();
   const files = photosMeta?.[safeBrand]?.[safePerson]?.[safeDate];
-  if (!files) return res.redirect('/admin-gallery');
+
+  if (!files) {
+    if (wantsJSON) return res.status(404).json({ ok: false, error: 'Not found' });
+    return res.redirect('/admin-gallery');
+  }
 
   const index = files.findIndex((f) => f.name === filename);
-  if (index === -1) return res.redirect('/admin-gallery');
+  if (index === -1) {
+    if (wantsJSON) return res.status(404).json({ ok: false, error: 'File not found' });
+    return res.redirect('/admin-gallery');
+  }
 
   const file = files[index];
 
@@ -457,13 +465,15 @@ app.post('/delete-photo', requireLogin('admin'), async (req, res) => {
     console.log(`Deleted from S3: ${file.s3Key}`);
   } catch (err) {
     console.error('S3 delete error:', err);
+    // Continue deleting from metadata even if S3 delete fails
   }
 
   files.splice(index, 1);
   await savePhotosMetadata(photosMeta);
   console.log(`Deleted from metadata: ${filename}`);
 
-  res.redirect('/admin-gallery');
+  if (wantsJSON) return res.json({ ok: true, filename });
+  return res.redirect('/admin-gallery');
 });
 
 // Add Google Sheet
