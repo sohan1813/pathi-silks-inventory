@@ -163,7 +163,12 @@
 
                                 <% if (isAdmin) { %>
                                   <div class="photo-actions">
-                                    <form method="POST" action="/rename-photo" class="rename-form">
+                                    <form
+                                      method="POST"
+                                      action="/rename-photo"
+                                      class="rename-form"
+                                      data-oldfilename="<%= file.name %>"
+                                    >
                                       <input type="hidden" name="brand" value="<%= brand.name %>" />
                                       <input type="hidden" name="person" value="<%= person.name %>" />
                                       <input type="hidden" name="date" value="<%= date.name %>" />
@@ -324,6 +329,64 @@
       if (searchInput) {
         searchInput.addEventListener('input', applySearch);
       }
+    });
+  </script>
+
+  <!-- NEW: Rename without page reload -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const renameForms = document.querySelectorAll('form.rename-form');
+
+      renameForms.forEach((form) => {
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault(); // stop normal form submit (no reload) [web:219]
+
+          const btn = form.querySelector('button.rename-btn');
+          const input = form.querySelector('input[name="newfilename"]');
+          const oldHidden = form.querySelector('input[name="oldfilename"]');
+
+          const prevBtnText = btn ? btn.textContent : '';
+          if (btn) {
+            btn.disabled = true;
+            btn.textContent = '...';
+          }
+
+          try {
+            const fd = new FormData(form); // build form payload [web:192]
+
+            const res = await fetch(form.action, {
+              method: 'POST',
+              body: fd,
+              headers: { 'Accept': 'application/json' }
+            });
+
+            const data = await res.json();
+            if (!data.ok) throw new Error(data.error || 'Rename failed');
+
+            // Update visible filename
+            const card = form.closest('.photo-card');
+            if (card) {
+              const nameEl = card.querySelector('.photo-filename');
+              if (nameEl) nameEl.textContent = data.newfilename;
+            }
+
+            // IMPORTANT: update hidden oldfilename so the next rename works without reload
+            if (oldHidden) oldHidden.value = data.newfilename;
+            form.dataset.oldfilename = data.newfilename;
+
+            // Clear input for faster next rename
+            if (input) input.value = '';
+            if (input) input.focus();
+          } catch (err) {
+            alert(err.message || 'Rename failed');
+          } finally {
+            if (btn) {
+              btn.disabled = false;
+              btn.textContent = prevBtnText || 'Rename';
+            }
+          }
+        });
+      });
     });
   </script>
 </body>

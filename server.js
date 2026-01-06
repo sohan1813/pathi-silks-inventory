@@ -385,10 +385,16 @@ app.post('/admin/upload-purchase', requireLogin('admin'), async (req, res) => {
   }
 });
 
-// Admin rename photo
+// Admin rename photo (UPDATED: returns JSON for fetch/AJAX, redirects for normal form submit)
 app.post('/rename-photo', requireLogin('admin'), async (req, res) => {
   const { brand, person, date, oldfilename, newfilename } = req.body;
+
+  // If fetch sends Accept: application/json, respond in JSON.
+  // Otherwise (normal browser form submit), keep redirect behavior.
+  const wantsJSON = (req.headers.accept || '').includes('application/json');
+
   if (!brand || !person || !date || !oldfilename || !newfilename) {
+    if (wantsJSON) return res.status(400).json({ ok: false, error: 'Missing data' });
     return res.status(400).send('Missing data');
   }
 
@@ -398,17 +404,27 @@ app.post('/rename-photo', requireLogin('admin'), async (req, res) => {
 
   const photosMeta = await getPhotosMetadata();
   const files = photosMeta?.[safeBrand]?.[safePerson]?.[safeDate];
-  if (!files) return res.redirect('/admin-gallery');
 
-  const file = files.find((f) => f.name === oldfilename);
-  if (file) {
-    const ext = path.extname(file.name);
-    file.name = newfilename.includes('.') ? newfilename : newfilename + ext;
-    await savePhotosMetadata(photosMeta);
-    console.log(`Renamed (meta): ${oldfilename} → ${file.name}`);
+  if (!files) {
+    if (wantsJSON) return res.status(404).json({ ok: false, error: 'Not found' });
+    return res.redirect('/admin-gallery');
   }
 
-  res.redirect('/admin-gallery');
+  const file = files.find((f) => f.name === oldfilename);
+  if (!file) {
+    if (wantsJSON) return res.status(404).json({ ok: false, error: 'File not found' });
+    return res.redirect('/admin-gallery');
+  }
+
+  const ext = path.extname(file.name);
+  const updatedName = newfilename.includes('.') ? newfilename : newfilename + ext;
+
+  file.name = updatedName;
+  await savePhotosMetadata(photosMeta);
+  console.log(`Renamed (meta): ${oldfilename} → ${file.name}`);
+
+  if (wantsJSON) return res.json({ ok: true, oldfilename, newfilename: updatedName });
+  return res.redirect('/admin-gallery');
 });
 
 // Admin delete photo
