@@ -511,7 +511,7 @@ button {
   box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.18);
 }
 
-/* ---------- Nav image cards (no shadow, zoom hover) ---------- */
+/* ---------- Nav image cards (UPDATED to match your 1st screenshot) ---------- */
 
 /* wrapper that can scroll horizontally but hides scrollbar */
 .nav-cards-scroll {
@@ -528,75 +528,98 @@ button {
   display: flex;
   gap: 18px;
   margin: 14px 0 22px;
-  padding-bottom: 4px;
+  padding-bottom: 6px;
 }
 
+/* Card container */
 .nav-card {
   position: relative;
-  min-width: 220px;
-  max-width: 240px;
-  height: 300px;
-  border-radius: 24px;
-  border: none;
+  min-width: 260px;           /* bigger like your 1st image */
+  max-width: 280px;
+  height: 320px;              /* taller */
+  border-radius: 26px;
   padding: 0;
-  background: transparent;
   overflow: hidden;
   cursor: pointer;
-  box-shadow: none;
-  transition: transform 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.25);
+  transform: translateZ(0);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: #000;
 }
 
+/* Image */
 .nav-card-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
   transform: scale(1);
-  transition: transform 0.25s ease;
+  transition: transform 0.35s ease;
+  filter: saturate(1.05) contrast(1.02);
 }
 
-/* text only, no dark overlay */
+/* Gradient overlay behind text (key change) */
 .nav-card-overlay {
   position: absolute;
   inset: 0;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 16px 18px;
-  background: transparent;
+  padding: 18px 18px 16px;
   color: #ffffff;
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.75);
+
+  /* Gradient layer for readable text (like your 1st screenshot) */
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.82) 0%,
+    rgba(0, 0, 0, 0.45) 28%,
+    rgba(0, 0, 0, 0.12) 52%,
+    rgba(0, 0, 0, 0) 70%
+  );
 }
 
+/* Title + subtitle */
 .nav-card-title {
   font-size: 18px;
-  font-weight: 800;
+  font-weight: 900;
   letter-spacing: 0.03em;
   margin-bottom: 4px;
 }
 
 .nav-card-sub {
   font-size: 12px;
-  opacity: 0.9;
+  opacity: 0.95;
 }
 
+/* Play icon in a small circle (like premium UI) */
 .nav-card::after {
   content: '▶';
   position: absolute;
   right: 14px;
-  bottom: 16px;
-  font-size: 18px;
-  opacity: 0.9;
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+  bottom: 14px;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  backdrop-filter: blur(8px);
+  text-shadow: none;
 }
 
+/* Hover */
 .nav-card:hover {
   transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 22px 60px rgba(15, 23, 42, 0.35);
 }
 
-/* zoom the image on hover */
 .nav-card:hover .nav-card-img {
-  transform: scale(1.06);
+  transform: scale(1.08);
 }
 
 /* Simple page fade-in */
@@ -785,9 +808,9 @@ body.blue-mode {
   }
 
   .nav-card {
-    min-width: 190px;
-    max-width: 210px;
-    height: 260px;
+    min-width: 220px;
+    max-width: 240px;
+    height: 290px;
   }
 
   .nav-card-title {
