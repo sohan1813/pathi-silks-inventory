@@ -1,5 +1,7 @@
-console.log('ENV REGION =', process.env.AWS_REGION);
 require('dotenv').config();
+
+console.log('ENV REGION =', process.env.AWS_REGION);
+
 const express = require('express');
 const fileUpload = require('express-fileupload');
 const session = require('express-session');
@@ -48,6 +50,13 @@ app.use(
     saveUninitialized: false,
   })
 );
+
+// --- SORT HELPERS (LATEST DATE TOP) ---
+function sortDateKeysDesc(a, b) {
+  if (!a || a === 'NoDate') return 1;
+  if (!b || b === 'NoDate') return -1;
+  return b.localeCompare(a); // works for YYYY-MM-DD format
+}
 
 // --- AUTH HELPERS ---
 function requireLogin(role) {
@@ -320,7 +329,6 @@ app.post('/admin/upload-purchase', requireLogin('admin'), async (req, res) => {
     return res.status(400).send('Missing date or supplier');
   }
 
-  // Prepare arrays from express-fileupload
   const invoiceFiles = Array.isArray(req.files?.invoicePhotos)
     ? req.files.invoicePhotos
     : req.files?.invoicePhotos
@@ -345,23 +353,15 @@ app.post('/admin/upload-purchase', requireLogin('admin'), async (req, res) => {
   const productPhotoUrls = [];
 
   try {
-    // upload product photos
     for (let i = 0; i < productFiles.length; i++) {
       const f = productFiles[i];
-      const url = await uploadToS3AndGetUrl(
-        f,
-        `purchases/${id}-product-${i + 1}`
-      );
+      const url = await uploadToS3AndGetUrl(f, `purchases/${id}-product-${i + 1}`);
       productPhotoUrls.push(url);
     }
 
-    // upload invoice photos (if any)
     for (let i = 0; i < invoiceFiles.length; i++) {
       const f = invoiceFiles[i];
-      const url = await uploadToS3AndGetUrl(
-        f,
-        `purchases/${id}-invoice-${i + 1}`
-      );
+      const url = await uploadToS3AndGetUrl(f, `purchases/${id}-invoice-${i + 1}`);
       invoicePhotoUrls.push(url);
     }
 
@@ -371,8 +371,8 @@ app.post('/admin/upload-purchase', requireLogin('admin'), async (req, res) => {
       date,
       supplier: supplier.trim(),
       purchaseIds: purchaseIds || '',
-      invoicePhotoUrls,   // array of strings
-      productPhotoUrls,   // array of strings
+      invoicePhotoUrls,
+      productPhotoUrls,
       totalPurchase: totalPurchase || '',
       returnInfo: returnInfo || '',
     };
@@ -548,6 +548,7 @@ app.get('/admin-gallery', requireLogin('admin'), async (req, res) => {
       const persons = Object.keys(personsMeta).map((personName) => {
         const datesMeta = personsMeta[personName];
         const dates = Object.keys(datesMeta)
+          .sort(sortDateKeysDesc) // <-- LATEST FIRST
           .map((dateName) => {
             const files = datesMeta[dateName].map((f) => ({
               src: f.url,
@@ -574,6 +575,7 @@ app.get('/admin-other-gallery', requireLogin('admin'), async (req, res) => {
       const persons = Object.keys(personsMeta).map((personName) => {
         const datesMeta = personsMeta[personName];
         const dates = Object.keys(datesMeta)
+          .sort(sortDateKeysDesc) // <-- LATEST FIRST
           .map((dateName) => {
             const files = datesMeta[dateName]
               .filter((f) => f.galleryType === 'other')
@@ -602,6 +604,7 @@ app.get('/admin-other2-gallery', requireLogin('admin'), async (req, res) => {
       const persons = Object.keys(personsMeta).map((personName) => {
         const datesMeta = personsMeta[personName];
         const dates = Object.keys(datesMeta)
+          .sort(sortDateKeysDesc) // <-- LATEST FIRST
           .map((dateName) => {
             const files = datesMeta[dateName]
               .filter((f) => f.galleryType === 'other2')
@@ -630,6 +633,7 @@ app.get('/admin-sales-gallery', requireLogin('admin'), async (req, res) => {
       const persons = Object.keys(personsMeta).map((personName) => {
         const datesMeta = personsMeta[personName];
         const dates = Object.keys(datesMeta)
+          .sort(sortDateKeysDesc) // <-- LATEST FIRST
           .map((dateName) => {
             const files = datesMeta[dateName]
               .filter((f) => f.galleryType === 'sales')
@@ -661,6 +665,7 @@ app.get('/gallery', requireLogin('boss'), async (req, res) => {
       const persons = Object.keys(personsMeta).map((personName) => {
         const datesMeta = personsMeta[personName];
         const dates = Object.keys(datesMeta)
+          .sort(sortDateKeysDesc) // <-- LATEST FIRST
           .map((dateName) => {
             const files = datesMeta[dateName]
               .filter((f) => !f.galleryType || f.galleryType === 'main')
@@ -689,6 +694,7 @@ app.get('/other-gallery', requireLogin('boss'), async (req, res) => {
       const persons = Object.keys(personsMeta).map((personName) => {
         const datesMeta = personsMeta[personName];
         const dates = Object.keys(datesMeta)
+          .sort(sortDateKeysDesc) // <-- LATEST FIRST
           .map((dateName) => {
             const files = datesMeta[dateName]
               .filter((f) => f.galleryType === 'other')
@@ -717,6 +723,7 @@ app.get('/other-gallery-2', requireLogin('boss'), async (req, res) => {
       const persons = Object.keys(personsMeta).map((personName) => {
         const datesMeta = personsMeta[personName];
         const dates = Object.keys(datesMeta)
+          .sort(sortDateKeysDesc) // <-- LATEST FIRST
           .map((dateName) => {
             const files = datesMeta[dateName]
               .filter((f) => f.galleryType === 'other2')
@@ -745,6 +752,7 @@ app.get('/sales-gallery', requireLogin('boss'), async (req, res) => {
       const persons = Object.keys(personsMeta).map((personName) => {
         const datesMeta = personsMeta[personName];
         const dates = Object.keys(datesMeta)
+          .sort(sortDateKeysDesc) // <-- LATEST FIRST
           .map((dateName) => {
             const files = datesMeta[dateName]
               .filter((f) => f.galleryType === 'sales')
@@ -763,11 +771,11 @@ app.get('/sales-gallery', requireLogin('boss'), async (req, res) => {
   res.render('gallery', { brands, isAdmin: false, galleryTitle: 'Sales Gallery' });
 });
 
-// Stock Purchase page (boss + admin)
+// Stock Purchase page (boss + admin)  (LATEST FIRST)
 app.get('/purchases', requireLogin(), async (req, res) => {
   const purchasesMeta = await getPurchasesMetadata();
   const purchases = Object.values(purchasesMeta).sort((a, b) =>
-    a.date.localeCompare(b.date)
+    (b.date || '').localeCompare(a.date || '')
   );
   res.render('purchases', { purchases });
 });
@@ -804,7 +812,6 @@ app.post('/admin/delete-purchase', requireLogin('admin'), async (req, res) => {
   const purchasesMeta = await getPurchasesMetadata();
   const purchase = purchasesMeta[id];
 
-  // Optional: delete first product photo from S3 (old behaviour)
   if (purchase && purchase.productPhotoUrls && purchase.productPhotoUrls.length) {
     const firstUrl = purchase.productPhotoUrls[0];
     const split = firstUrl.split('.amazonaws.com/');
