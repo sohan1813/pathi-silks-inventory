@@ -260,11 +260,11 @@ button {
   letter-spacing: 0.06em;
 }
 
-/* Modern photo grid */
+/* Modern photo grid (BIGGER + premium) */
 .photos {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
 }
 
 /* ---------- Photo cards (UPDATED like nav card style) ---------- */
@@ -283,7 +283,7 @@ button {
 
 .photo-card img {
   width: 100%;
-  height: 210px; /* bigger */
+  height: 320px; /* bigger */
   object-fit: cover;
   display: block;
   transform: scale(1);
@@ -841,13 +841,13 @@ body.blue-mode {
   }
 
   .photos {
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
   }
 
   /* mobile photo card size */
   .photo-card img {
-    height: 170px;
+    height: 220px;
   }
 
   .photo-filename {
