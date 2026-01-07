@@ -871,3 +871,16 @@ body.blue-mode {
     max-width: 100%;
   }
 }
+
+/* =========================================================
+   FIX: Admin rename/delete should be clickable
+   Because .photo-card-inner has pointer-events: none
+   ========================================================= */
+.photo-actions,
+.photo-actions *,
+.rename-form,
+.rename-form *,
+.delete-form,
+.delete-form * {
+  pointer-events: auto;
+}
