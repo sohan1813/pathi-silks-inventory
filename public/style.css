@@ -291,7 +291,7 @@ button {
   transition: transform 0.35s ease;
 }
 
-/* UPDATED: nav-style bottom black fade (no big overlay panel) */
+/* nav-style bottom black fade (click-through so lightbox works) */
 .photo-card-inner {
   position: absolute;
   inset: 0;
@@ -304,6 +304,9 @@ button {
     rgba(0, 0, 0, 0.35) 35%,
     rgba(0, 0, 0, 0.00) 70%
   );
+
+  /* FIX: don't block clicks on the image/lightbox */
+  pointer-events: none;
 }
 
 .photo-filename {
@@ -318,6 +321,9 @@ button {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+
+  /* still allow click-through */
+  pointer-events: none;
 }
 
 /* Hover effect */
