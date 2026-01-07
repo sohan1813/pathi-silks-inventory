@@ -1,19 +1,26 @@
 {
   "name": "Pathi Silks Inventory",
   "short_name": "Pathi Silks",
-  "start_url": "/login",
+  "start_url": "/",
   "display": "standalone",
-  "background_color": "#faf7f5",
+  "background_color": "#ffffff",
   "theme_color": "#201a2c",
   "icons": [
     {
-      "src": "/public/icon-192.png",
+      "src": "/public/pathi-logo-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/public/icon-512.png",
+      "src": "/public/pathi-logo-512.png",
       "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "splash_screens": [
+    {
+      "src": "https://pathi-silks-inventory-images.s3.ap-southeast-2.amazonaws.com/public/splash-android.png",
+      "sizes": "1280x1920",
       "type": "image/png"
     }
   ]
