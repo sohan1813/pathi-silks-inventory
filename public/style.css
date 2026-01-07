@@ -281,6 +281,20 @@ button {
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
+/* NEW: black base shadow under card (like your nav cards area) */
+.photo-card::before {
+  content: "";
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: -12px;
+  height: 28px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.55);
+  filter: blur(12px);
+  z-index: -1;
+}
+
 .photo-card img {
   width: 100%;
   height: 320px; /* match nav-card height */
@@ -291,22 +305,18 @@ button {
   transition: transform 0.35s ease;
 }
 
-/* filename overlay (match nav overlay effect) */
+/* UPDATED: no big overlay gradient, small glass label only */
 .photo-card-inner {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 18px 18px 16px;
-  background: linear-gradient(
-    to top,
-    rgba(0, 0, 0, 0.82) 0%,
-    rgba(0, 0, 0, 0.45) 28%,
-    rgba(0, 0, 0, 0.12) 52%,
-    rgba(0, 0, 0, 0) 70%
-  );
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(8px);
   display: flex;
-  align-items: flex-end;
+  align-items: center;
 }
 
 .photo-filename {
@@ -845,9 +855,15 @@ body.blue-mode {
     gap: 12px;
   }
 
-  /* mobile photo card size */
   .photo-card img {
     height: 290px;
+  }
+
+  .photo-card-inner {
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    padding: 7px 9px;
   }
 
   .photo-filename {
