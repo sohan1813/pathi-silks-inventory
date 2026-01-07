@@ -281,20 +281,6 @@ button {
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
-/* NEW: black base shadow under card (like your nav cards area) */
-.photo-card::before {
-  content: "";
-  position: absolute;
-  left: 14px;
-  right: 14px;
-  bottom: -12px;
-  height: 28px;
-  border-radius: 999px;
-  background: rgba(0, 0, 0, 0.55);
-  filter: blur(12px);
-  z-index: -1;
-}
-
 .photo-card img {
   width: 100%;
   height: 320px; /* match nav-card height */
@@ -305,30 +291,33 @@ button {
   transition: transform 0.35s ease;
 }
 
-/* UPDATED: no big overlay gradient, small glass label only */
+/* UPDATED: nav-style bottom black fade (no big overlay panel) */
 .photo-card-inner {
   position: absolute;
-  left: 12px;
-  right: 12px;
-  bottom: 12px;
-  padding: 8px 10px;
-  border-radius: 12px;
-  background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(8px);
+  inset: 0;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
+  padding: 12px 14px;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.70) 0%,
+    rgba(0, 0, 0, 0.35) 35%,
+    rgba(0, 0, 0, 0.00) 70%
+  );
 }
 
 .photo-filename {
   font-size: 11px;
   color: #f9fafb;
   font-weight: 600;
-  width: 100%;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(6px);
+  max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  line-height: 1.3;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.75);
 }
 
 /* Hover effect */
@@ -860,10 +849,7 @@ body.blue-mode {
   }
 
   .photo-card-inner {
-    left: 10px;
-    right: 10px;
-    bottom: 10px;
-    padding: 7px 9px;
+    padding: 10px 12px;
   }
 
   .photo-filename {
