@@ -6,6 +6,13 @@
 
   <!-- keep /public because server mounts static at /public -->
   <link rel="stylesheet" href="/public/style.css" />
+
+  <!-- Favicons (optional but good branding) -->
+  <link rel="icon" href="/public/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" href="/public/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="/public/favicon-16x16.png" sizes="16x16">
+  <link rel="apple-touch-icon" href="/public/apple-touch-icon.png">
+
   <link rel="manifest" href="/public/manifest.webmanifest" />
   <meta name="theme-color" content="#201a2c" />
 </head>
@@ -22,12 +29,10 @@
           <img src="/public/pathi-logo.jpg" alt="Pathi Silks logo" class="header-logo">
           <div class="header-title">Pathi Silks Inventory</div>
         </div>
+
         <nav>
           <% if (!isAdmin) { %>
-            <a href="/gallery">📸 Main Gallery</a>
-            <a href="/other-gallery">🗂️ Other Albums</a>
-            <a href="/sales-gallery">💰 Sales</a>
-            <a href="/sheets">📊 Sheets</a>
+            <!-- Removed 4 links (Main/Other/Sales/Sheets). Only keep what is not in cards -->
             <a href="/purchases">📦 Stock Purchase</a>
           <% } %>
 
