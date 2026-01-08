@@ -723,6 +723,47 @@ body.blue-mode .search-bar input {
   border-color: #4b5563;
 }
 
+/* ✅ NEW: Auth/login theme fixes (so "Login" title is visible) */
+body.dark-mode .auth-card,
+body.brown-mode .auth-card,
+body.blue-mode .auth-card {
+  background: rgba(2, 6, 23, 0.92);
+  border-color: rgba(148, 163, 184, 0.25);
+  box-shadow: 0 20px 55px rgba(0, 0, 0, 0.55);
+}
+
+body.dark-mode .auth-card h2,
+body.brown-mode .auth-card h2,
+body.blue-mode .auth-card h2 {
+  color: #f9fafb;
+}
+
+body.dark-mode .auth-card label,
+body.brown-mode .auth-card label,
+body.blue-mode .auth-card label {
+  color: rgba(229, 231, 235, 0.9);
+}
+
+body.dark-mode .auth-card input,
+body.brown-mode .auth-card input,
+body.blue-mode .auth-card input {
+  background: rgba(15, 23, 42, 0.75);
+  color: #f9fafb;
+  border-color: rgba(75, 85, 99, 0.9);
+}
+
+body.dark-mode .auth-card input::placeholder,
+body.brown-mode .auth-card input::placeholder,
+body.blue-mode .auth-card input::placeholder {
+  color: rgba(229, 231, 235, 0.55);
+}
+
+body.dark-mode .auth-hint,
+body.brown-mode .auth-hint,
+body.blue-mode .auth-hint {
+  color: rgba(229, 231, 235, 0.65);
+}
+
 /* Individual backgrounds */
 
 /* Dark (purple) */
