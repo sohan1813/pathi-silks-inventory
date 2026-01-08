@@ -9,6 +9,9 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentIndex = -1;
 
   function openAt(index) {
+    // NEW: disable lightbox while selecting
+    if (document.body.classList.contains('select-mode')) return;
+
     if (index < 0 || index >= thumbs.length) return;
     currentIndex = index;
     const img = thumbs[currentIndex];
@@ -37,7 +40,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Click on thumbnails
   thumbs.forEach((img, index) => {
-    img.addEventListener('click', () => openAt(index));
+    img.addEventListener('click', () => {
+      // NEW: disable lightbox while selecting
+      if (document.body.classList.contains('select-mode')) return;
+      openAt(index);
+    });
   });
 
   // Buttons
