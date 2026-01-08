@@ -19,10 +19,7 @@
         </div>
         <nav>
           <% if (!isAdmin) { %>
-            <a href="/gallery">📸 Main Gallery</a>
-            <a href="/other-gallery">🗂️ Other Albums</a>
-            <a href="/sales-gallery">💰 Sales</a>
-            <a href="/sheets">📊 Sheets</a>
+            <!-- Removed 4 links (Main/Other/Sales/Sheets). Use nav cards instead -->
             <a href="/purchases">📦 Stock Purchase</a>
           <% } %>
 
@@ -423,7 +420,7 @@
 
             // Remove photo card from UI
             const card = form.closest('.photo-card');
-            if (card) card.remove(); // [web:269]
+            if (card) card.remove(); // [web:590]
           } catch (err) {
             alert(err.message || 'Delete failed');
             if (btn) {
