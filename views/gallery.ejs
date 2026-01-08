@@ -519,7 +519,6 @@
       });
 
       async function getSelectedFiles() {
-        // convert selected URLs -> File[] for Web Share API [web:621][web:637]
         const urls = Array.from(selected);
         const files = [];
 
@@ -538,20 +537,36 @@
 
       btnCancel?.addEventListener('click', () => setSelectMode(false));
 
+      // ✅ UPDATED: Download using fetch -> blob -> objectURL (reliable)
       btnDownload?.addEventListener('click', async () => {
-        const urls = Array.from(selected);
-        for (let i = 0; i < urls.length; i++) {
-          const url = urls[i];
-          const card = cards.find(c => c.dataset.src === url);
-          const filename = (card && card.dataset.name) ? card.dataset.name : `image-${i + 1}.jpg`;
+        try {
+          const urls = Array.from(selected);
 
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = filename; // triggers download when allowed [web:626]
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-          await new Promise(r => setTimeout(r, 180));
+          for (let i = 0; i < urls.length; i++) {
+            const url = urls[i];
+            const card = cards.find(c => c.dataset.src === url);
+            const filename = (card && card.dataset.name) ? card.dataset.name : `image-${i + 1}.jpg`;
+
+            const res = await fetch(url, { cache: 'no-store' });
+            if (!res.ok) throw new Error(`Download failed (${res.status})`);
+
+            const blob = await res.blob();
+            const blobUrl = URL.createObjectURL(blob); // [web:728]
+
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+
+            // wait a bit before revoking to avoid Chrome issues [web:721]
+            setTimeout(() => URL.revokeObjectURL(blobUrl), 2000); // [web:723]
+
+            await new Promise(r => setTimeout(r, 250));
+          }
+        } catch (err) {
+          alert(err?.message || 'Download failed');
         }
       });
 
@@ -560,7 +575,6 @@
           const files = await getSelectedFiles();
           const shareData = { files, title: 'Pathi Silks', text: `Photos (${files.length})` };
 
-          // Web Share API feature detection for files [web:636][web:621]
           if (navigator.canShare && navigator.canShare({ files })) {
             await navigator.share(shareData);
           } else {
@@ -571,12 +585,10 @@
         }
       });
 
-      // Optional: ESC exits select mode (desktop)
       window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && selectMode) setSelectMode(false);
       });
 
-      // start hidden
       setSelectMode(false);
     });
   </script>
