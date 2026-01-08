@@ -6,6 +6,93 @@
   <link rel="stylesheet" href="/public/style.css" />
   <link rel="manifest" href="/public/manifest.webmanifest" />
   <meta name="theme-color" content="#201a2c" />
+
+  <!-- Multi-select toolbar styles (boss only) -->
+  <style>
+    .select-toolbar {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 16px;
+      z-index: 10050;
+      display: none;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.78);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.18);
+      box-shadow: 0 18px 45px rgba(0,0,0,0.45);
+      backdrop-filter: blur(10px);
+    }
+    .select-toolbar.show { display: flex; }
+
+    .select-toolbar .count {
+      font-size: 13px;
+      font-weight: 600;
+      padding: 0 6px;
+      opacity: 0.95;
+      white-space: nowrap;
+    }
+
+    .select-toolbar button {
+      border: 1px solid rgba(255,255,255,0.25);
+      background: rgba(255,255,255,0.10);
+      color: #fff;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .select-toolbar button:hover { background: rgba(255,255,255,0.16); }
+
+    .select-toolbar button.primary {
+      background: linear-gradient(90deg, #7c3aed, #ec4899);
+      border: none;
+      box-shadow: 0 10px 26px rgba(236, 72, 153, 0.30);
+    }
+
+    /* Selected visual */
+    .photo-card.is-selected {
+      outline: 4px solid rgba(236, 72, 153, 0.9);
+      outline-offset: 0px;
+    }
+    .photo-card .select-badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      font-size: 14px;
+      font-weight: 800;
+      color: #fff;
+      background: rgba(0,0,0,0.45);
+      border: 1px solid rgba(255,255,255,0.35);
+      backdrop-filter: blur(10px);
+      z-index: 5;
+      opacity: 0;
+      transform: scale(0.92);
+      transition: opacity .15s ease, transform .15s ease;
+      pointer-events: none;
+    }
+    .photo-card.is-selected .select-badge {
+      opacity: 1;
+      transform: scale(1);
+      background: rgba(236,72,153,0.85);
+      border-color: rgba(255,255,255,0.6);
+    }
+
+    /* Disable long-press callout/selection while selecting */
+    body.select-mode {
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+  </style>
 </head>
 <body>
   <% if (typeof isAdmin === 'undefined') { isAdmin = false; } %>
@@ -153,7 +240,14 @@
                         <h4><%= date.name %></h4>
                         <div class="photos">
                           <% date.files.forEach(function (file) { %>
-                            <div class="photo-card">
+                            <!-- Added data-src + data-name + badge (boss selection) -->
+                            <div class="photo-card"
+                                 data-src="<%= file.src %>"
+                                 data-name="<%= file.name %>">
+                              <% if (!isAdmin) { %>
+                                <div class="select-badge">✓</div>
+                              <% } %>
+
                               <img src="<%= file.src %>" alt="<%= file.name %>" class="lb-img" />
                               <div class="photo-card-inner">
                                 <div class="photo-filename"><%= file.name %></div>
@@ -214,6 +308,16 @@
       </div>
     </div>
   </div>
+
+  <!-- Boss multi-select toolbar -->
+  <% if (!isAdmin) { %>
+    <div id="selectToolbar" class="select-toolbar">
+      <div id="selectCount" class="count">0 selected</div>
+      <button id="btnShare" class="primary" type="button">Share</button>
+      <button id="btnDownload" type="button">Download</button>
+      <button id="btnCancel" type="button">Cancel</button>
+    </div>
+  <% } %>
 
   <script src="/public/lightbox.js"></script>
 
@@ -329,6 +433,155 @@
     });
   </script>
 
+  <!-- Boss: multi-select + share/download -->
+  <% if (!isAdmin) { %>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const cards = Array.from(document.querySelectorAll('.photo-card'));
+      const toolbar = document.getElementById('selectToolbar');
+      const countEl = document.getElementById('selectCount');
+      const btnShare = document.getElementById('btnShare');
+      const btnDownload = document.getElementById('btnDownload');
+      const btnCancel = document.getElementById('btnCancel');
+
+      let selectMode = false;
+      const selected = new Set();
+
+      function setSelectMode(on) {
+        selectMode = on;
+        document.body.classList.toggle('select-mode', on);
+        if (!toolbar) return;
+        toolbar.classList.toggle('show', on);
+        if (!on) {
+          selected.clear();
+          cards.forEach(c => c.classList.remove('is-selected'));
+        }
+        updateCount();
+      }
+
+      function updateCount() {
+        if (!countEl) return;
+        countEl.textContent = `${selected.size} selected`;
+        if (btnShare) btnShare.disabled = selected.size === 0;
+        if (btnDownload) btnDownload.disabled = selected.size === 0;
+      }
+
+      function toggleCard(card) {
+        const key = card.dataset.src;
+        if (!key) return;
+
+        if (selected.has(key)) {
+          selected.delete(key);
+          card.classList.remove('is-selected');
+        } else {
+          selected.add(key);
+          card.classList.add('is-selected');
+        }
+        updateCount();
+      }
+
+      // Long press detection (mouse + touch) [web:627]
+      let pressTimer = null;
+      let longPressed = false;
+
+      function startPress(card, e) {
+        longPressed = false;
+        clearTimeout(pressTimer);
+        pressTimer = setTimeout(() => {
+          longPressed = true;
+          if (!selectMode) setSelectMode(true);
+          toggleCard(card);
+        }, 600);
+      }
+      function cancelPress() {
+        clearTimeout(pressTimer);
+        pressTimer = null;
+      }
+
+      cards.forEach((card) => {
+        // mouse
+        card.addEventListener('mousedown', (e) => startPress(card, e));
+        card.addEventListener('mouseup', cancelPress);
+        card.addEventListener('mouseleave', cancelPress);
+
+        // touch
+        card.addEventListener('touchstart', (e) => startPress(card, e), { passive: true });
+        card.addEventListener('touchend', cancelPress);
+        card.addEventListener('touchcancel', cancelPress);
+
+        // click behavior: if selecting -> toggle, else allow normal (lightbox)
+        card.addEventListener('click', (e) => {
+          if (!selectMode) return; // let lightbox.js handle normal clicks
+          e.preventDefault();
+          e.stopPropagation();
+          toggleCard(card);
+        });
+      });
+
+      async function getSelectedFiles() {
+        // convert selected URLs -> File[] for Web Share API [web:621][web:637]
+        const urls = Array.from(selected);
+        const files = [];
+
+        for (let i = 0; i < urls.length; i++) {
+          const url = urls[i];
+          const card = cards.find(c => c.dataset.src === url);
+          const name = (card && card.dataset.name) ? card.dataset.name : `image-${i + 1}.jpg`;
+
+          const res = await fetch(url, { cache: 'no-store' });
+          const blob = await res.blob();
+          const type = blob.type || 'image/jpeg';
+          files.push(new File([blob], name, { type }));
+        }
+        return files;
+      }
+
+      btnCancel?.addEventListener('click', () => setSelectMode(false));
+
+      btnDownload?.addEventListener('click', async () => {
+        const urls = Array.from(selected);
+        for (let i = 0; i < urls.length; i++) {
+          const url = urls[i];
+          const card = cards.find(c => c.dataset.src === url);
+          const filename = (card && card.dataset.name) ? card.dataset.name : `image-${i + 1}.jpg`;
+
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename; // triggers download when allowed [web:626]
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          await new Promise(r => setTimeout(r, 180));
+        }
+      });
+
+      btnShare?.addEventListener('click', async () => {
+        try {
+          const files = await getSelectedFiles();
+          const shareData = { files, title: 'Pathi Silks', text: `Photos (${files.length})` };
+
+          // Web Share API feature detection for files [web:636][web:621]
+          if (navigator.canShare && navigator.canShare({ files })) {
+            await navigator.share(shareData);
+          } else {
+            alert("Sharing files not supported on this device/browser. Use Download instead.");
+          }
+        } catch (err) {
+          alert(err?.message || 'Share failed');
+        }
+      });
+
+      // Optional: ESC exits select mode (desktop)
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && selectMode) setSelectMode(false);
+      });
+
+      // start hidden
+      setSelectMode(false);
+    });
+  </script>
+  <% } %>
+
   <!-- Rename without page reload -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -336,7 +589,7 @@
 
       renameForms.forEach((form) => {
         form.addEventListener('submit', async (e) => {
-          e.preventDefault(); // stop normal form submit (no reload) [web:219]
+          e.preventDefault();
 
           const btn = form.querySelector('button.rename-btn');
           const input = form.querySelector('input[name="newfilename"]');
@@ -349,7 +602,7 @@
           }
 
           try {
-            const fd = new FormData(form); // build form payload [web:192]
+            const fd = new FormData(form);
 
             const res = await fetch(form.action, {
               method: 'POST',
@@ -360,18 +613,15 @@
             const data = await res.json();
             if (!data.ok) throw new Error(data.error || 'Rename failed');
 
-            // Update visible filename
             const card = form.closest('.photo-card');
             if (card) {
               const nameEl = card.querySelector('.photo-filename');
               if (nameEl) nameEl.textContent = data.newfilename;
             }
 
-            // IMPORTANT: update hidden oldfilename so the next rename works without reload
             if (oldHidden) oldHidden.value = data.newfilename;
             form.dataset.oldfilename = data.newfilename;
 
-            // Clear input for faster next rename
             if (input) input.value = '';
             if (input) input.focus();
           } catch (err) {
@@ -394,9 +644,9 @@
 
       deleteForms.forEach((form) => {
         form.addEventListener('submit', async (e) => {
-          e.preventDefault(); // stop normal form submit (no reload) [web:219]
+          e.preventDefault();
 
-          if (!confirm('Delete this photo?')) return; // confirm dialog [web:276]
+          if (!confirm('Delete this photo?')) return;
 
           const btn = form.querySelector('button.delete-btn');
           const prevText = btn ? btn.textContent : '';
@@ -407,7 +657,7 @@
           }
 
           try {
-            const fd = new FormData(form); // build payload [web:192]
+            const fd = new FormData(form);
 
             const res = await fetch(form.action, {
               method: 'POST',
@@ -418,9 +668,8 @@
             const data = await res.json();
             if (!data.ok) throw new Error(data.error || 'Delete failed');
 
-            // Remove photo card from UI
             const card = form.closest('.photo-card');
-            if (card) card.remove(); // [web:590]
+            if (card) card.remove();
           } catch (err) {
             alert(err.message || 'Delete failed');
             if (btn) {
