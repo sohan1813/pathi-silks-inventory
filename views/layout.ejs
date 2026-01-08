@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <title>Pathi Silks Inventory</title>
-  <link rel="stylesheet" href="/public/style.css" />
-  <link rel="manifest" href="/public/manifest.webmanifest" />
+
+  <!-- FIX: don't use /public/ in URLs -->
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="manifest" href="/manifest.webmanifest" />
   <meta name="theme-color" content="#201a2c" />
 </head>
 <body>
@@ -17,7 +19,8 @@
     <div class="page-inner">
       <header>
         <div class="header-left">
-          <img src="/public/pathi-logo.jpg" alt="Pathi Silks logo" class="header-logo">
+          <!-- FIX: don't use /public/ -->
+          <img src="/pathi-logo.jpg" alt="Pathi Silks logo" class="header-logo">
           <div class="header-title">Pathi Silks Inventory</div>
         </div>
         <nav>
@@ -61,12 +64,14 @@
     </div>
   </div>
 
-  <script src="/public/lightbox.js"></script>
+  <!-- FIX: don't use /public/ -->
+  <script src="/lightbox.js"></script>
 
   <script>
     // Register service worker for PWA
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/public/sw.js');
+      // FIX: don't use /public/
+      navigator.serviceWorker.register('/sw.js');
     }
 
     // Custom install button handling
