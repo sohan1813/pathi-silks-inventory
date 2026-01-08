@@ -3,25 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <title>Pathi Silks Inventory</title>
-  <link rel="stylesheet" href="/public/style.css" />
-  <link rel="manifest" href="/public/manifest.webmanifest" />
+
+  <!-- FIX: public/ is static root -->
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="manifest" href="/manifest.webmanifest" />
   <meta name="theme-color" content="#201a2c" />
 </head>
 <body>
   <% if (typeof isAdmin === 'undefined') { isAdmin = false; } %>
 
-  <!-- Background wrapper -->
   <div class="page">
     <div class="page-bg"></div>
 
     <div class="page-inner">
       <header>
         <div class="header-left">
-          <img src="/public/pathi-logo.jpg" alt="Pathi Silks logo" class="header-logo">
+          <img src="/pathi-logo.jpg" alt="Pathi Silks logo" class="header-logo">
           <div class="header-title">Pathi Silks Inventory</div>
         </div>
+
         <nav>
-          <!-- Boss links -->
           <% if (!isAdmin) { %>
             <a href="/gallery">📸 Main Gallery</a>
             <a href="/other-gallery">🗂️ Other Albums</a>
@@ -30,7 +31,6 @@
             <a href="/purchases">📦 Stock Purchase</a>
           <% } %>
 
-          <!-- Admin links -->
           <% if (isAdmin) { %>
             <a href="/admin-gallery">📸 Admin Gallery</a>
             <a href="/admin-main-gallery">📸 Admin Main</a>
@@ -49,7 +49,6 @@
         <%- typeof body === 'string' ? body : '' %>
       </main>
 
-      <!-- Image lightbox -->
       <div id="lightbox" class="lightbox">
         <span id="lightbox-close" class="lightbox-close">&times;</span>
         <span id="lightbox-prev" class="lightbox-arrow lightbox-prev">❮</span>
@@ -61,15 +60,14 @@
     </div>
   </div>
 
-  <script src="/public/lightbox.js"></script>
+  <!-- FIX: public/ is static root -->
+  <script src="/lightbox.js"></script>
 
   <script>
-    // Register service worker for PWA
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/public/sw.js');
+      navigator.serviceWorker.register('/sw.js');
     }
 
-    // Custom install button handling
     let deferredInstallPrompt = null;
     const installBtn = document.getElementById('installAppBtn');
 

@@ -1,22 +1,23 @@
 {
   "name": "Pathi Silks Inventory",
-  "short_name": "Pathi Silks", 
+  "short_name": "Pathi Silks",
   "start_url": "/login",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#faf7f5",
   "theme_color": "#201a2c",
   "icons": [
     {
-      "src": "/public/icon-192.png",
+      "src": "/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     },
     {
-      "src": "/public/icon-512.png", 
+      "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     }
   ]
 }
