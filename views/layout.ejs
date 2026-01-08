@@ -48,6 +48,9 @@
             <a href="/upload">⬆️ Upload</a>
           <% } %>
 
+          <!-- ✅ Theme toggle now global (shows on login also) -->
+          <button id="themeToggle" class="install-btn" type="button">🌙 Dark</button>
+
           <a href="/logout">🚪 Logout</a>
           <button id="installAppBtn" class="install-btn" style="display:none;">Install app</button>
         </nav>
@@ -70,6 +73,44 @@
   </div>
 
   <script src="/public/lightbox.js"></script>
+
+  <script>
+    // ✅ Global Theme toggle: light -> dark -> brown -> blue -> light (persist in localStorage)
+    (function () {
+      const themeBtn = document.getElementById('themeToggle');
+      const themes = ['light', 'dark', 'brown', 'blue'];
+      const labels = {
+        light: '🌙 Dark',
+        dark: '🤎 Brown',
+        brown: '💙 Blue',
+        blue: '☀️ Light',
+      };
+
+      function applyTheme(theme) {
+        document.body.classList.remove('dark-mode', 'brown-mode', 'blue-mode');
+
+        if (theme === 'dark') document.body.classList.add('dark-mode');
+        if (theme === 'brown') document.body.classList.add('brown-mode');
+        if (theme === 'blue') document.body.classList.add('blue-mode');
+
+        if (themeBtn) themeBtn.textContent = labels[theme] || '🌙 Dark';
+        localStorage.setItem('theme', theme);
+      }
+
+      let current = localStorage.getItem('theme') || 'light';
+      if (!themes.includes(current)) current = 'light';
+      applyTheme(current);
+
+      if (themeBtn) {
+        themeBtn.addEventListener('click', () => {
+          const idx = themes.indexOf(current);
+          const next = themes[(idx + 1) % themes.length];
+          current = next;
+          applyTheme(current);
+        });
+      }
+    })();
+  </script>
 
   <script>
     // Register service worker for PWA
