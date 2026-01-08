@@ -480,7 +480,7 @@
         updateCount();
       }
 
-      // Long press detection (mouse + touch) [web:627]
+      // Long press detection (mouse + touch)
       let pressTimer = null;
       let longPressed = false;
 
@@ -537,21 +537,30 @@
 
       btnCancel?.addEventListener('click', () => setSelectMode(false));
 
-      // ✅ UPDATED: Download using fetch -> blob -> objectURL (reliable)
+      // ✅ UPDATED: Download multiple files reliably (1 user gesture per file)
       btnDownload?.addEventListener('click', async () => {
         try {
           const urls = Array.from(selected);
+
+          if (urls.length === 0) return;
+
+          // optional: ask once before starting
+          const startOk = confirm(`Download ${urls.length} photos one by one?`);
+          if (!startOk) return;
 
           for (let i = 0; i < urls.length; i++) {
             const url = urls[i];
             const card = cards.find(c => c.dataset.src === url);
             const filename = (card && card.dataset.name) ? card.dataset.name : `image-${i + 1}.jpg`;
 
+            const ok = confirm(`Download ${i + 1}/${urls.length}\n${filename}`);
+            if (!ok) break;
+
             const res = await fetch(url, { cache: 'no-store' });
             if (!res.ok) throw new Error(`Download failed (${res.status})`);
 
             const blob = await res.blob();
-            const blobUrl = URL.createObjectURL(blob); // [web:728]
+            const blobUrl = URL.createObjectURL(blob);
 
             const a = document.createElement('a');
             a.href = blobUrl;
@@ -560,10 +569,7 @@
             a.click();
             a.remove();
 
-            // wait a bit before revoking to avoid Chrome issues [web:721]
-            setTimeout(() => URL.revokeObjectURL(blobUrl), 2000); // [web:723]
-
-            await new Promise(r => setTimeout(r, 250));
+            setTimeout(() => URL.revokeObjectURL(blobUrl), 2000);
           }
         } catch (err) {
           alert(err?.message || 'Download failed');
