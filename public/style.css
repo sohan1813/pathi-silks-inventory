@@ -925,3 +925,38 @@ body.blue-mode {
 .delete-form * {
   pointer-events: auto;
 }
+
+/* =========================================================
+   Scroll-to-top button (black, bottom edge)
+   ========================================================= */
+.scroll-top-btn {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  border: none;
+  background: #000000;
+  color: #ffffff;
+  font-size: 20px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 120;
+}
+
+.scroll-top-btn:hover {
+  transform: translateY(-2px);
+}
+
+.scroll-top-btn--show {
+  opacity: 1;
+  pointer-events: auto;
+}
