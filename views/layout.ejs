@@ -116,21 +116,33 @@
   </script>
 
   <script>
-    // ✅ Scroll-to-top behavior (show after scrolling + smooth scroll)
+    // ✅ Scroll-to-top behavior (more reliable: check actual document scroll position)
     (function () {
       const btn = document.getElementById('scrollTopBtn');
       if (!btn) return;
 
-      window.addEventListener('scroll', () => {
-        if (window.scrollY > 300) {
+      function getScrollTop() {
+        return window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+      }
+
+      function updateBtn() {
+        // show after small scroll (more forgiving)
+        if (getScrollTop() > 120) {
           btn.classList.add('scroll-top-btn--show');
         } else {
           btn.classList.remove('scroll-top-btn--show');
         }
-      });
+      }
+
+      // Run once on load (important)
+      updateBtn();
+
+      // Listen on both (some pages behave differently)
+      window.addEventListener('scroll', updateBtn, { passive: true });
+      document.addEventListener('scroll', updateBtn, { passive: true });
 
       btn.addEventListener('click', () => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({ top: 0, behavior: 'smooth' }); // supported by modern browsers
       });
     })();
   </script>
